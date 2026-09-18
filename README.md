@@ -6,12 +6,20 @@
 
 - `index.html` — 앱 진입점과 공통 레이아웃
 - `css/style.css` — 현재 레거시 통합 스타일. 새 기능은 영역별 파일 분리를 원칙으로 합니다.
-- `js/app.js` — 현재 레거시 통합 로직. 게임/커리큘럼별 모듈 분리를 진행합니다.
+- `css/home.css` — 하늘 모험 홈과 반응형 페이지
+- `js/app.js` — 홈·메뉴·기록·보호자 화면
+- `js/core.js` — 저장 호환과 게임 생명주기
+- `js/learning.js` — 커리큘럼·단계 지도·코딩 활동
+- `js/games.js` — 기존 6개 게임
 - `assets/` — 이미지/게임 에셋
 - `docs/ARCHITECTURE.md` — 구조와 유지보수 원칙
 - `docs/SECURITY.md` — 보안 기준
 - `docs/DEPLOYMENT.md` — 배포/인수인계 절차
 - `vercel.json` — 배포 보안 헤더
+
+`npm run dev`로 로컬 서버를 실행하고 `npm test`로 기본 검사를 실행합니다.
+이번 반영 범위와 미완성 기능은 `docs/RELEASE-2026-09-18.md`에 구분했습니다.
+현재는 전체 3D 플랫폼 완성본이 아니며, 후반 학습 문제에는 반복 템플릿이 포함되어 있습니다.
 
 ## 학습 영역
 

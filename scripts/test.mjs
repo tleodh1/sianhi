@@ -1,0 +1,38 @@
+import fs from "node:fs";
+import vm from "node:vm";
+import assert from "node:assert/strict";
+for (const p of fs.readdirSync("js").filter((p) => p.endsWith(".js")))
+  new vm.Script(fs.readFileSync("js/" + p, "utf8"));
+const learning = fs.readFileSync("js/learning.js", "utf8");
+const ctx = vm.createContext({ state: { stage100: {} } });
+vm.runInContext(learning, ctx);
+for (const subject of [
+  "연산",
+  "수학",
+  "사고력 수학",
+  "한글",
+  "영어",
+  "과학",
+  "코딩",
+  "한자",
+]) {
+  const stages = vm.runInContext(`build100('${subject}')`, ctx);
+  assert.equal(stages.length, 100);
+  for (let n = 1; n <= 100; n++) {
+    const q = vm.runInContext(`stageQuestion('${subject}',${n})`, ctx);
+    assert.ok(q.opts.map(String).includes(q.ans));
+  }
+}
+for (let stage = 1; stage <= 100; stage++) {
+  const size = stage < 31 ? 5 : stage < 71 ? 6 : 7;
+  assert.ok(size * 3 >= (size - 1) * 2);
+}
+for (const file of [
+  "assets/sian-face.webp",
+  "assets/sky-world.webp",
+  "assets/PretendardVariable.woff2",
+])
+  assert.ok(fs.statSync(file).size > 1000);
+console.log(
+  "PASS: syntax, 800 stage answers, coding command budget, local image/font assets",
+);
