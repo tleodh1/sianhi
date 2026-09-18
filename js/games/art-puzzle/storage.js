@@ -5,12 +5,7 @@
       ...old,
       version: 1,
       works: { ...(old.works || {}) },
-      unlocked: [
-        ...new Set([
-          ...(old.unlocked || []),
-          ...A.artworks.slice(0, 3).map((a) => a.id),
-        ]),
-      ],
+      unlocked: A.artworks.map((a) => a.id),
     };
     s.records.artPuzzle = r;
     return r;
@@ -46,9 +41,6 @@
       lastLevel: e.level,
     };
     s.stars += delta;
-    const count = Object.keys(r.works).length;
-    for (const a of A.artworks.slice(0, Math.min(12, 3 + count * 2)))
-      if (!r.unlocked.includes(a.id)) r.unlocked.push(a.id);
     return delta;
   };
 })(SianArt);

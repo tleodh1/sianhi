@@ -33,10 +33,10 @@ for (const key of ["level", "progress", "stage100", "collection"])
   assert.deepEqual(s[key], original[key]);
 for (const key of Object.keys(original.records))
   assert.deepEqual(s.records[key], original.records[key]);
-assert.equal(A.progress(s).unlocked.length, 5);
+assert.equal(A.progress(s).unlocked.length, 12);
 A.unlock(s, A.artworks[11].id);
 assert(A.progress(s).unlocked.includes(A.artworks[11].id));
 assert.equal(A.reward(s, A.artworks[1], new A.Engine()), 0);
 console.log(
-  "PASS capped repeat rewards, reload, optional unlock, legacy runner/claw/learning/level preservation",
+  "PASS capped repeat rewards, reload, all artworks open, legacy runner/claw/learning/level preservation",
 );

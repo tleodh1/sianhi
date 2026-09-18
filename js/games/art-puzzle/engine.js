@@ -2,6 +2,7 @@
   A.levels = [
     { id: "easy", name: "쉬움", cols: 3, rows: 2 },
     { id: "normal", name: "보통", cols: 3, rows: 3 },
+    { id: "medium", name: "한걸음", cols: 4, rows: 3 },
     { id: "hard", name: "어려움", cols: 4, rows: 4 },
     { id: "challenge", name: "도전", cols: 5, rows: 4 },
   ];

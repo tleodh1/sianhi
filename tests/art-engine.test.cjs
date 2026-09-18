@@ -43,5 +43,5 @@ assert.equal(
   -1,
 );
 console.log(
-  "PASS 12 sourced artworks, 4 difficulties/2 orientations, wrong placement, completion, hint cap, snap bounds",
+  "PASS 12 sourced artworks, 5 difficulties/2 orientations, wrong placement, completion, hint cap, snap bounds",
 );

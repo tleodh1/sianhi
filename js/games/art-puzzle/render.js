@@ -13,11 +13,14 @@
     );
   A.card = function (a, r, unlocked) {
     const rec = r?.works?.[a.id],
-      stars = rec?.bestStars || 0;
-    return `<button class="art-card ${unlocked ? "" : "art-locked"}" data-art="${a.id}"><span class="art-frame"><img src="${a.image}" loading="lazy" alt="${A.escape(a.title)}"></span><span class="art-card-copy"><strong>${A.escape(a.title)}</strong><small>${a.artist}</small><span class="art-card-status">${rec ? "✓ 완성 · " + "★".repeat(stars) : unlocked ? "열린 액자 · 시작하기" : "잠긴 액자 · 먼저 열어 보기"}</span></span></button>`;
+      stars = rec?.bestStars || 0,
+      records = Object.entries(rec?.levels || {}),
+      best = records.sort((a,b)=>(A.levels.findIndex(x=>x.id===b[0]))-(A.levels.findIndex(x=>x.id===a[0])))[0],
+      detail = best ? `${A.levels.find(x=>x.id===best[0])?.cols * A.levels.find(x=>x.id===best[0])?.rows}조각 · ${best[1].bestSeconds}초` : "자유 선택 · 시작하기";
+    return `<button class="art-card" data-art="${a.id}"><span class="art-frame"><img src="${a.image}" loading="lazy" alt="${A.escape(a.title)}"></span><span class="art-card-copy"><strong>${A.escape(a.title)}</strong><small>${a.artist}</small><span class="art-card-status">${rec ? "✓ " + "★".repeat(stars) + " · " + detail : detail}</span></span></button>`;
   };
   A.gallery = function (root, record, onSelect, onBook, scope) {
-    root.innerHTML = `<div class="art-heading"><div><small>SIANHi · LITTLE MUSEUM</small><h2>명화 갤러리</h2><p>조각을 모으면, 나만의 미술관이 열려요.</p></div><button data-book>▣ 나의 명화 도감 <b>${Object.keys(record?.works || {}).length}/12</b></button></div><div class="art-gallery">${A.artworks.map((a, i) => A.card(a, record, i < 3 || record?.unlocked?.includes(a.id))).join("")}</div><p class="art-note">마음에 드는 액자는 먼저 열어도 괜찮아요. 천천히, 시안이의 속도로.</p>`;
+    root.innerHTML = `<div class="art-heading"><div><small>SIANHi · LITTLE MUSEUM</small><h2>명화 갤러리</h2><p>마음에 드는 작품과 조각 수를 자유롭게 골라요.</p></div><button data-book>▣ 나의 명화 도감 <b>${Object.keys(record?.works || {}).length}/12</b></button></div><div class="art-gallery">${A.artworks.map((a) => A.card(a, record, true)).join("")}</div><p class="art-note">모든 기본 작품은 처음부터 열려 있어요.</p>`;
     root
       .querySelectorAll("[data-art]")
       .forEach((b) =>

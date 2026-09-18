@@ -22,17 +22,9 @@
     const detail = (art) => {
       const sc = screen(),
         r = A.progress(state),
-        open = r.unlocked.includes(art.id),
         rec = r.works[art.id];
-      root.innerHTML = `<div class="art-toolbar"><button data-back>← 갤러리</button></div><div class="art-detail"><div class="art-frame"><img src="${art.image}" alt="${A.escape(art.title)}"></div><h2>${art.title}</h2><small>${art.artist} · ${art.country} · ${art.year}</small><p>${art.story}</p>${open ? "" : '<p>아직 잠긴 액자예요. 마음에 들면 지금 먼저 열어 보세요!</p><button data-unlock class="art-primary">⌑ 이 액자 먼저 열기</button>'}<div class="art-levels">${A.levels.map((d, i) => `<button data-level="${d.id}" ${!open || (i > 0 && !rec) ? "disabled" : ""} class="${i === 0 ? "primary" : ""}"><b>${d.name}</b><span>${d.cols * d.rows}조각 ${rec?.levels?.[d.id] ? "· " + "★".repeat(rec.levels[d.id].stars) : ""}</span></button>`).join("")}</div>${!rec ? '<p class="art-note">6조각을 완성하면 더 많은 조각에 도전할 수 있어요.</p>' : ""}<a class="art-source" href="${art.source}" target="_blank" rel="noopener">시카고 미술관 작품 정보 · Public Domain</a><br><a class="art-source" href="${art.imageSource}" target="_blank" rel="noopener">이미지 출처 · Wikimedia Commons · ${art.imageLicense}</a><small>${A.escape(art.originalTitle)}</small></div>`;
+      root.innerHTML = `<div class="art-toolbar"><button data-back>← 갤러리</button></div><div class="art-detail"><div class="art-frame"><img src="${art.image}" alt="${A.escape(art.title)}"></div><h2>${art.title}</h2><small>${art.artist} · ${art.country} · ${art.year}</small><p>${art.story}</p><div class="art-levels">${A.levels.map((d, i) => `<button data-level="${d.id}" class="${i === 0 ? "primary" : ""}"><b>${d.name}</b><span>${d.cols * d.rows}조각 ${rec?.levels?.[d.id] ? "· " + "★".repeat(rec.levels[d.id].stars) : ""}</span></button>`).join("")}</div><p class="art-note">원하는 조각 수를 바로 골라도 괜찮아요.</p><a class="art-source" href="${art.source}" target="_blank" rel="noopener">시카고 미술관 작품 정보 · Public Domain</a><br><a class="art-source" href="${art.imageSource}" target="_blank" rel="noopener">이미지 출처 · Wikimedia Commons · ${art.imageLicense}</a><small>${A.escape(art.originalTitle)}</small></div>`;
       sc.on(root.querySelector("[data-back]"), "click", gallery);
-      const unlock = root.querySelector("[data-unlock]");
-      if (unlock)
-        sc.on(unlock, "click", () => {
-          A.unlock(state, art.id);
-          save();
-          detail(art);
-        });
       root.querySelectorAll("[data-level]").forEach((b) =>
         sc.on(b, "click", () => {
           const playScope = screen();
