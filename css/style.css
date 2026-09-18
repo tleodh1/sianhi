@@ -97,3 +97,14 @@ html,body,button,input,select,textarea,
 .modal,.modal *, .gameModal,.gameModal *{
  font-family:Pretendard,"Pretendard Variable","Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
 }
+
+/* 100-stage curriculum UI */
+.stageMap,.storyStage{padding:26px;max-width:900px;margin:auto;font-family:Pretendard,"Pretendard Variable",sans-serif}
+.stageMapHead,.stageTop{display:flex;align-items:center;justify-content:space-between;gap:18px}.stageMapHead h2{margin:3px 0;font-size:25px}.stageMapHead p{margin:0;color:#668}.stageMapHead>b,.stageTop>b{background:#edf7ff;padding:9px 14px;border-radius:16px}
+.mapClose,.backMap{border:0;background:#eef3f7;border-radius:13px;padding:10px 13px;font-weight:700}
+.zoneTabs{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:20px 0}.zoneTabs button{border:0;border-radius:12px;padding:9px;background:#eef3f7;font-weight:700}.zoneTabs button.on{background:#2588e8;color:white}
+.stageStory,.storyPanel{background:linear-gradient(135deg,#eefaff,#fff6df);border-radius:20px;padding:18px 20px;margin:14px 0;line-height:1.55}.storyPanel h2{margin:5px 0;font-size:25px}.storyPanel p{margin:5px 0}
+.stageNodes{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.stageNode{min-height:112px;border:0;border-radius:19px;background:#f0f5f8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;box-shadow:0 4px 10px #173b7914}.stageNode i{font-style:normal;width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:white;color:#247ed2;font-weight:800}.stageNode.current{background:#fff0b7;outline:3px solid #ffc72e}.stageNode.clear{background:#e6f8ec}.stageNode.locked{opacity:.42}.stageNode b{font-size:14px}.stageNode small{font-size:11px;color:#65727c}
+.questCard{background:white;border-radius:22px;padding:24px;margin-top:16px;box-shadow:0 8px 22px #173b7915}.questCard h3{font-size:22px;text-align:center}.questCard .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:620px;margin:18px auto}.questCard .choice{min-height:54px;border:2px solid #e1edf4;border-radius:15px;background:#f9fcff;font-size:16px;font-weight:700}.questCard .feedback{text-align:center;min-height:30px;font-weight:700;color:#168575}
+.mathSubject{background:linear-gradient(145deg,#5bb9d8,#3b91bc)!important}
+@media(max-width:650px){.stageNodes{grid-template-columns:repeat(2,1fr)}.zoneTabs{grid-template-columns:repeat(2,1fr)}.questCard .choices{grid-template-columns:1fr}}
