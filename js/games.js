@@ -126,65 +126,7 @@ function playBrick() {
   draw();
   raf = Session.frame(step);
 }
-function playMemory() {
-  const vals = [
-    "A",
-    "A",
-    "B",
-    "B",
-    "C",
-    "C",
-    "D",
-    "D",
-    "E",
-    "E",
-    "F",
-    "F",
-  ].sort(() => Math.random() - 0.5);
-  let first = null,
-    lock = false,
-    done = 0;
-  gameShell(
-    "🃏 영어 카드 뒤집기",
-    `<div class="memoryGrid">${vals.map((v, i) => `<button class="memoryCard" data-v="${v}"><span>?</span></button>`).join("")}</div><p class="gameStatus">같은 알파벳 두 장을 찾아봐!</p>`,
-  );
-  gameBody.querySelectorAll(".memoryCard").forEach(
-    (c) =>
-      (c.onclick = () => {
-        if (lock || c.classList.contains("matched") || c === first) return;
-        c.classList.add("open");
-        c.querySelector("span").textContent = c.dataset.v;
-        if (!first) {
-          first = c;
-          return;
-        }
-        if (first.dataset.v === c.dataset.v) {
-          first.classList.add("matched");
-          c.classList.add("matched");
-          first = null;
-          done += 2;
-          if (done === vals.length) {
-            gameBody.querySelector(".gameStatus").textContent =
-              "🎉 모든 알파벳 짝을 찾았어! ⭐";
-            state.stars++;
-            save();
-          }
-        } else {
-          lock = true;
-          let a = first;
-          first = null;
-          Session.timeout(() => {
-            a.classList.remove("open");
-            c.classList.remove("open");
-            a.querySelector("span").textContent = c.querySelector(
-              "span",
-            ).textContent = "?";
-            lock = false;
-          }, 650);
-        }
-      }),
-  );
-}
+function playMemory() { SianMemory.start(); }
 function playRunner() {
   HangulRunner.start();
 }

@@ -1,0 +1,30 @@
+window.SianMemory = window.SianMemory || {};
+SianMemory.catalog = [
+  ["starry","별콩이","A","Apple","사과","COMMON",0],
+  ["flame","불꼬리","B","Ball","공","RARE",1],
+  ["drop","방울이","C","Cat","고양이","COMMON",2],
+  ["cloud","몽실이","D","Dog","강아지","COMMON",3],
+  ["forest","새싹이","E","Egg","달걀","RARE",4],
+  ["spark","찌릿이","F","Fish","물고기","EPIC",5],
+  ["golem","돌콩이","G","Goat","염소","RARE",6],
+  ["ice","서리곰","H","Hat","모자","EPIC",7],
+  ["space","우주링","I","Ink","잉크","EPIC",8],
+  ["robot","로보링","J","Jam","잼","RARE",9],
+  ["jelly","말랑이","K","Kid","아이","COMMON",10],
+  ["dino","잎룡이","L","Lion","사자","RARE",11],
+  ["moth","달나비","M","Moon","달","EPIC",12],
+  ["bubble","보글이","N","Nest","둥지","RARE",13],
+  ["flower","해꽃이","O","Orange","오렌지","LEGENDARY",14],
+  ["wind","바람새","P","Pig","돼지","EPIC",15],
+  ["crab","사탕게","Q","Queen","여왕","RARE",16],
+  ["prism","보석벌","R","Robot","로봇","LEGENDARY",17],
+  ["mountain","쿨쿨산","S","Sun","해","EPIC",18],
+  ["comet","별여우","T","Top","팽이","LEGENDARY",19],
+].map(([id,name,letter,word,korean,rarity,index])=>({id,name,letter,word,korean,rarity,index}));
+SianMemory.levels = [
+  {id:1,label:"A ↔ a",kind:"case",help:"대문자와 소문자를 찾아요"},
+  {id:2,label:"A ↔ Apple",kind:"word",help:"알파벳과 시작 단어를 찾아요"},
+  {id:3,label:"단어 ↔ 친구",kind:"picture",help:"영어 단어와 몬스터 친구를 찾아요"},
+  {id:4,label:"소리 ↔ 글자",kind:"phonics",help:"소리와 알파벳을 연결해요"},
+  {id:5,label:"CVC 첫걸음",kind:"cvc",help:"짧은 단어와 그림을 연결해요"},
+];
