@@ -64,6 +64,9 @@ function notify(message) {
   n.hidden = false;
   setTimeout(() => (n.hidden = true), 4000);
 }
+function notice(message) {
+  notify(message);
+}
 const Session = {
   timers: new Set(),
   intervals: new Set(),
