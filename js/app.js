@@ -101,9 +101,33 @@ function playMemory(){
  gameBody.querySelectorAll('.memoryCard').forEach(c=>c.onclick=()=>{if(lock||c.classList.contains('matched')||c===first)return;c.classList.add('open');c.querySelector('span').textContent=c.dataset.v;if(!first){first=c;return}if(first.dataset.v===c.dataset.v){first.classList.add('matched');c.classList.add('matched');first=null;done+=2;if(done===vals.length){gameBody.querySelector('.gameStatus').textContent='🎉 모든 알파벳 짝을 찾았어! ⭐';state.stars++;save()}}else{lock=true;let a=first;first=null;setTimeout(()=>{a.classList.remove('open');c.classList.remove('open');a.querySelector('span').textContent=c.querySelector('span').textContent='?';lock=false},650)}})
 }
 function playRunner(){
- let score=0,x=8,jumping=false,items=['가','나','다','라','마'];
- gameShell('🏃 한글 달리기',`<div class="runnerScene"><div class="runnerKid">🏃</div>${items.map((v,i)=>`<span class="hangulCoin" style="left:${24+i*14}%">${v}</span>`).join('')}<div class="runnerGround"></div></div><p class="gameStatus">화살표로 달리고 점프로 글자를 모아요! 0 / 5</p>`,`<button data-m="L">◀</button><button data-m="J">⬆ 점프</button><button data-m="R">▶</button>`);
- const kid=gameBody.querySelector('.runnerKid'),msg=gameBody.querySelector('.gameStatus');function move(d){x=Math.max(3,Math.min(92,x+d));kid.style.left=x+'%';gameBody.querySelectorAll('.hangulCoin').forEach(c=>{if(!c.classList.contains('got')&&Math.abs(x-parseFloat(c.style.left))<6){c.classList.add('got');score++;msg.textContent='글자를 모아요! '+score+' / 5';if(score===5){msg.textContent='🎉 가나다라마를 모두 모았어! ⭐';state.stars++;save()}}})}gameBody.querySelector('[data-m="L"]').onclick=()=>move(-8);gameBody.querySelector('[data-m="R"]').onclick=()=>move(8);gameBody.querySelector('[data-m="J"]').onclick=()=>{if(jumping)return;jumping=true;kid.classList.add('jump');setTimeout(()=>{kid.classList.remove('jump');jumping=false},500)};move(0)
+ const rounds=[
+  {name:'가나다 길',items:['가','나','다','라','마','바','사','아','자','차','카','타','파','하']},
+  {name:'받침 숲',items:['산','달','별','문','집','꽃','눈','밤','공','책']},
+  {name:'낱말 마을',items:['가방','나무','다리','라면','마음','바다','사과','아기','자동차','차표']},
+  {name:'문장 길',items:['나는','오늘','학교에','가서','친구와','신나게','공부를','했어요']}
+ ];
+ let round=0,score=0,x=7,jumping=false,finished=false,keyHandler;
+ gameShell('🏃 한글 달리기',
+ '<div class="runnerHud"><b>STAGE <span id="runStage">1</span>/4</b><b><span id="runName">가나다 길</span></b><b>모은 글자 <span id="runScore">0</span></b></div><div class="runnerScene longRunner"><div class="runnerKid facingRight">🏃‍➡️</div><div class="runnerItems"></div><div class="runnerObstacle" style="left:38%">🪵</div><div class="runnerObstacle" style="left:69%">🪨</div><div class="runnerGround"></div></div><div class="wordTrail"></div><p class="gameStatus">→로 달리고 ↑ 또는 Space로 점프해서 글자를 모아요!</p>',
+ '<button data-m="L">◀</button><button data-m="J">⬆ 점프</button><button data-m="R">▶</button>');
+ const scene=gameBody.querySelector('.runnerScene'),kid=gameBody.querySelector('.runnerKid'),itemsEl=gameBody.querySelector('.runnerItems'),msg=gameBody.querySelector('.gameStatus'),trail=gameBody.querySelector('.wordTrail');
+ function loadRound(){
+  finished=false;x=7;score=0;kid.style.left=x+'%';gameBody.querySelector('#runStage').textContent=round+1;gameBody.querySelector('#runName').textContent=rounds[round].name;gameBody.querySelector('#runScore').textContent=0;trail.innerHTML='';
+  const arr=rounds[round].items;itemsEl.innerHTML=arr.map((v,i)=>'<span class="hangulCoin" data-i="'+i+'" style="left:'+(14+i*(78/Math.max(1,arr.length-1)))+'%;bottom:'+(i%3===1?92:48)+'px">'+v+'</span>').join('');
+  msg.textContent=(round+1)+'단계 '+rounds[round].name+' — 글자를 순서대로 모아봐!';
+ }
+ function collect(){
+  const arr=rounds[round].items;const next=itemsEl.querySelector('.hangulCoin:not(.got)');if(!next)return;
+  const cx=parseFloat(next.style.left),high=parseFloat(next.style.bottom)>70;
+  if(Math.abs(x-cx)<5 && (!high||jumping)){next.classList.add('got');score++;gameBody.querySelector('#runScore').textContent=score;trail.insertAdjacentHTML('beforeend','<span>'+next.textContent+'</span>');if(score===arr.length)completeRound()}
+ }
+ function completeRound(){finished=true;if(round<rounds.length-1){msg.textContent='🎉 '+rounds[round].name+' 성공! 다음 길이 열렸어!';setTimeout(()=>{round++;loadRound()},750)}else{msg.textContent='🏆 한글 달리기 완주! 가나다부터 문장까지 모두 모았어! ⭐';state.stars++;save()}}
+ function move(d){if(finished)return;x=Math.max(3,Math.min(94,x+d));kid.style.left=x+'%';kid.classList.toggle('faceLeft',d<0);collect()}
+ function jump(){if(jumping||finished)return;jumping=true;kid.classList.add('jumping');collect();setTimeout(()=>{collect();kid.classList.remove('jumping');jumping=false},520)}
+ gameBody.querySelector('[data-m="L"]').onclick=()=>move(-4);gameBody.querySelector('[data-m="R"]').onclick=()=>move(4);gameBody.querySelector('[data-m="J"]').onclick=jump;
+ keyHandler=e=>{if(!game.open)return;if(e.key==='ArrowLeft'){e.preventDefault();move(-3)}if(e.key==='ArrowRight'){e.preventDefault();move(3)}if(e.key==='ArrowUp'||e.key===' '){e.preventDefault();jump()}};
+ document.addEventListener('keydown',keyHandler);const back=gameBody.querySelector('.backWorld');if(back)back.addEventListener('click',()=>document.removeEventListener('keydown',keyHandler),{once:true});loadRound()
 }
 function playShape(){
  const themes=[
