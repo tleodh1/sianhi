@@ -4,7 +4,7 @@
     const c = canvas.getContext("2d"), w = canvas.width, h = canvas.height;
     c.clearRect(0, 0, w, h); const sky = c.createLinearGradient(0, 0, 0, h); sky.addColorStop(0, "#162757"); sky.addColorStop(1, "#5a35a4"); c.fillStyle = sky; c.fillRect(0, 0, w, h);
     c.save(); c.translate(w / 2, h * .57); c.scale(zoom * (yaw < 0 ? -1 : 1), zoom); c.translate(0, 8);
-    const P = build.colors || { primary: "#3bdcff", secondary: "#6754ff", accent: "#ffca3a" };
+    const P = build.colors?.[selected] || build.colors?.body || build.colors || { primary: "#3bdcff", secondary: "#6754ff", accent: "#ffca3a" };
     const glow = selected === "body" ? "#fff" : "#18365f";
     rr(c, -56, -62, 112, 112, 28, P.primary, glow); rr(c, -42, -50, 84, 36, 18, "#122344");
     c.fillStyle = P.accent; c.beginPath(); c.arc(-18, -32, 7, 0, 7); c.arc(18, -32, 7, 0, 7); c.fill();
