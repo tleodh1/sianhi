@@ -1,0 +1,10 @@
+const assert=require("node:assert/strict"),fs=require("node:fs");
+const css=fs.readFileSync("css/style.css","utf8"),js=fs.readFileSync("js/games.js","utf8");
+assert.match(js,/const W = 10,[\s\S]*H = 18/);
+assert.match(js,/classList\.add\("tetrisGame"\)/);
+assert.match(css,/width:calc\(10 \* var\(--cell\) \+ 9 \* var\(--grid-gap\) \+ 8px\)/);
+assert.match(css,/height:calc\(18 \* var\(--cell\) \+ 17 \* var\(--grid-gap\) \+ 8px\)/);
+assert.match(css,/overflow:hidden/);
+assert.match(css,/\.tetrisBoard\{--cell:18px/);
+assert.match(css,/white-space:nowrap/);
+console.log("PASS exact 10x18 board dimensions, mobile cell size, nowrap header");
