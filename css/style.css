@@ -50,3 +50,24 @@ nav{gap:3px}nav button{font-weight:950;border-radius:22px;padding:11px 16px;colo
 .world{background:linear-gradient(#eefaff,#f8fdff);padding-top:0}.subjectGrid{margin:-55px auto 0}.subject{height:270px;border-radius:25px;padding-top:24px}.subject .ico{width:90px;height:90px;font-size:48px}.subject h3{font-size:27px;margin-top:12px}.subject p{font-size:14px!important;white-space:normal!important;max-width:125px;margin:0 auto;line-height:1.35}.subject em{width:43px;height:43px;bottom:11px;font-size:20px}.growth{margin-top:20px}
 @media(max-width:1000px){.subject{height:235px}.kidGameHero .say,.kidGameHero .rocketKid{display:none}}
 @media(max-width:650px){.kidGameHero{background-position:55% center!important}.kidGameHero .heroCopy{left:22px;top:50px}.kidGameHero h1{font-size:46px}}
+
+/* 2026-09-18 readability + kid font refinement */
+@import url('https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;600;700;800;900&display=swap');
+body{font-family:"Noto Sans KR",Pretendard,sans-serif;font-weight:600;letter-spacing:-.02em;color:#24466f}
+.logo,.hero h1,.bubble,.cta,.subject h3,.subject .ico,.growth,.daily h2,.sectionTitle h2,.record h2,nav button,.profile{font-family:"Jua","Noto Sans KR",sans-serif;letter-spacing:-.015em}
+.heroCopy p,.subject p,.daily p,.steps p,.record p{font-family:"Noto Sans KR",sans-serif;letter-spacing:-.02em}
+.kidGameHero h1{font-weight:400;text-shadow:0 3px 0 #2b5f9d,0 2px 8px #173b7940}
+.kidGameHero p{font-weight:800;text-shadow:0 2px 4px #173b7970}
+.subject{filter:saturate(.82);text-shadow:0 1px 2px #173b7945;box-shadow:0 7px 16px #326b9424}
+.subject h3{font-weight:400;font-size:26px;text-shadow:0 2px 2px #173b7955}
+.subject p{font-weight:700;font-size:13px!important;line-height:1.45;text-shadow:0 1px 2px #173b7950}
+.subject:nth-child(1){background:linear-gradient(145deg,#f79b39,#ee6e22)}
+.subject:nth-child(2){background:linear-gradient(145deg,#ef7097,#df4f7d)}
+.subject:nth-child(3){background:linear-gradient(145deg,#48b9d5,#2999bd)}
+.subject:nth-child(4){background:linear-gradient(145deg,#9074df,#7358c8)}
+.subject:nth-child(5){background:linear-gradient(145deg,#45b985,#269d69)}
+.subject:nth-child(6){background:linear-gradient(145deg,#4c8bd8,#3472c4)}
+.subject:nth-child(7){background:linear-gradient(145deg,#e87867,#d85a4a)}
+.gameWorldCard{background:linear-gradient(145deg,#f3c94b,#e9aa2e)!important}
+.subject .ico{background:#ffffff42;box-shadow:inset 0 0 0 2px #ffffff65}
+.world{background:#f3faff}
