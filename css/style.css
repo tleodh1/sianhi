@@ -86,3 +86,14 @@ body{font-family:"Gowun Dodum","Noto Sans KR",sans-serif;letter-spacing:-.035em}
 }
 nav button{font-size:17px!important}
 .kidGameHero h1{font-size:clamp(54px,5.4vw,78px)!important;line-height:.98!important}
+
+/* 2026-09-18 unified Pretendard typography */
+html,body,button,input,select,textarea,
+.logo,nav,nav button,.profile,
+.hero,.hero *, .kidGameHero,.kidGameHero *,
+.world,.world *, .subject,.subject *,
+.growth,.daily,.daily *, .steps,.steps *,
+.record,.record *, .sectionTitle,.sectionTitle *,
+.modal,.modal *, .gameModal,.gameModal *{
+ font-family:Pretendard,"Pretendard Variable","Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+}
