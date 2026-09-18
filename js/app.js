@@ -215,7 +215,7 @@ playTetris=function(){
  const W=10,H=18,board=Array.from({length:H},()=>Array(W).fill(0));
  const pieces=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]],[[0,0,1],[1,1,1]],[[0,1,1],[1,1,0]],[[1,1,0],[0,1,1]]];
  let piece,x,y,timer,score=0,over=false,downHandler;
- gameShell('🟦 테트리스',\`<div class="tetrisWrap"><div class="tetrisBoard"></div><div class="tetrisSide"><b>점수</b><strong id="tScore">0</strong><p>← → 이동<br>↑ 회전<br>↓ 빠르게<br>Space 즉시 내리기</p><div class="nextPiece">다음 블록은 랜덤 교체!</div></div></div><p class="gameStatus">키보드와 화면 버튼을 모두 사용할 수 있어요.</p>\`,\`<button data-t="L">◀</button><button data-t="R">▶</button><button data-t="D">▼</button><button data-t="X">↻</button><button data-t="DROP">⤓</button>\`);
+ gameShell('🟦 테트리스',`<div class="tetrisWrap"><div class="tetrisBoard"></div><div class="tetrisSide"><b>점수</b><strong id="tScore">0</strong><p>← → 이동<br>↑ 회전<br>↓ 빠르게<br>Space 즉시 내리기</p><div class="nextPiece">다음 블록은 랜덤 교체!</div></div></div><p class="gameStatus">키보드와 화면 버튼을 모두 사용할 수 있어요.</p>`,`<button data-t="L">◀</button><button data-t="R">▶</button><button data-t="D">▼</button><button data-t="X">↻</button><button data-t="DROP">⤓</button>`);
  const el=gameBody.querySelector('.tetrisBoard'),msg=gameBody.querySelector('.gameStatus');
  function spawn(){piece=pieces[Math.floor(Math.random()*pieces.length)].map(r=>[...r]);x=3;y=0;if(hit(0,0,piece)){over=true;clearInterval(timer);msg.textContent='게임 종료! 점수 '+score+'점'}}
  function hit(dx,dy,p=piece){return p.some((r,yy)=>r.some((v,xx)=>v&&(y+yy+dy>=H||x+xx+dx<0||x+xx+dx>=W||board[y+yy+dy]?.[x+xx+dx])))}
