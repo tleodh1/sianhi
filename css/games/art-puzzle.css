@@ -147,10 +147,16 @@ dialog#game.art-dialog {
 .art-toolbar h3 {
   font-size: 20px;
   margin: 0 auto 0 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .art-toolbar button {
+  flex: 0 0 auto;
   font-size: 12px;
   padding: 8px 10px;
+  white-space: nowrap;
 }
 .art-detail {
   max-width: 760px;

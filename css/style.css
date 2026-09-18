@@ -142,7 +142,13 @@ html,body,button,input,select,textarea,
 
 /* Tetris: fixed cell size + combo HUD */
 .plainBrick{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.gameHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.gameHeaderTitle{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.15}
+.gameHeaderBack{flex:0 0 auto;white-space:nowrap}
 @media(max-width:650px){
+  .gameHeader{gap:7px;padding:9px 10px!important}
+  .gameHeaderTitle{font-size:clamp(13px,3.7vw,16px)}
+  .gameHeaderBack{font-size:clamp(11px,3.2vw,14px);padding:8px 9px!important}
   .plainBrick{height:360px;margin-top:8px}
   .plainBrick .pixelBall{font-size:23px}
   .plainBrick .pixelPaddle{height:20px;width:26%;min-width:74px}

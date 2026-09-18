@@ -18,7 +18,7 @@ function openGameWorld() {
 }
 function gameShell(title, body, controls = "") {
   Session.begin();
-  gameBody.innerHTML = `<div class="arcade"><div class="arcadeTop"><b>${title}</b><button class="backWorld">← 게임월드</button></div>${body}<div class="arcadeControls">${controls}</div></div>`;
+  gameBody.innerHTML = `<div class="arcade"><div class="arcadeTop gameHeader"><b class="gameHeaderTitle">${title}</b><button class="backWorld gameHeaderBack">← 게임월드</button></div>${body}<div class="arcadeControls">${controls}</div></div>`;
   gameBody.querySelector(".backWorld").onclick = openGameWorld;
 }
 function playBrick() {
