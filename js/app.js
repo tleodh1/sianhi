@@ -109,17 +109,17 @@ function playRunner(){
  ];
  let st=0,pos=5,hp=3,big=false,dead=false,jumping=false,score=0,keyHandler,tick;
  gameShell('🏃 한글 달리기',
- '<div class="runner3Hud"><b>🌱 <span id="rStage">1-1 한글 숲</span></b><b>❤️ <span id="rHp">♥♥♥</span></b><b>⭐ <span id="rScore">0</span></b></div><div class="runner3View"><div class="runnerSky">☁️　　☁️　　　　☁️</div><div class="runnerTrack"><div class="runnerAvatar"><span class="avatarHead">🙂</span><span class="avatarBody">🧢</span></div><div class="runnerObjects"></div><div class="runnerFloor"></div></div></div><div class="wordTrail"></div><p class="gameStatus">→로 달리고 ↑ 또는 Space로 점프! 글자를 모아 목적지까지 가요.</p>',
+ '<div class="runner3Hud"><b>🌱 <span id="rStage">1-1 한글 숲</span></b><b>❤️ <span id="rHp">♥♥♥</span></b><b>⭐ <span id="rScore">0</span></b></div><div class="runner3View"><div class="runnerSky">☁️　　☁️　　　　☁️</div><div class="runnerTrack"><div class="runnerAvatar"><span class="avatarHead"><i class="hair"></i><i class="cap"></i><i class="eye e1"></i><i class="eye e2"></i><i class="smile"></i></span><span class="avatarBody"><i class="arm"></i><i class="leg"></i></span></div><div class="runnerObjects"></div><div class="runnerFloor"></div></div></div><div class="wordTrail"></div><p class="gameStatus">→로 달리고 ↑ 또는 Space로 점프! 글자를 모아 목적지까지 가요.</p>',
  '<button data-m="L">◀</button><button data-m="J">⬆ 점프</button><button data-m="R">▶</button>');
  const track=gameBody.querySelector('.runnerTrack'),avatar=gameBody.querySelector('.runnerAvatar'),objs=gameBody.querySelector('.runnerObjects'),msg=gameBody.querySelector('.gameStatus'),trail=gameBody.querySelector('.wordTrail');
  function makeStage(){
   dead=false;pos=5;hp=3;big=false;score=0;avatar.className='runnerAvatar';avatar.style.left=pos+'%';avatar.style.transform='';gameBody.querySelector('#rStage').textContent=(st+1)+'-1 '+stages[st].name;gameBody.querySelector('#rHp').textContent='♥♥♥';gameBody.querySelector('#rScore').textContent=0;trail.innerHTML='';
   let html='',ls=stages[st].letters;
   ls.forEach((v,i)=>{let x=13+i*(76/Math.max(1,ls.length-1));html+='<span class="rLetter" data-kind="letter" data-v="'+v+'" style="left:'+x+'%;bottom:'+(i%4===1?125:76)+'px">'+v+'</span>'});
-  const hazards=[22,43,64,82];hazards.forEach((x,i)=>html+=i%2?'<span class="rHazard germ" data-kind="germ" style="left:'+x+'%">🦠</span>':'<span class="rHazard cactus" data-kind="cactus" style="left:'+x+'%">🌵</span>');
+  const hazards=[22,43,64,82];hazards.forEach((x,i)=>html+=i%2?'<span class="rHazard germ" data-kind="germ" style="left:'+x+'%"><i></i></span>':'<span class="rHazard cactus" data-kind="cactus" style="left:'+x+'%"><i></i></span>');
   [34,73].forEach(x=>html+='<span class="rHole" data-kind="hole" style="left:'+x+'%"></span>');
-  [29,57].forEach(x=>html+='<span class="rPower" data-kind="power" style="left:'+x+'%">🍄</span>');
-  html+='<span class="rGoal" style="left:94%">⭐<i>GOAL</i></span>';objs.innerHTML=html;msg.textContent='글자를 모으고 장애물을 피해 별 깃발까지!';
+  [29,57].forEach(x=>html+='<span class="rPower" data-kind="power" style="left:'+x+'%"><i></i></span>');
+  html+='<span class="rGoal" style="left:94%"><i class="pole"></i><i class="flag">★</i><b>GOAL</b></span>';objs.innerHTML=html;msg.textContent='글자를 모으고 장애물을 피해 별 깃발까지!';
  }
  function damage(){
   if(dead)return;if(big){big=false;avatar.classList.remove('big');msg.textContent='앗! 힘이 줄어서 다시 작아졌어.';return}
