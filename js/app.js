@@ -124,15 +124,46 @@ function playShape(){
  const clock=setInterval(()=>{if(!game.open){clearInterval(clock);return}let n=Math.floor((Date.now()-start)/1000);let e=gameBody.querySelector('#pTime');if(e)e.textContent=String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0')},1000)
 }
 function playClaw(){
- let coins=5,x=50,prizes=0,busy=false,downHandler;
- const toys=[['🦖',18],['🤖',32],['🧸',48],['🐼',62],['🚗',77],['🦁',87]];
- gameShell('🕹️ 인형뽑기','<div class="clawHud"><b>🪙 코인 <span id="clawCoins">5</span></b><b>🎁 뽑은 인형 <span id="clawWins">0</span></b></div><div class="clawMachine"><div class="clawRail"><div class="clawHead">▼<div class="clawArm">│<span>⌄</span></div></div></div><div class="toyBin">'+toys.map((t,i)=>'<span class="clawToy" data-i="'+i+'" style="left:'+t[1]+'%">'+t[0]+'</span>').join('')+'</div></div><p class="gameStatus">← → 로 집게를 움직이고 Space를 눌러 뽑아봐!</p>','<button data-claw="L">◀</button><button data-claw="R">▶</button><button data-claw="GO">🪙 넣고 뽑기 (Space)</button>');
- const head=gameBody.querySelector('.clawHead'),arm=gameBody.querySelector('.clawArm'),msg=gameBody.querySelector('.gameStatus');
- function draw(){head.style.left=x+'%'}
- function move(d){if(!busy)x=Math.max(8,Math.min(92,x+d));draw()}
- function go(){if(busy)return;if(coins<=0){msg.textContent='코인이 없어! 게임월드로 돌아갔다 다시 도전해 봐.';return}coins--;gameBody.querySelector('#clawCoins').textContent=coins;busy=true;arm.classList.add('down');setTimeout(()=>{let target=[...gameBody.querySelectorAll('.clawToy:not(.won)')].sort((a,b)=>Math.abs(parseFloat(a.style.left)-x)-Math.abs(parseFloat(b.style.left)-x))[0];let hit=target&&Math.abs(parseFloat(target.style.left)-x)<8;if(hit){target.classList.add('caught');setTimeout(()=>{target.classList.add('won');target.classList.remove('caught');prizes++;gameBody.querySelector('#clawWins').textContent=prizes;msg.textContent='🎉 '+target.textContent+' 뽑기 성공! ⭐';state.stars++;save()},500)}else msg.textContent='아깝다! 인형 가운데에 집게를 맞춰봐.';arm.classList.remove('down');setTimeout(()=>busy=false,700)},900)}
- gameBody.querySelector('[data-claw="L"]').onclick=()=>move(-7);gameBody.querySelector('[data-claw="R"]').onclick=()=>move(7);gameBody.querySelector('[data-claw="GO"]').onclick=go;
- downHandler=e=>{if(!game.open)return;if(e.key==='ArrowLeft'){e.preventDefault();move(-5)}if(e.key==='ArrowRight'){e.preventDefault();move(5)}if(e.key===' '){e.preventDefault();go()}};document.addEventListener('keydown',downHandler);const back=gameBody.querySelector('.backWorld');if(back)back.addEventListener('click',()=>document.removeEventListener('keydown',downHandler),{once:true});draw()
+ let coins=10,x=50,prizes=0,busy=false,downHandler,round=0;
+ const icons=['🧸','🦖','🤖','🐼','🚗','🦁','🐰','🐯','🐶','🦊','🐨','🐵','🐙','🦈','🚀','🚒','🏎️','⚽','🐲','🐧','🦕','🐻','🐸','🛸'];
+ const toys=Array.from({length:34},(_,i)=>({icon:icons[i%icons.length],x:5+Math.random()*90,y:3+Math.random()*82,rot:-25+Math.random()*50,size:34+Math.random()*18,won:false}));
+ gameShell('🕹️ 인형뽑기',
+ '<div class="clawHud"><b>🪙 코인 <span id="clawCoins">10</span></b><b>🎁 뽑은 인형 <span id="clawWins">0</span></b><b>🎯 집게 위치 <span id="clawPos">50</span></b></div><div class="clawMachine realClaw"><div class="clawRail"><div class="clawHead"><span class="clawCar">▰</span><div class="clawArm"><i></i><span class="clawGrip">⌄</span></div></div></div><div class="toyBin"></div><div class="clawGlass"></div><div class="clawSlot">🪙 1 COIN</div></div><p class="gameStatus">← → 로 위치를 아주 잘 맞춘 뒤 Space! 집게 힘이 매번 달라서 쉽게 안 뽑혀요.</p>',
+ '<button data-claw="L">◀</button><button data-claw="R">▶</button><button data-claw="GO">🪙 넣고 뽑기 (Space)</button>');
+ const head=gameBody.querySelector('.clawHead'),arm=gameBody.querySelector('.clawArm'),grip=gameBody.querySelector('.clawGrip'),bin=gameBody.querySelector('.toyBin'),msg=gameBody.querySelector('.gameStatus');
+ toys.forEach((t,i)=>{let e=document.createElement('span');e.className='clawToy';e.dataset.i=i;e.textContent=t.icon;e.style.left=t.x+'%';e.style.bottom=t.y+'px';e.style.fontSize=t.size+'px';e.style.transform='translateX(-50%) rotate('+t.rot+'deg)';e.style.zIndex=1+Math.floor(t.y/10);bin.appendChild(e)});
+ function draw(){head.style.left=x+'%';gameBody.querySelector('#clawPos').textContent=Math.round(x)}
+ function move(d){if(!busy){x=Math.max(5,Math.min(95,x+d));draw()}}
+ function go(){
+  if(busy)return;if(coins<=0){msg.textContent='코인이 없어! 다시 시작하면 코인이 충전돼.';return}
+  coins--;round++;gameBody.querySelector('#clawCoins').textContent=coins;busy=true;grip.classList.remove('closed');arm.classList.add('down');msg.textContent='집게가 내려가는 중...';
+  setTimeout(()=>{
+   const candidates=toys.map((t,i)=>({t,i,dist:Math.abs(t.x-x)})).filter(o=>!o.t.won&&o.dist<10).sort((a,b)=>a.dist-b.dist);
+   const target=candidates[0];let success=false;
+   if(target){
+    const center=Math.max(0,1-target.dist/10);
+    const crowd=candidates.length;
+    const gripPower=.28+Math.random()*.42;
+    const buried=Math.min(.35,target.t.y/220)+(crowd>2?.12:0);
+    const chance=Math.max(.08,Math.min(.68,center*.62+gripPower*.35-buried));
+    success=Math.random()<chance;
+    const el=bin.querySelector('[data-i="'+target.i+'"]');
+    grip.classList.add('closed');
+    if(success){
+     msg.textContent='잡았다! 떨어뜨리지 않게 버텨라...';el.classList.add('caught');
+     setTimeout(()=>{
+      const holdChance=.58+Math.min(.2,center*.2);
+      if(Math.random()<holdChance){target.t.won=true;el.classList.add('won');el.classList.remove('caught');prizes++;gameBody.querySelector('#clawWins').textContent=prizes;msg.textContent='🎉 '+target.t.icon+' 뽑기 성공! ⭐';state.stars++;save()}
+      else{el.classList.remove('caught');el.classList.add('dropped');target.t.x=Math.max(6,Math.min(94,target.t.x+(Math.random()-.5)*12));target.t.y=Math.max(2,target.t.y-8);el.style.left=target.t.x+'%';el.style.bottom=target.t.y+'px';setTimeout(()=>el.classList.remove('dropped'),450);msg.textContent='앗! 올라오다가 떨어졌어. 위치를 다시 맞춰봐!'}
+     },700)
+    }else msg.textContent=target.dist<4?'집게가 인형을 눌렀지만 힘이 부족했어!':'살짝 빗나갔어. 인형 중심을 더 정확히 맞춰봐!';
+   }else msg.textContent='허공을 잡았어! 인형 위에 집게 중심을 맞춰야 해.';
+   setTimeout(()=>{arm.classList.remove('down');grip.classList.remove('closed');setTimeout(()=>busy=false,650)},success?1450:650)
+  },950)
+ }
+ gameBody.querySelector('[data-claw="L"]').onclick=()=>move(-3);gameBody.querySelector('[data-claw="R"]').onclick=()=>move(3);gameBody.querySelector('[data-claw="GO"]').onclick=go;
+ downHandler=e=>{if(!game.open)return;if(e.key==='ArrowLeft'){e.preventDefault();move(-2)}if(e.key==='ArrowRight'){e.preventDefault();move(2)}if(e.key===' '){e.preventDefault();go()}};
+ document.addEventListener('keydown',downHandler);const back=gameBody.querySelector('.backWorld');if(back)back.addEventListener('click',()=>document.removeEventListener('keydown',downHandler),{once:true});draw()
 }
 function playTetris(){
  const W=10,H=16,board=Array.from({length:H},()=>Array(W).fill(0)),pieces=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0],[1,0],[1,1]],[[0,1],[0,1],[1,1]]];let piece,x,y,timer,score=0,over=false;
