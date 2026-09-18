@@ -37,13 +37,16 @@ nav{gap:3px}nav button{font-weight:950;border-radius:22px;padding:11px 16px;colo
 @media(max-width:1200px){.subject p,.gameWorldCard p{font-size:10.5px}}@media(max-width:1000px){.subject p,.gameWorldCard p{font-size:12px}}
 
 /* Target visual: bright kid game-world homepage */
-.kidGameHero{background-image:none!important;background:linear-gradient(#54c9ff 0 62%,#8ee36b 62% 69%,#865027 69%)!important;position:relative}
-.kidGameHero:before{content:'☁️　　　☁️　　　　　　　🌈　　　🏰';position:absolute;inset:25px 0 auto 0;font-size:72px;letter-spacing:18px;white-space:nowrap;opacity:.92;text-align:center;filter:drop-shadow(0 4px 0 #ffffff55)}
-.kidGameHero:after{content:'🌳　🪙　🧱　🌳　⭐　❓　🪙　🌳';position:absolute;left:0;right:0;bottom:58px;font-size:58px;word-spacing:36px;text-align:center;filter:drop-shadow(0 5px 0 #2e7f3a)}
-.kidGameHero .shade{background:linear-gradient(90deg,#42bfffe8 0%,#42bfff33 42%,transparent 68%)}
-.kidGameHero .heroCopy{top:48px}.kidGameHero .bubble{border-radius:22px;padding:9px 20px;color:#173b79}
-.kidGameHero h1{color:#fff!important;text-shadow:0 5px 0 #1352a4,0 0 0 #fff;font-size:68px}.kidGameHero h1 strong{color:#ff5a1f}.kidGameHero h1 strong span{color:#fff}.kidGameHero p{font-size:21px;line-height:1.42}
-.kidGameHero .say{background:#fff;border:5px solid #173b79;padding:15px 20px;transform:rotate(-4deg);right:30%;top:70px;color:#173b79;text-shadow:none;box-shadow:6px 6px 0 #173b79}
-.kidGameHero .rocketKid{font-size:0;right:9%;bottom:95px}.kidGameHero .rocketKid:before{content:'👦🏻';font-size:145px;display:block;filter:drop-shadow(0 8px 0 #2168a755)}.kidGameHero .rocketKid b{font-size:19px;width:180px;right:-30px;top:-70px;border-radius:12px;border:5px solid #7a481f;color:#173b79;box-shadow:5px 5px 0 #7a481f}
+.kidGameHero{height:610px;background-image:url('../assets/hero.webp')!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;position:relative}
+.kidGameHero .shade{background:linear-gradient(90deg,rgba(12,91,177,.12) 0%,rgba(20,116,205,.04) 36%,transparent 58%)}
+.kidGameHero:before,.kidGameHero:after{content:none!important}
+.kidGameHero .heroCopy{top:58px;left:5.8vw}
+.kidGameHero .bubble{padding:9px 20px;border-radius:22px;color:#173b79;background:#fff}
+.kidGameHero h1{font-size:clamp(48px,5vw,72px);color:#fff!important;text-shadow:0 5px 0 #1352a4,0 0 6px #1352a455}
+.kidGameHero h1 strong{color:#ff5a1f}.kidGameHero h1 strong span{color:#fff}.kidGameHero p{color:#fff;font-size:20px;line-height:1.45;text-shadow:0 2px 3px #173b79}
+.kidGameHero .say{background:#fff;border:5px solid #173b79;padding:14px 18px;right:29%;top:68px;color:#173b79;text-shadow:none;box-shadow:6px 6px 0 #173b79}
+.kidGameHero .rocketKid{font-size:0;right:6%;bottom:82px;filter:none}.kidGameHero .rocketKid:before{content:none!important}
+.kidGameHero .rocketKid b{font-size:18px;width:170px;right:0;top:auto;bottom:0;border-radius:12px;border:5px solid #7a481f;color:#173b79;box-shadow:5px 5px 0 #7a481f}
 .world{background:linear-gradient(#eefaff,#f8fdff);padding-top:0}.subjectGrid{margin:-55px auto 0}.subject{height:270px;border-radius:25px;padding-top:24px}.subject .ico{width:90px;height:90px;font-size:48px}.subject h3{font-size:27px;margin-top:12px}.subject p{font-size:14px!important;white-space:normal!important;max-width:125px;margin:0 auto;line-height:1.35}.subject em{width:43px;height:43px;bottom:11px;font-size:20px}.growth{margin-top:20px}
-@media(max-width:1000px){.kidGameHero:before,.kidGameHero:after{opacity:.55}.kidGameHero .rocketKid{display:block}.subject{height:235px}}
+@media(max-width:1000px){.subject{height:235px}.kidGameHero .say,.kidGameHero .rocketKid{display:none}}
+@media(max-width:650px){.kidGameHero{background-position:55% center!important}.kidGameHero .heroCopy{left:22px;top:50px}.kidGameHero h1{font-size:46px}}
