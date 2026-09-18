@@ -214,18 +214,25 @@ render();
 playTetris=function(){
  const W=10,H=18,board=Array.from({length:H},()=>Array(W).fill(0));
  const pieces=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]],[[0,0,1],[1,1,1]],[[0,1,1],[1,1,0]],[[1,1,0],[0,1,1]]];
- let piece,x,y,timer,score=0,over=false,downHandler;
- gameShell('🟦 테트리스',`<div class="tetrisWrap"><div class="tetrisBoard"></div><div class="tetrisSide"><b>점수</b><strong id="tScore">0</strong><p>← → 이동<br>↑ 회전<br>↓ 빠르게<br>Space 즉시 내리기</p><div class="nextPiece">다음 블록은 랜덤 교체!</div></div></div><p class="gameStatus">키보드와 화면 버튼을 모두 사용할 수 있어요.</p>`,`<button data-t="L">◀</button><button data-t="R">▶</button><button data-t="D">▼</button><button data-t="X">↻</button><button data-t="DROP">⤓</button>`);
+ let piece,nextPiece=null,holdPiece=null,x,y,timer,score=0,lines=0,combo=0,level=1,over=false,canHold=true,downHandler;
+ gameShell('🎮 게임월드  ›  테트리스',
+ '<div class="tetrisHud"><div class="tStats"><div>🏆<small>점수</small><strong id="tScore">0</strong></div><div>⭐<small>레벨</small><strong id="tLevel">1</strong></div><div>🚩<small>라인</small><strong id="tLines">0</strong></div><div class="comboBox">🔥<small>콤보</small><strong id="tCombo">-</strong></div></div><div class="tetrisMain"><div class="tetrisBoard"></div><div class="tetrisSide"><b>다음 블록</b><div id="nextPreview" class="piecePreview"></div><b>보관 블록</b><div id="holdPreview" class="piecePreview"></div><button data-t="H">교체 (C)</button><p>← → 이동<br>↑ 회전<br>↓ 빠르게<br>Space 즉시 내리기<br>C 블록 교체</p></div></div></div><p class="gameStatus">여러 줄을 연속으로 지우면 콤보 점수가 올라가요!</p>',
+ '<button data-t="L">◀</button><button data-t="R">▶</button><button data-t="D">▼</button><button data-t="X">↻</button><button data-t="H">교체</button><button data-t="DROP">⤓</button>');
  const el=gameBody.querySelector('.tetrisBoard'),msg=gameBody.querySelector('.gameStatus');
- function spawn(){piece=pieces[Math.floor(Math.random()*pieces.length)].map(r=>[...r]);x=3;y=0;if(hit(0,0,piece)){over=true;clearInterval(timer);msg.textContent='게임 종료! 점수 '+score+'점'}}
+ function clone(p){return p.map(r=>[...r])}
+ function randomPiece(){return clone(pieces[Math.floor(Math.random()*pieces.length)])}
+ function preview(id,p){const e=gameBody.querySelector(id);if(!e)return;e.innerHTML=p?p.flatMap(r=>r.map(v=>'<i class="'+(v?'on':'')+'"></i>')).join(''):'';e.style.setProperty('--cols',p?p[0].length:4)}
+ function spawn(p=null){piece=p?clone(p):(nextPiece||randomPiece());nextPiece=randomPiece();x=Math.floor((W-piece[0].length)/2);y=0;canHold=true;preview('#nextPreview',nextPiece);preview('#holdPreview',holdPiece);if(hit(0,0,piece)){over=true;clearInterval(timer);msg.textContent='게임 종료! 점수 '+score+'점'}}
  function hit(dx,dy,p=piece){return p.some((r,yy)=>r.some((v,xx)=>v&&(y+yy+dy>=H||x+xx+dx<0||x+xx+dx>=W||board[y+yy+dy]?.[x+xx+dx])))}
  function renderT(){let t=board.map(r=>[...r]);piece?.forEach((r,yy)=>r.forEach((v,xx)=>{if(v&&t[y+yy])t[y+yy][x+xx]=2}));el.innerHTML=t.flat().map(v=>'<i class="'+(v?'on ':'')+(v===2?'fall':'')+'"></i>').join('')}
- function lock(){piece.forEach((r,yy)=>r.forEach((v,xx)=>{if(v)board[y+yy][x+xx]=1}));for(let r=H-1;r>=0;r--)if(board[r].every(Boolean)){board.splice(r,1);board.unshift(Array(W).fill(0));score+=100;gameBody.querySelector('#tScore').textContent=score;r++}spawn();renderT()}
+ function updateHud(){gameBody.querySelector('#tScore').textContent=score;gameBody.querySelector('#tLines').textContent=lines;gameBody.querySelector('#tLevel').textContent=level;gameBody.querySelector('#tCombo').textContent=combo>1?combo+' COMBO!':'-'}
+ function lock(){piece.forEach((r,yy)=>r.forEach((v,xx)=>{if(v&&board[y+yy])board[y+yy][x+xx]=1}));let cleared=0;for(let r=H-1;r>=0;r--)if(board[r].every(Boolean)){board.splice(r,1);board.unshift(Array(W).fill(0));cleared++;r++}if(cleared){lines+=cleared;combo++;level=1+Math.floor(lines/10);score+=cleared*100*level+(combo>1?(combo-1)*50:0);msg.textContent=combo>1?'🔥 '+combo+' COMBO! 연속으로 지웠어!':'⭐ 라인 클리어!';}else combo=0;updateHud();spawn();renderT()}
  function drop(){if(over)return;if(!hit(0,1))y++;else lock();renderT()}
  function rot(){let p=piece[0].map((_,i)=>piece.map(r=>r[i]).reverse());if(!hit(0,0,p))piece=p;renderT()}
- function action(a){if(over)return;if(a==='L'&&!hit(-1,0))x--;if(a==='R'&&!hit(1,0))x++;if(a==='D')drop();if(a==='X')rot();if(a==='DROP'){while(!hit(0,1))y++;lock()}renderT()}
+ function hold(){if(over||!canHold)return;const old=clone(piece);if(holdPiece){piece=clone(holdPiece);holdPiece=old;x=Math.floor((W-piece[0].length)/2);y=0}else{holdPiece=old;piece=nextPiece;nextPiece=randomPiece();x=Math.floor((W-piece[0].length)/2);y=0}canHold=false;preview('#nextPreview',nextPiece);preview('#holdPreview',holdPiece);renderT()}
+ function action(a){if(over)return;if(a==='L'&&!hit(-1,0))x--;if(a==='R'&&!hit(1,0))x++;if(a==='D')drop();if(a==='X')rot();if(a==='H')hold();if(a==='DROP'){while(!hit(0,1))y++;lock()}renderT()}
  gameBody.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>action(b.dataset.t));
- downHandler=e=>{if(!game.open)return;const m={ArrowLeft:'L',ArrowRight:'R',ArrowDown:'D',ArrowUp:'X',' ':'DROP'}[e.key];if(m){e.preventDefault();action(m)}};document.addEventListener('keydown',downHandler);
- const back=gameBody.querySelector('.backWorld');back.addEventListener('click',()=>{clearInterval(timer);document.removeEventListener('keydown',downHandler)},{once:true});
- spawn();renderT();timer=setInterval(drop,650);
+ downHandler=e=>{if(!game.open)return;const m={ArrowLeft:'L',ArrowRight:'R',ArrowDown:'D',ArrowUp:'X',' ':'DROP',c:'H',C:'H'}[e.key];if(m){e.preventDefault();action(m)}};document.addEventListener('keydown',downHandler);
+ const back=gameBody.querySelector('.backWorld');if(back)back.addEventListener('click',()=>{clearInterval(timer);document.removeEventListener('keydown',downHandler)},{once:true});
+ spawn();updateHud();renderT();timer=setInterval(drop,650);
 };
