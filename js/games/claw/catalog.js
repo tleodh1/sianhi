@@ -16,6 +16,6 @@ var SianClaw = globalThis.SianClaw || {};
   ['deer','달빛 사슴',3,40,1.04,'금빛 달이 뿔 위에서 반짝여요.'],
   ['phoenix','햇살 불사조',3,39,1.00,'무지개 날개로 희망을 전해요.']
  ].map(([id,name,rarity,radius,mass,story],sprite)=>({id,name,rarity,radius,mass,story,sprite}));
- C.layout=function(){return C.catalog.map((d,i)=>({id:d.id,x:[-168,-57,62,173][i%4]+(i>=8?10:0),z:[.85,.52,.18][Math.floor(i/4)],height:0,vy:0,tilt:(i%3-1)*.12,won:false}));};
+ C.layout=function(){return C.catalog.map((d,i)=>({id:d.id,x:[-168,-57,62,173][i%4]+[0,7,-12,0,8,-9,8,-7,10,-3,9,-8][i],z:[.85,.52,.18][Math.floor(i/4)]+[0,.035,-.035,0,.025,-.015,.03,-.03,0,.02,-.015,.035][i],height:0,vy:0,tilt:(i%3-1)*.12,won:false}));};
  C.clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 })(SianClaw);
