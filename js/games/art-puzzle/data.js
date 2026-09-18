@@ -13,7 +13,9 @@ SianArt.artworks = [
     "source": "https://www.artic.edu/artworks/28560",
     "apiSource": "https://api.artic.edu/api/v1/artworks/28560",
     "publicDomain": true,
-    "imageId": "6644829f-f292-c5c4-a73c-0356a6fdbf0d"
+    "imageId": "6644829f-f292-c5c4-a73c-0356a6fdbf0d",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:1926.417_-_The_Bedroom_Vincent_van_Gogh_1889.jpg",
+    "imageLicense": "Public domain"
   },
   {
     "id": "111436",
@@ -28,7 +30,9 @@ SianArt.artworks = [
     "source": "https://www.artic.edu/artworks/111436",
     "apiSource": "https://api.artic.edu/api/v1/artworks/111436",
     "publicDomain": true,
-    "imageId": "52ac8996-3460-cf71-cb42-5c4d0aa29b74"
+    "imageId": "52ac8996-3460-cf71-cb42-5c4d0aa29b74",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Paul_C%C3%A9zanne_-_The_Basket_of_Apples_-_1926.252_-_Art_Institute_of_Chicago.jpg",
+    "imageLicense": "Public domain"
   },
   {
     "id": "14655",
@@ -43,10 +47,12 @@ SianArt.artworks = [
     "source": "https://www.artic.edu/artworks/14655",
     "apiSource": "https://api.artic.edu/api/v1/artworks/14655",
     "publicDomain": true,
-    "imageId": "3a608f55-d76e-fa96-d0b1-0789fbc48f1e"
+    "imageId": "3a608f55-d76e-fa96-d0b1-0789fbc48f1e",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Pierre-Auguste_Renoir_-_Two_Sisters_(On_the_Terrace)_-_1933.455_-_Art_Institute_of_Chicago.jpg",
+    "imageLicense": "Public domain"
   },
   {
-    "id": "24645",
+    "id": "77333",
     "title": "가나가와 해변의 높은 파도",
     "originalTitle": "Under the Wave off Kanagawa (Kanagawa oki nami ura), also known as The Great Wave, from the series \"Thirty-Six Views of Mount Fuji (Fugaku sanjūrokkei)\"",
     "artist": "가쓰시카 호쿠사이",
@@ -54,11 +60,13 @@ SianArt.artworks = [
     "year": "1830–1833",
     "story": "커다란 파도가 배 위로 솟아올라요. 멀리 작은 후지산도 보여요.",
     "look": "큰 파도 사이에서 작은 산을 찾아보세요.",
-    "image": "assets/art-puzzle/24645.jpg",
-    "source": "https://www.artic.edu/artworks/24645",
-    "apiSource": "https://api.artic.edu/api/v1/artworks/24645",
+    "image": "assets/art-puzzle/77333.jpg",
+    "source": "https://www.artic.edu/artworks/77333",
+    "apiSource": "https://api.artic.edu/api/v1/artworks/77333",
     "publicDomain": true,
-    "imageId": "b3974542-b9b4-7568-fc4b-966738f61d78"
+    "imageId": "05cd1ba7-67d1-96c5-0e78-2eb4114b65e7",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:1952.343_-_Under_the_Wave_off_Kanagawa_(Kanagawa_oki_nami.jpg",
+    "imageLicense": "CC0"
   },
   {
     "id": "16568",
@@ -73,7 +81,9 @@ SianArt.artworks = [
     "source": "https://www.artic.edu/artworks/16568",
     "apiSource": "https://api.artic.edu/api/v1/artworks/16568",
     "publicDomain": true,
-    "imageId": "3c27b499-af56-f0d5-93b5-a7f2f1ad5813"
+    "imageId": "3c27b499-af56-f0d5-93b5-a7f2f1ad5813",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Water_Lilies_-_1933.1157_-_Art_Institute_of_Chicago.jpg",
+    "imageLicense": "Public domain"
   },
   {
     "id": "87088",
@@ -88,7 +98,9 @@ SianArt.artworks = [
     "source": "https://www.artic.edu/artworks/87088",
     "apiSource": "https://api.artic.edu/api/v1/artworks/87088",
     "publicDomain": true,
-    "imageId": "8534685d-1102-e1e3-e194-94f6e925e8b0"
+    "imageId": "8534685d-1102-e1e3-e194-94f6e925e8b0",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Water_Lily_Pond_-_1933.441_-_Art_Institute_of_Chicago.jpg",
+    "imageLicense": "Public domain"
   },
   {
     "id": "20684",
@@ -103,7 +115,9 @@ SianArt.artworks = [
     "source": "https://www.artic.edu/artworks/20684",
     "apiSource": "https://api.artic.edu/api/v1/artworks/20684",
     "publicDomain": true,
-    "imageId": "f8fd76e9-c396-5678-36ed-6a348c904d27"
+    "imageId": "f8fd76e9-c396-5678-36ed-6a348c904d27",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Gustave_Caillebotte_-_Paris_Street,_Rainy_Day_-_1964.336_-_Art_Institute_of_Chicago.jpg",
+    "imageLicense": "Public domain"
   },
   {
     "id": "111442",
@@ -118,7 +132,9 @@ SianArt.artworks = [
     "source": "https://www.artic.edu/artworks/111442",
     "apiSource": "https://api.artic.edu/api/v1/artworks/111442",
     "publicDomain": true,
-    "imageId": "3b885ae0-4d46-5fe4-d70a-00474827f02c"
+    "imageId": "3b885ae0-4d46-5fe4-d70a-00474827f02c",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:The_Child%27s_Bath_by_Mary_Cassatt_1893.jpg",
+    "imageLicense": "Public domain"
   },
   {
     "id": "64818",
@@ -133,7 +149,9 @@ SianArt.artworks = [
     "source": "https://www.artic.edu/artworks/64818",
     "apiSource": "https://api.artic.edu/api/v1/artworks/64818",
     "publicDomain": true,
-    "imageId": "a38e2828-ec6f-ece1-a30f-70243449197b"
+    "imageId": "a38e2828-ec6f-ece1-a30f-70243449197b",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Stacks_of_Wheat_(End_of_Summer)_-_1985.1103_-_Art_Institute_of_Chicago.jpg",
+    "imageLicense": "Public domain"
   },
   {
     "id": "14620",
@@ -148,7 +166,9 @@ SianArt.artworks = [
     "source": "https://www.artic.edu/artworks/14620",
     "apiSource": "https://api.artic.edu/api/v1/artworks/14620",
     "publicDomain": true,
-    "imageId": "b0effb1c-ff23-bbaa-f809-9fd94e31c1a0"
+    "imageId": "b0effb1c-ff23-bbaa-f809-9fd94e31c1a0",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Cliff_Walk_at_Pourville_-_Google_Art_Project.jpg",
+    "imageLicense": "Public domain"
   },
   {
     "id": "27992",
@@ -163,7 +183,9 @@ SianArt.artworks = [
     "source": "https://www.artic.edu/artworks/27992",
     "apiSource": "https://api.artic.edu/api/v1/artworks/27992",
     "publicDomain": true,
-    "imageId": "2d484387-2509-5e8e-2c43-22f9981972eb"
+    "imageId": "2d484387-2509-5e8e-2c43-22f9981972eb",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Georges_Seurat_-_A_Sunday_on_La_Grande_Jatte_--_1884_-_Google_Art_Project.jpg",
+    "imageLicense": "Public domain"
   },
   {
     "id": "64957",
@@ -178,6 +200,8 @@ SianArt.artworks = [
     "source": "https://www.artic.edu/artworks/64957",
     "apiSource": "https://api.artic.edu/api/v1/artworks/64957",
     "publicDomain": true,
-    "imageId": "f11bd233-6cc3-4221-59eb-f7363be4119e"
+    "imageId": "f11bd233-6cc3-4221-59eb-f7363be4119e",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_Grapes,_Lemons,_Pears,_and_Apples_-_1949.215_-_Art_Institute_of_Chicago.jpg",
+    "imageLicense": "Public domain"
   }
 ];
