@@ -11,7 +11,7 @@
  };
  C.Engine=class {
   constructor(options={}){
-   this.onEvent=options.onEvent||(()=>{});this.toys=C.layout();this.claw={x:0,z:.55,height:285,open:1,strength:1.7,sway:0};
+   this.onEvent=options.onEvent||(()=>{});this.toys=C.layout();this.claw={x:0,z:.55,height:180,open:1,strength:1.7,sway:0};
    this.phase='aim';this.phaseTime=0;this.elapsed=0;this.held=null;this.target=null;this.targetHeight=0;this.aimTarget=null;this.round=0;this.attempts=options.attempts??10;this.grip=null;this.result=null;this.events={};
   }
   emit(type,detail={}){this.events[type]=(this.events[type]||0)+1;this.onEvent({type,...detail});}
@@ -23,7 +23,7 @@
    this.target=candidates[0]?.t||null;this.targetHeight=this.target?C.catalog.find(d=>d.id===this.target.id).radius*.7+8:10;
    this.enter('descend');this.emit('attempt');return true;
   }
-  resetRound(){if(this.phase!=='result')return;this.claw.open=1;this.claw.height=285;this.claw.sway=0;this.held=null;this.result=null;this.enter('aim');}
+  resetRound(){if(this.phase!=='result')return;this.claw.open=1;this.claw.height=180;this.claw.sway=0;this.held=null;this.result=null;this.enter('aim');}
   restock(){if(this.phase==='aim'&&this.toys.every(t=>t.won)){this.toys=C.layout();this.emit('restock');}}
   step(dt,input={}){
    dt=C.clamp(dt,0,.025);this.elapsed+=dt;this.phaseTime+=dt;
@@ -43,9 +43,9 @@
     if(this.phaseTime>=.65){if(this.target){this.grip=C.evaluateGrip(c,this.target,C.catalog.find(d=>d.id===this.target.id));if(this.grip.enclosure>.2&&this.grip.margin>-.08){this.held=this.target;this.emit('grip',{quality:this.grip});}else this.emit('miss',{reason:'off-center'});}else this.emit('miss',{reason:'empty'});this.enter('lift');}
    }
    else if(this.phase==='lift'){
-    c.height=approach(c.height,285,132*dt);c.sway=.08+Math.abs(Math.sin(this.phaseTime*4))*.08;
+    c.height=approach(c.height,180,132*dt);c.sway=.08+Math.abs(Math.sin(this.phaseTime*4))*.08;
     if(this.held){const d=C.catalog.find(d=>d.id===this.held.id),dynamicLoad=d.mass*(.83+c.sway*.7);if(this.phaseTime>.22&&this.grip.force<dynamicLoad){this.releaseToy('lift');}}
-    if(c.height===285){this.transportStart={x:c.x,z:c.z};this.enter('transport');}
+    if(c.height===180){this.transportStart={x:c.x,z:c.z};this.enter('transport');}
    }
    else if(this.phase==='transport'){
     const t=C.clamp(this.phaseTime/1.9,0,1),ease=t*t*(3-2*t);c.x=this.transportStart.x+(-199-this.transportStart.x)*ease;c.z=this.transportStart.z+(.07-this.transportStart.z)*ease;c.sway=Math.abs(Math.sin(t*Math.PI*3))*.19;
