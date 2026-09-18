@@ -594,3 +594,12 @@ dialog#game.art-dialog {
 .art-app img {
   -webkit-user-drag: none;
 }
+#game.art-dialog > .close {
+  position: sticky !important;
+  top: 0;
+  margin-left: auto;
+  display: block;
+  float: none;
+  background: #f1e6d5;
+  color: #655339;
+}

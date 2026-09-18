@@ -18,13 +18,20 @@
       this.timers.add(id);
       return id;
     }
+    stopLoop() {
+      this.looping = false;
+      cancelAnimationFrame(this.frame);
+      this.frame = 0;
+    }
     loop(fn) {
+      this.stopLoop();
+      this.looping = true;
       let last = 0;
       const tick = (now) => {
-        if (this.closed) return;
+        if (this.closed || !this.looping) return;
         fn(last ? Math.min((now - last) / 1000, 0.1) : 0);
         last = now;
-        this.frame = requestAnimationFrame(tick);
+        if (this.looping) this.frame = requestAnimationFrame(tick);
       };
       this.frame = requestAnimationFrame(tick);
     }
