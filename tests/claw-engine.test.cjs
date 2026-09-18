@@ -1,10 +1,110 @@
-const fs=require('node:fs'),vm=require('node:vm'),a=require('node:assert/strict');const ctx=vm.createContext({});for(const f of ['catalog','engine'])vm.runInContext(fs.readFileSync(`js/games/claw/${f}.js`,'utf8'),ctx);const C=ctx.SianClaw;let total=0;function test(s,f){f();console.log('PASS',s);total++;}function run(e){for(let n=0;n<2000&&e.phase!=='result';n++)e.step(1/120);a.equal(e.phase,'result');}
-test('12 unique original toys and four rarities',()=>{a.equal(C.catalog.length,12);a.equal(new Set(C.catalog.map(t=>t.id)).size,12);a.equal(new Set(C.catalog.map(t=>t.rarity)).size,4);});
-test('centered drops succeed for every weight and size',()=>{for(const d of C.catalog){const e=new C.Engine();const t=e.toys.find(t=>t.id===d.id);e.claw.x=t.x;e.claw.z=t.z;a(e.drop());run(e);a.equal(e.result.toyId,d.id);a(e.result.success);a.equal(e.events.delivery,1);}});
-test('empty area fails without random reward',()=>{const e=new C.Engine();e.claw.x=-240;e.claw.z=.07;e.drop();run(e);a.equal(e.result.success,false);a.equal(e.events.delivery,undefined);});
-test('offset influences enclosure and holding margin',()=>{const e=new C.Engine(),t=e.toys[1],d=C.catalog[1];e.claw.x=t.x;e.claw.z=t.z;const good=C.evaluateGrip(e.claw,t,d);e.claw.x+=43;const bad=C.evaluateGrip(e.claw,t,d);a(good.force>bad.force);a(good.margin>0);a(bad.margin<0);});
-test('marginal grip lifts then slips physically',()=>{const e=new C.Engine(),t=e.toys[1];e.claw.x=t.x+27;e.claw.z=t.z;e.drop();run(e);a(e.events.grip);a(e.events.slip);a.equal(e.result.success,false);a.equal(t.won,false);});
-test('drop debounces and aim locks during sequence',()=>{const e=new C.Engine();a(e.drop());a(!e.drop());a.equal(e.attempts,9);const x=e.claw.x;e.step(.01,{right:true});a.equal(e.claw.x,x);run(e);e.resetRound();a.equal(e.phase,'aim');});
-test('all crane phases in order',()=>{const phases=[],e=new C.Engine({onEvent:e=>{if(e.type==='phase')phases.push(e.phase);}});e.drop();run(e);a.deepEqual(phases,['descend','close','lift','transport','release','reveal','result']);});
-test('movement, front/back, sway settling, free refill',()=>{const e=new C.Engine({attempts:0});a(!e.drop());a(e.refill());for(let i=0;i<60;i++)e.step(1/120,{right:true,back:true});a(e.claw.x>0&&e.claw.z>.55&&e.claw.sway>0);for(let i=0;i<90;i++)e.step(1/120);a.equal(e.claw.sway,0);});
-console.log(total+' claw engine tests passed');
+const fs = require("node:fs"),
+  vm = require("node:vm"),
+  a = require("node:assert/strict");
+const ctx = vm.createContext({});
+for (const f of ["catalog", "engine"])
+  vm.runInContext(fs.readFileSync(`js/games/claw/${f}.js`, "utf8"), ctx);
+const C = ctx.SianClaw;
+let total = 0;
+function test(s, f) {
+  f();
+  console.log("PASS", s);
+  total++;
+}
+function run(e) {
+  for (let n = 0; n < 2000 && e.phase !== "result"; n++) e.step(1 / 120);
+  a.equal(e.phase, "result");
+}
+test("12 unique original toys and four rarities", () => {
+  a.equal(C.catalog.length, 12);
+  a.equal(new Set(C.catalog.map((t) => t.id)).size, 12);
+  a.equal(new Set(C.catalog.map((t) => t.rarity)).size, 4);
+});
+test("centered drops succeed for every weight and size", () => {
+  for (const d of C.catalog) {
+    const e = new C.Engine();
+    const t = e.toys.find((t) => t.id === d.id);
+    e.claw.x = t.x;
+    e.claw.z = t.z;
+    a(e.drop());
+    run(e);
+    a.equal(e.result.toyId, d.id);
+    a(e.result.success);
+    a.equal(e.events.delivery, 1);
+  }
+});
+test("empty area fails without random reward", () => {
+  const e = new C.Engine();
+  e.claw.x = -240;
+  e.claw.z = 0.07;
+  e.drop();
+  run(e);
+  a.equal(e.result.success, false);
+  a.equal(e.events.delivery, undefined);
+});
+test("offset influences enclosure and holding margin", () => {
+  const e = new C.Engine(),
+    t = e.toys[1],
+    d = C.catalog[1];
+  e.claw.x = t.x;
+  e.claw.z = t.z;
+  const good = C.evaluateGrip(e.claw, t, d);
+  e.claw.x += 43;
+  const bad = C.evaluateGrip(e.claw, t, d);
+  a(good.force > bad.force);
+  a(good.margin > 0);
+  a(bad.margin < 0);
+});
+test("marginal grip lifts then slips physically", () => {
+  const e = new C.Engine(),
+    t = e.toys[1];
+  e.claw.x = t.x + 27;
+  e.claw.z = t.z;
+  e.drop();
+  run(e);
+  a(e.events.grip);
+  a(e.events.slip);
+  a.equal(e.result.success, false);
+  a.equal(t.won, false);
+});
+test("drop debounces and aim locks during sequence", () => {
+  const e = new C.Engine();
+  a(e.drop());
+  a(!e.drop());
+  a.equal(e.attempts, 9);
+  const x = e.claw.x;
+  e.step(0.01, { right: true });
+  a.equal(e.claw.x, x);
+  run(e);
+  e.resetRound();
+  a.equal(e.phase, "aim");
+});
+test("all crane phases in order", () => {
+  const phases = [],
+    e = new C.Engine({
+      onEvent: (e) => {
+        if (e.type === "phase") phases.push(e.phase);
+      },
+    });
+  e.drop();
+  run(e);
+  a.deepEqual(phases, [
+    "descend",
+    "close",
+    "lift",
+    "transport",
+    "release",
+    "reveal",
+    "result",
+  ]);
+});
+test("movement, front/back, sway settling, free refill", () => {
+  const e = new C.Engine({ attempts: 0 });
+  a(!e.drop());
+  a(e.refill());
+  for (let i = 0; i < 60; i++) e.step(1 / 120, { right: true, back: true });
+  a(e.claw.x > 0 && e.claw.z > 0.55 && e.claw.sway > 0);
+  for (let i = 0; i < 90; i++) e.step(1 / 120);
+  a.equal(e.claw.sway, 0);
+});
+console.log(total + " claw engine tests passed");

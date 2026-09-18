@@ -1,2 +1,69 @@
-const fs=require('fs'),vm=require('vm'),assert=require('assert');class Target{constructor(){this.events={};this.dataset={};this.classList={add(){},remove(){}};}addEventListener(t,fn,o){(this.events[t]??=[]).push(fn);o?.signal.addEventListener('abort',()=>this.events[t]=this.events[t].filter(f=>f!==fn));}fire(t,opts={}){for(const f of this.events[t]||[])f({preventDefault(){},...opts});}setPointerCapture(){}querySelectorAll(){return this.buttons||[];}count(){return Object.values(this.events).flat().length;}}
-const win=new Target(),doc=new Target(),root=new Target(),canvas=new Target();root.buttons=['left','right','front','back'].map(move=>{const b=new Target();b.dataset.move=move;return b;});const c=vm.createContext({SianClaw:{},window:win,document:doc,AbortController});vm.runInContext(fs.readFileSync('js/games/claw/controls.js','utf8'),c);for(let run=0;run<3;run++){const controls=new c.SianClaw.Controls(root,canvas,{}, {},()=>{});const [left,right,front]=root.buttons;left.fire('pointerdown',{pointerId:1});front.fire('pointerdown',{pointerId:2});assert(controls.read().left&&controls.read().front);left.fire('pointercancel',{pointerId:1});assert(!controls.read().left&&controls.read().front);win.fire('blur');assert(!controls.read().front);right.fire('pointerdown',{pointerId:3});doc.hidden=true;doc.fire('visibilitychange');assert(!controls.read().right);controls.destroy();assert.equal(win.count()+doc.count()+canvas.count()+root.buttons.reduce((n,b)=>n+b.count(),0),0);}console.log('PASS 3 lifecycle cycles, independent pointers, cancel, blur, visibility, all listener cleanup');
+const fs = require("fs"),
+  vm = require("vm"),
+  assert = require("assert");
+class Target {
+  constructor() {
+    this.events = {};
+    this.dataset = {};
+    this.classList = { add() {}, remove() {} };
+  }
+  addEventListener(t, fn, o) {
+    (this.events[t] ??= []).push(fn);
+    o?.signal.addEventListener(
+      "abort",
+      () => (this.events[t] = this.events[t].filter((f) => f !== fn)),
+    );
+  }
+  fire(t, opts = {}) {
+    for (const f of this.events[t] || []) f({ preventDefault() {}, ...opts });
+  }
+  setPointerCapture() {}
+  querySelectorAll() {
+    return this.buttons || [];
+  }
+  count() {
+    return Object.values(this.events).flat().length;
+  }
+}
+const win = new Target(),
+  doc = new Target(),
+  root = new Target(),
+  canvas = new Target();
+root.buttons = ["left", "right", "front", "back"].map((move) => {
+  const b = new Target();
+  b.dataset.move = move;
+  return b;
+});
+const c = vm.createContext({
+  SianClaw: {},
+  window: win,
+  document: doc,
+  AbortController,
+});
+vm.runInContext(fs.readFileSync("js/games/claw/controls.js", "utf8"), c);
+for (let run = 0; run < 3; run++) {
+  const controls = new c.SianClaw.Controls(root, canvas, {}, {}, () => {});
+  const [left, right, front] = root.buttons;
+  left.fire("pointerdown", { pointerId: 1 });
+  front.fire("pointerdown", { pointerId: 2 });
+  assert(controls.read().left && controls.read().front);
+  left.fire("pointercancel", { pointerId: 1 });
+  assert(!controls.read().left && controls.read().front);
+  win.fire("blur");
+  assert(!controls.read().front);
+  right.fire("pointerdown", { pointerId: 3 });
+  doc.hidden = true;
+  doc.fire("visibilitychange");
+  assert(!controls.read().right);
+  controls.destroy();
+  assert.equal(
+    win.count() +
+      doc.count() +
+      canvas.count() +
+      root.buttons.reduce((n, b) => n + b.count(), 0),
+    0,
+  );
+}
+console.log(
+  "PASS 3 lifecycle cycles, independent pointers, cancel, blur, visibility, all listener cleanup",
+);
