@@ -22,10 +22,11 @@ function gameShell(title, body, controls = "") {
   gameBody.querySelector(".backWorld").onclick = openGameWorld;
 }
 function playBrick() {
+  const touchMode = window.matchMedia("(pointer: coarse)").matches;
   gameShell(
     "🧱 벽돌깨기",
-    `<div class="brickScene plainBrick"><div class="brickField"></div><div class="pixelBall">⭐</div><div class="pixelPaddle"></div></div><p class="gameStatus">마우스나 버튼으로 받침대를 움직여 벽돌을 모두 깨요!</p>`,
-    `<button class="moveL">◀</button><button class="moveR">▶</button>`,
+    `<div class="brickScene plainBrick" aria-label="벽돌깨기 게임 영역"><div class="brickField"></div><div class="pixelBall">⭐</div><div class="pixelPaddle"></div></div><p class="gameStatus">${touchMode ? "손가락으로 받침대를 움직여 벽돌을 모두 깨요!" : "마우스나 방향키로 받침대를 움직여 벽돌을 모두 깨요!"}</p>`,
+    `<button class="moveL" aria-label="받침대 왼쪽 이동">◀</button><button class="moveR" aria-label="받침대 오른쪽 이동">▶</button>`,
   );
   let x = 50,
     y = 75,
@@ -87,19 +88,41 @@ function playBrick() {
     draw();
     raf = Session.frame(step);
   }
-  scene.onmousemove = (e) => {
+  const movePaddle = (clientX) => {
     let r = scene.getBoundingClientRect();
-    p = Math.max(13, Math.min(87, ((e.clientX - r.left) / r.width) * 100));
+    p = Math.max(13, Math.min(87, ((clientX - r.left) / r.width) * 100));
     draw();
   };
-  gameBody.querySelector(".moveL").onclick = () => {
+  scene.onmousemove = (e) => movePaddle(e.clientX);
+  let dragPointer = null;
+  scene.onpointerdown = (e) => {
+    if (e.pointerType === "mouse") return;
+    dragPointer = e.pointerId;
+    scene.setPointerCapture?.(e.pointerId);
+    movePaddle(e.clientX);
+  };
+  scene.onpointermove = (e) => {
+    if (e.pointerId === dragPointer) movePaddle(e.clientX);
+  };
+  const releasePointer = (e) => {
+    if (e.pointerId === dragPointer) dragPointer = null;
+  };
+  scene.onpointerup = releasePointer;
+  scene.onpointercancel = releasePointer;
+  const left = () => {
     p = Math.max(13, p - 12);
     draw();
   };
-  gameBody.querySelector(".moveR").onclick = () => {
+  const right = () => {
     p = Math.min(87, p + 12);
     draw();
   };
+  gameBody.querySelector(".moveL").onclick = left;
+  gameBody.querySelector(".moveR").onclick = right;
+  Session.key((e) => {
+    if (e.key === "ArrowLeft") left();
+    if (e.key === "ArrowRight") right();
+  });
   draw();
   raf = Session.frame(step);
 }
