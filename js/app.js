@@ -14,48 +14,48 @@ const GAMES = [
     "한글 달리기",
     "LETTER ADVENTURE",
     "점프하며 글자를 모아요",
-    "가",
-    "#d9eef9",
+    "assets/game-cards/hangul-runner.webp",
+    "시안이가 한글 블록을 모으며 달리는 모습",
   ],
   [
     "brick",
     "별빛 벽돌깨기",
     "STAR BREAKER",
     "통통 튀는 공으로 별을 깨워요",
-    "▰",
-    "#d9ecdf",
+    "assets/game-cards/star-breaker.webp",
+    "시안이가 빛나는 공으로 벽돌을 깨는 모습",
   ],
   [
     "memory",
     "영어 카드 뒤집기",
     "ALPHABET FRIENDS",
-    "숨은 알파벳 짝을 찾아요",
-    "Aa",
-    "#e4def7",
+    "숨은 영어 친구를 찾아요",
+    "assets/game-cards/alphabet-friends.webp",
+    "시안이가 영어 카드를 뒤집어 친구를 찾는 모습",
   ],
   [
     "claw",
     "토이 인형뽑기",
     "TOY COLLECTION",
     "집게를 움직여 친구를 잡아요",
-    "⌁",
-    "#fae0e6",
+    "assets/game-cards/toy-claw.webp",
+    "시안이가 집게로 인형을 뽑는 모습",
   ],
   [
     "shape",
-    "그림 퍼즐",
-    "PICTURE PUZZLE",
-    "조각조각, 하나의 그림으로",
-    "▧",
-    "#faeacb",
+    "명화 퍼즐",
+    "MASTERPIECE PUZZLE",
+    "조각조각 명화를 완성해요",
+    "assets/game-cards/masterpiece-puzzle.webp",
+    "시안이가 별이 빛나는 밤 퍼즐을 맞추는 모습",
   ],
   [
     "tetris",
     "블록 공장",
     "BLOCK FACTORY",
     "차곡차곡 빈틈없이 쌓아요",
-    "▦",
-    "#dce7f9",
+    "assets/game-cards/block-factory.webp",
+    "시안이가 빛나는 블록 게임을 완성하는 모습",
   ],
 ];
 const escapeText = (s) =>
@@ -74,7 +74,7 @@ function render() {
 function cards() {
   return GAMES.map(
     (g) =>
-      `<button class="adventureCard" data-game="${g[0]}" style="--tint:${g[5]}"><div class="cardPicture"><span>${g[4]}</span><i>✦</i></div><div class="cardCopy"><small>${g[2]}</small><h3>${g[1]}</h3><p>${g[3]}</p><b>↗</b></div></button>`,
+      `<button class="adventureCard adventureCard--${g[0]}" data-game="${g[0]}" aria-label="${g[1]} 게임 시작"><div class="cardPicture"><img src="${g[4]}" alt="${g[5]}" loading="lazy" decoding="async"><span class="cardShine" aria-hidden="true"></span></div><div class="cardCopy"><small>${g[2]}</small><h3>${g[1]}</h3><p>${g[3]}</p><b aria-hidden="true">→</b></div></button>`,
   ).join("");
 }
 function subjectButtons() {
