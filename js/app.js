@@ -74,14 +74,14 @@ function openGameWorld(){
  <button class="pixelGame pgMath" data-pg="brick"><b>🧱</b><strong>벽돌깨기</strong><small>별 공으로 벽돌을 모두 깨요!</small></button>
  <button class="pixelGame pgHangul" data-pg="runner"><b>🏃</b><strong>한글 달리기</strong><small>점프해서 글자를 모아요!</small></button>
  <button class="pixelGame pgEnglish" data-pg="memory"><b>🃏</b><strong>영어 카드 뒤집기</strong><small>같은 알파벳 짝을 찾아요!</small></button>
- <button class="pixelGame pgCoding" data-pg="maze"><b>🤖</b><strong>코딩 미로</strong><small>명령으로 별까지!</small></button>
- <button class="pixelGame pgShape" data-pg="shape"><b>🧩</b><strong>도형 퍼즐</strong><small>같은 모양의 자리를 찾아요!</small></button>
+ <button class="pixelGame pgCoding" data-pg="claw"><b>🕹️</b><strong>인형뽑기</strong><small>코인을 넣고 집게로 인형을 뽑아요!</small></button>
+ <button class="pixelGame pgShape" data-pg="shape"><b>🧩</b><strong>퍼즐 맞추기</strong><small>공룡·동물·자동차·로봇 그림 퍼즐!</small></button>
  <button class="pixelGame pgTetris" data-pg="tetris"><b>🟦</b><strong>테트리스</strong><small>블록을 움직여 줄을 완성해요!</small></button></div><div class="pixelHint">★ 모든 게임을 바로 플레이할 수 있어요.</div></div>`;
  game.showModal();
  gameBody.querySelector('[data-pg="brick"]').onclick=playBrick;
  gameBody.querySelector('[data-pg="runner"]').onclick=playRunner;
  gameBody.querySelector('[data-pg="memory"]').onclick=playMemory;
- gameBody.querySelector('[data-pg="maze"]').onclick=()=>playCoding(state.progress['코딩']||0);
+ gameBody.querySelector('[data-pg="claw"]').onclick=playClaw;
  gameBody.querySelector('[data-pg="shape"]').onclick=playShape;
  gameBody.querySelector('[data-pg="tetris"]').onclick=playTetris;
 }
@@ -106,9 +106,33 @@ function playRunner(){
  const kid=gameBody.querySelector('.runnerKid'),msg=gameBody.querySelector('.gameStatus');function move(d){x=Math.max(3,Math.min(92,x+d));kid.style.left=x+'%';gameBody.querySelectorAll('.hangulCoin').forEach(c=>{if(!c.classList.contains('got')&&Math.abs(x-parseFloat(c.style.left))<6){c.classList.add('got');score++;msg.textContent='글자를 모아요! '+score+' / 5';if(score===5){msg.textContent='🎉 가나다라마를 모두 모았어! ⭐';state.stars++;save()}}})}gameBody.querySelector('[data-m="L"]').onclick=()=>move(-8);gameBody.querySelector('[data-m="R"]').onclick=()=>move(8);gameBody.querySelector('[data-m="J"]').onclick=()=>{if(jumping)return;jumping=true;kid.classList.add('jump');setTimeout(()=>{kid.classList.remove('jump');jumping=false},500)};move(0)
 }
 function playShape(){
- const shapes=['●','▲','■','★'];let done=0;
- gameShell('🧩 도형 퍼즐',`<div class="shapeGame"><div class="shapePieces">${shapes.map(s=>`<button class="shapePiece" draggable="true" data-s="${s}">${s}</button>`).join('')}</div><div class="shapeSlots">${shapes.slice().reverse().map(s=>`<button class="shapeSlot" data-s="${s}">?</button>`).join('')}</div></div><p class="gameStatus">위 도형을 누른 뒤, 같은 모양이 들어갈 자리를 눌러요.</p>`);
- let pick=null;gameBody.querySelectorAll('.shapePiece').forEach(p=>p.onclick=()=>{pick=p;gameBody.querySelectorAll('.shapePiece').forEach(x=>x.classList.remove('picked'));p.classList.add('picked')});gameBody.querySelectorAll('.shapeSlot').forEach(s=>s.onclick=()=>{if(!pick)return;if(pick.dataset.s===s.dataset.s){s.textContent=pick.dataset.s;s.classList.add('filled');pick.disabled=true;pick.classList.add('used');pick=null;done++;if(done===4){gameBody.querySelector('.gameStatus').textContent='🎉 도형 퍼즐 완성! ⭐';state.stars++;save()}}else{s.classList.add('wrongBrick');setTimeout(()=>s.classList.remove('wrongBrick'),300)}})
+ const themes=[
+  {name:'공룡 월드',icon:'🦖',tiles:['🌋','🌴','🦕','🥚','🦖','🌿','🪨','☀️','🌳']},
+  {name:'동물 친구',icon:'🦁',tiles:['🦁','🐼','🐯','🐻','🐰','🐶','🦊','🐵','🐨']},
+  {name:'자동차 도시',icon:'🚙',tiles:['🚗','🚕','🚙','🏎️','🚓','🚑','🚒','🚜','🚌']},
+  {name:'몬스터 모험',icon:'👾',tiles:['👾','🐲','🔥','⚡','💧','🌿','⭐','🥚','🏆']},
+  {name:'로봇 연구소',icon:'🤖',tiles:['🤖','⚙️','🔋','🦾','🛸','📡','💡','🔧','🚀']},
+  {name:'우주 탐험',icon:'🚀',tiles:['🚀','🌍','🌙','⭐','🪐','👨‍🚀','☄️','🛸','🌌']}
+ ]; let ti=0,moves=0,start=Date.now(),selected=null;
+ gameShell('🧩 퍼즐 맞추기','<div class="jigsawGame"><aside class="puzzleThemes"></aside><section><div class="puzzleInfo"><b id="pTitle"></b><span>이동 <strong id="pMoves">0</strong>회</span><span id="pTime">00:00</span></div><div class="jigsawBoard"></div><p class="gameStatus">두 조각을 차례로 눌러 자리를 바꿔 완성해요.</p></section></div>');
+ const themesEl=gameBody.querySelector('.puzzleThemes'),board=gameBody.querySelector('.jigsawBoard');
+ themesEl.innerHTML=themes.map((t,i)=>'<button data-theme="'+i+'">'+t.icon+' '+t.name+'</button>').join('');
+ function load(i){ti=i;moves=0;selected=null;start=Date.now();const t=themes[i];gameBody.querySelector('#pTitle').textContent=t.icon+' '+t.name;gameBody.querySelector('#pMoves').textContent=0;let arr=t.tiles.map((v,n)=>({v,n})).sort(()=>Math.random()-.5);if(arr.every((x,n)=>x.n===n))[arr[0],arr[1]]=[arr[1],arr[0]];board.innerHTML=arr.map(x=>'<button class="jPiece" data-home="'+x.n+'">'+x.v+'</button>').join('');bind()}
+ function bind(){board.querySelectorAll('.jPiece').forEach(p=>p.onclick=()=>{if(!selected){selected=p;p.classList.add('picked');return}if(selected===p){p.classList.remove('picked');selected=null;return}const marker=document.createElement('span');selected.before(marker);p.before(selected);marker.replaceWith(p);selected.classList.remove('picked');selected=null;moves++;gameBody.querySelector('#pMoves').textContent=moves;check()})}
+ function check(){const ok=[...board.children].every((p,i)=>+p.dataset.home===i);if(ok){gameBody.querySelector('.gameStatus').textContent='🎉 퍼즐 완성! '+moves+'번 만에 성공했어! ⭐';state.stars++;save();board.querySelectorAll('button').forEach(x=>x.disabled=true)}}
+ themesEl.querySelectorAll('button').forEach(b=>b.onclick=()=>load(+b.dataset.theme));load(0);
+ const clock=setInterval(()=>{if(!game.open){clearInterval(clock);return}let n=Math.floor((Date.now()-start)/1000);let e=gameBody.querySelector('#pTime');if(e)e.textContent=String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0')},1000)
+}
+function playClaw(){
+ let coins=5,x=50,prizes=0,busy=false,downHandler;
+ const toys=[['🦖',18],['🤖',32],['🧸',48],['🐼',62],['🚗',77],['🦁',87]];
+ gameShell('🕹️ 인형뽑기','<div class="clawHud"><b>🪙 코인 <span id="clawCoins">5</span></b><b>🎁 뽑은 인형 <span id="clawWins">0</span></b></div><div class="clawMachine"><div class="clawRail"><div class="clawHead">▼<div class="clawArm">│<span>⌄</span></div></div></div><div class="toyBin">'+toys.map((t,i)=>'<span class="clawToy" data-i="'+i+'" style="left:'+t[1]+'%">'+t[0]+'</span>').join('')+'</div></div><p class="gameStatus">← → 로 집게를 움직이고 Space를 눌러 뽑아봐!</p>','<button data-claw="L">◀</button><button data-claw="R">▶</button><button data-claw="GO">🪙 넣고 뽑기 (Space)</button>');
+ const head=gameBody.querySelector('.clawHead'),arm=gameBody.querySelector('.clawArm'),msg=gameBody.querySelector('.gameStatus');
+ function draw(){head.style.left=x+'%'}
+ function move(d){if(!busy)x=Math.max(8,Math.min(92,x+d));draw()}
+ function go(){if(busy)return;if(coins<=0){msg.textContent='코인이 없어! 게임월드로 돌아갔다 다시 도전해 봐.';return}coins--;gameBody.querySelector('#clawCoins').textContent=coins;busy=true;arm.classList.add('down');setTimeout(()=>{let target=[...gameBody.querySelectorAll('.clawToy:not(.won)')].sort((a,b)=>Math.abs(parseFloat(a.style.left)-x)-Math.abs(parseFloat(b.style.left)-x))[0];let hit=target&&Math.abs(parseFloat(target.style.left)-x)<8;if(hit){target.classList.add('caught');setTimeout(()=>{target.classList.add('won');target.classList.remove('caught');prizes++;gameBody.querySelector('#clawWins').textContent=prizes;msg.textContent='🎉 '+target.textContent+' 뽑기 성공! ⭐';state.stars++;save()},500)}else msg.textContent='아깝다! 인형 가운데에 집게를 맞춰봐.';arm.classList.remove('down');setTimeout(()=>busy=false,700)},900)}
+ gameBody.querySelector('[data-claw="L"]').onclick=()=>move(-7);gameBody.querySelector('[data-claw="R"]').onclick=()=>move(7);gameBody.querySelector('[data-claw="GO"]').onclick=go;
+ downHandler=e=>{if(!game.open)return;if(e.key==='ArrowLeft'){e.preventDefault();move(-5)}if(e.key==='ArrowRight'){e.preventDefault();move(5)}if(e.key===' '){e.preventDefault();go()}};document.addEventListener('keydown',downHandler);const back=gameBody.querySelector('.backWorld');if(back)back.addEventListener('click',()=>document.removeEventListener('keydown',downHandler),{once:true});draw()
 }
 function playTetris(){
  const W=10,H=16,board=Array.from({length:H},()=>Array(W).fill(0)),pieces=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0],[1,0],[1,1]],[[0,1],[0,1],[1,1]]];let piece,x,y,timer,score=0,over=false;
