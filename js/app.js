@@ -70,13 +70,13 @@ function playCoding(levelIndex=0){
 
 
 function openGameWorld(){
- gameBody.innerHTML=\`<div class="pixelWorld"><div class="pixelTitle"><span>★ ★ ★ ★ ★</span><h2>시안Hi 게임월드</h2><p>원하는 게임을 골라서 출발!</p></div><div class="pixelGames">
+ gameBody.innerHTML=`<div class="pixelWorld"><div class="pixelTitle"><span>★ ★ ★ ★ ★</span><h2>시안Hi 게임월드</h2><p>원하는 게임을 골라서 출발!</p></div><div class="pixelGames">
  <button class="pixelGame pgMath" data-pg="brick"><b>🧱</b><strong>벽돌깨기</strong><small>별 공으로 벽돌을 모두 깨요!</small></button>
  <button class="pixelGame pgHangul" data-pg="runner"><b>🏃</b><strong>한글 달리기</strong><small>점프해서 글자를 모아요!</small></button>
  <button class="pixelGame pgEnglish" data-pg="memory"><b>🃏</b><strong>영어 카드 뒤집기</strong><small>같은 알파벳 짝을 찾아요!</small></button>
  <button class="pixelGame pgCoding" data-pg="maze"><b>🤖</b><strong>코딩 미로</strong><small>명령으로 별까지!</small></button>
  <button class="pixelGame pgShape" data-pg="shape"><b>🧩</b><strong>도형 퍼즐</strong><small>같은 모양의 자리를 찾아요!</small></button>
- <button class="pixelGame pgTetris" data-pg="tetris"><b>🟦</b><strong>테트리스</strong><small>블록을 움직여 줄을 완성해요!</small></button></div><div class="pixelHint">★ 모든 게임을 바로 플레이할 수 있어요.</div></div>\`;
+ <button class="pixelGame pgTetris" data-pg="tetris"><b>🟦</b><strong>테트리스</strong><small>블록을 움직여 줄을 완성해요!</small></button></div><div class="pixelHint">★ 모든 게임을 바로 플레이할 수 있어요.</div></div>`;
  game.showModal();
  gameBody.querySelector('[data-pg="brick"]').onclick=playBrick;
  gameBody.querySelector('[data-pg="runner"]').onclick=playRunner;
@@ -85,9 +85,9 @@ function openGameWorld(){
  gameBody.querySelector('[data-pg="shape"]').onclick=playShape;
  gameBody.querySelector('[data-pg="tetris"]').onclick=playTetris;
 }
-function gameShell(title,body,controls=''){gameBody.innerHTML=\`<div class="arcade"><div class="arcadeTop"><b>\${title}</b><button class="backWorld">← 게임월드</button></div>\${body}<div class="arcadeControls">\${controls}</div></div>\`;gameBody.querySelector('.backWorld').onclick=openGameWorld}
+function gameShell(title,body,controls=''){gameBody.innerHTML=`<div class="arcade"><div class="arcadeTop"><b>${title}</b><button class="backWorld">← 게임월드</button></div>${body}<div class="arcadeControls">${controls}</div></div>`;gameBody.querySelector('.backWorld').onclick=openGameWorld}
 function playBrick(){
- gameShell('🧱 벽돌깨기',\`<div class="brickScene plainBrick"><div class="brickField"></div><div class="pixelBall">⭐</div><div class="pixelPaddle"></div></div><p class="gameStatus">마우스나 버튼으로 받침대를 움직여 벽돌을 모두 깨요!</p>\`,\`<button class="moveL">◀</button><button class="moveR">▶</button>\`);
+ gameShell('🧱 벽돌깨기',`<div class="brickScene plainBrick"><div class="brickField"></div><div class="pixelBall">⭐</div><div class="pixelPaddle"></div></div><p class="gameStatus">마우스나 버튼으로 받침대를 움직여 벽돌을 모두 깨요!</p>`,`<button class="moveL">◀</button><button class="moveR">▶</button>`);
  let x=50,y=75,vx=1.05,vy=-1.15,p=50,lives=3,run=true,raf;const scene=gameBody.querySelector('.brickScene'),field=gameBody.querySelector('.brickField'),ball=gameBody.querySelector('.pixelBall'),pad=gameBody.querySelector('.pixelPaddle'),msg=gameBody.querySelector('.gameStatus');
  for(let i=0;i<24;i++){let e=document.createElement('div');e.className='plainBlock';e.style.left=(5+(i%6)*15.5)+'%';e.style.top=(10+Math.floor(i/6)*8)+'%';field.appendChild(e)}
  const draw=()=>{ball.style.left=x+'%';ball.style.top=y+'%';pad.style.left=p+'%'};
@@ -97,25 +97,25 @@ function playBrick(){
 }
 function playMemory(){
  const vals=['A','A','B','B','C','C','D','D','E','E','F','F'].sort(()=>Math.random()-.5);let first=null,lock=false,done=0;
- gameShell('🃏 영어 카드 뒤집기',\`<div class="memoryGrid">\${vals.map((v,i)=>\`<button class="memoryCard" data-v="\${v}"><span>?</span></button>\`).join('')}</div><p class="gameStatus">같은 알파벳 두 장을 찾아봐!</p>\`);
+ gameShell('🃏 영어 카드 뒤집기',`<div class="memoryGrid">${vals.map((v,i)=>`<button class="memoryCard" data-v="${v}"><span>?</span></button>`).join('')}</div><p class="gameStatus">같은 알파벳 두 장을 찾아봐!</p>`);
  gameBody.querySelectorAll('.memoryCard').forEach(c=>c.onclick=()=>{if(lock||c.classList.contains('matched')||c===first)return;c.classList.add('open');c.querySelector('span').textContent=c.dataset.v;if(!first){first=c;return}if(first.dataset.v===c.dataset.v){first.classList.add('matched');c.classList.add('matched');first=null;done+=2;if(done===vals.length){gameBody.querySelector('.gameStatus').textContent='🎉 모든 알파벳 짝을 찾았어! ⭐';state.stars++;save()}}else{lock=true;let a=first;first=null;setTimeout(()=>{a.classList.remove('open');c.classList.remove('open');a.querySelector('span').textContent=c.querySelector('span').textContent='?';lock=false},650)}})
 }
 function playRunner(){
  let score=0,x=8,jumping=false,items=['가','나','다','라','마'];
- gameShell('🏃 한글 달리기',\`<div class="runnerScene"><div class="runnerKid">🏃</div>\${items.map((v,i)=>\`<span class="hangulCoin" style="left:\${24+i*14}%">\${v}</span>\`).join('')}<div class="runnerGround"></div></div><p class="gameStatus">화살표로 달리고 점프로 글자를 모아요! 0 / 5</p>\`,\`<button data-m="L">◀</button><button data-m="J">⬆ 점프</button><button data-m="R">▶</button>\`);
+ gameShell('🏃 한글 달리기',`<div class="runnerScene"><div class="runnerKid">🏃</div>${items.map((v,i)=>`<span class="hangulCoin" style="left:${24+i*14}%">${v}</span>`).join('')}<div class="runnerGround"></div></div><p class="gameStatus">화살표로 달리고 점프로 글자를 모아요! 0 / 5</p>`,`<button data-m="L">◀</button><button data-m="J">⬆ 점프</button><button data-m="R">▶</button>`);
  const kid=gameBody.querySelector('.runnerKid'),msg=gameBody.querySelector('.gameStatus');function move(d){x=Math.max(3,Math.min(92,x+d));kid.style.left=x+'%';gameBody.querySelectorAll('.hangulCoin').forEach(c=>{if(!c.classList.contains('got')&&Math.abs(x-parseFloat(c.style.left))<6){c.classList.add('got');score++;msg.textContent='글자를 모아요! '+score+' / 5';if(score===5){msg.textContent='🎉 가나다라마를 모두 모았어! ⭐';state.stars++;save()}}})}gameBody.querySelector('[data-m="L"]').onclick=()=>move(-8);gameBody.querySelector('[data-m="R"]').onclick=()=>move(8);gameBody.querySelector('[data-m="J"]').onclick=()=>{if(jumping)return;jumping=true;kid.classList.add('jump');setTimeout(()=>{kid.classList.remove('jump');jumping=false},500)};move(0)
 }
 function playShape(){
  const shapes=['●','▲','■','★'];let done=0;
- gameShell('🧩 도형 퍼즐',\`<div class="shapeGame"><div class="shapePieces">\${shapes.map(s=>\`<button class="shapePiece" draggable="true" data-s="\${s}">\${s}</button>\`).join('')}</div><div class="shapeSlots">\${shapes.slice().reverse().map(s=>\`<button class="shapeSlot" data-s="\${s}">?</button>\`).join('')}</div></div><p class="gameStatus">위 도형을 누른 뒤, 같은 모양이 들어갈 자리를 눌러요.</p>\`);
+ gameShell('🧩 도형 퍼즐',`<div class="shapeGame"><div class="shapePieces">${shapes.map(s=>`<button class="shapePiece" draggable="true" data-s="${s}">${s}</button>`).join('')}</div><div class="shapeSlots">${shapes.slice().reverse().map(s=>`<button class="shapeSlot" data-s="${s}">?</button>`).join('')}</div></div><p class="gameStatus">위 도형을 누른 뒤, 같은 모양이 들어갈 자리를 눌러요.</p>`);
  let pick=null;gameBody.querySelectorAll('.shapePiece').forEach(p=>p.onclick=()=>{pick=p;gameBody.querySelectorAll('.shapePiece').forEach(x=>x.classList.remove('picked'));p.classList.add('picked')});gameBody.querySelectorAll('.shapeSlot').forEach(s=>s.onclick=()=>{if(!pick)return;if(pick.dataset.s===s.dataset.s){s.textContent=pick.dataset.s;s.classList.add('filled');pick.disabled=true;pick.classList.add('used');pick=null;done++;if(done===4){gameBody.querySelector('.gameStatus').textContent='🎉 도형 퍼즐 완성! ⭐';state.stars++;save()}}else{s.classList.add('wrongBrick');setTimeout(()=>s.classList.remove('wrongBrick'),300)}})
 }
 function playTetris(){
  const W=10,H=16,board=Array.from({length:H},()=>Array(W).fill(0)),pieces=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0],[1,0],[1,1]],[[0,1],[0,1],[1,1]]];let piece,x,y,timer,score=0,over=false;
- gameShell('🟦 테트리스',\`<div class="tetrisWrap"><div class="tetrisBoard"></div><div class="tetrisSide"><b>점수</b><strong id="tScore">0</strong><p>블록을 움직여<br>가로줄을 채워요!</p></div></div><p class="gameStatus">시작!</p>\`,\`<button data-t="L">◀</button><button data-t="R">▶</button><button data-t="D">▼</button><button data-t="X">↻ 회전</button>\`);
+ gameShell('🟦 테트리스',`<div class="tetrisWrap"><div class="tetrisBoard"></div><div class="tetrisSide"><b>점수</b><strong id="tScore">0</strong><p>블록을 움직여<br>가로줄을 채워요!</p></div></div><p class="gameStatus">시작!</p>`,`<button data-t="L">◀</button><button data-t="R">▶</button><button data-t="D">▼</button><button data-t="X">↻ 회전</button>`);
  const el=gameBody.querySelector('.tetrisBoard'),msg=gameBody.querySelector('.gameStatus');function spawn(){piece=pieces[Math.floor(Math.random()*pieces.length)].map(r=>[...r]);x=3;y=0;if(hit(0,0,piece)){over=true;clearInterval(timer);msg.textContent='게임 종료! 점수 '+score+'점'}}
  function hit(dx,dy,p=piece){return p.some((r,yy)=>r.some((v,xx)=>v&&(y+yy+dy>=H||x+xx+dx<0||x+xx+dx>=W||board[y+yy+dy]?.[x+xx+dx])))}
- function renderT(){let temp=board.map(r=>[...r]);piece?.forEach((r,yy)=>r.forEach((v,xx)=>{if(v&&temp[y+yy])temp[y+yy][x+xx]=2}));el.innerHTML=temp.flat().map(v=>\`<i class="\${v?'on':''} \${v===2?'fall':''}"></i>\`).join('')}
+ function renderT(){let temp=board.map(r=>[...r]);piece?.forEach((r,yy)=>r.forEach((v,xx)=>{if(v&&temp[y+yy])temp[y+yy][x+xx]=2}));el.innerHTML=temp.flat().map(v=>`<i class="${v?'on':''} ${v===2?'fall':''}"></i>`).join('')}
  function lock(){piece.forEach((r,yy)=>r.forEach((v,xx)=>{if(v)board[y+yy][x+xx]=1}));for(let r=H-1;r>=0;r--)if(board[r].every(Boolean)){board.splice(r,1);board.unshift(Array(W).fill(0));score+=100;document.getElementById('tScore').textContent=score;r++}spawn();renderT()}
  function drop(){if(over)return;if(!hit(0,1)){y++}else lock();renderT()}function rotate(){let p=piece[0].map((_,i)=>piece.map(r=>r[i]).reverse());if(!hit(0,0,p))piece=p;renderT()}
  gameBody.querySelector('[data-t="L"]').onclick=()=>{if(!hit(-1,0))x--;renderT()};gameBody.querySelector('[data-t="R"]').onclick=()=>{if(!hit(1,0))x++;renderT()};gameBody.querySelector('[data-t="D"]').onclick=drop;gameBody.querySelector('[data-t="X"]').onclick=rotate;spawn();renderT();timer=setInterval(drop,600)
