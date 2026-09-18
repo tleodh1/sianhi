@@ -398,72 +398,129 @@ p {
 .adventureGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
+  gap: 24px;
+  align-items: stretch;
 }
 .adventureCard {
   padding: 0;
-  border: 1px solid var(--line);
+  border: 4px solid #fff;
   background: #fff;
-  border-radius: 22px;
+  border-radius: 28px;
   overflow: hidden;
   text-align: left;
-  transition: 0.2s;
+  box-shadow: 0 8px 0 #d8eaf3, 0 18px 34px #315d7b26;
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
+  isolation: isolate;
+  transform: translateZ(0);
 }
-.adventureCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 25px #315d7b12;
+.adventureCard:hover,
+.adventureCard:focus-visible {
+  transform: translateY(-9px) scale(1.018);
+  box-shadow: 0 12px 0 #cce3ef, 0 26px 44px #244f7638;
+  outline: none;
+}
+.adventureCard:focus-visible {
+  box-shadow: 0 0 0 4px #ffd75c, 0 12px 0 #cce3ef, 0 26px 44px #244f7638;
+}
+.adventureCard:active {
+  transform: translateY(-2px) scale(0.99);
 }
 .cardPicture {
-  height: 160px;
-  background: linear-gradient(140deg, var(--tint), #fbfcff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  aspect-ratio: 4 / 3;
+  background: #bcecff;
   position: relative;
+  overflow: hidden;
 }
-.cardPicture > span {
-  font-size: 62px;
-  line-height: 1;
-  color: #fff;
-  text-shadow:
-    0 4px 0 #7295b239,
-    0 8px 14px #6084a72b;
-  transform: rotate(-8deg);
-  font-weight: 850;
-}
-.cardPicture > i {
+.cardPicture::after {
+  content: "";
   position: absolute;
-  right: 24%;
-  top: 25%;
-  font-size: 23px;
-  font-style: normal;
-  color: #e4c885;
+  inset: auto 0 0;
+  height: 24%;
+  background: linear-gradient(transparent, #0a376b3d);
+  pointer-events: none;
+}
+.cardPicture img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.55s cubic-bezier(.2,.7,.2,1), filter 0.35s;
+}
+.cardShine {
+  position: absolute;
+  inset: -35% auto auto -55%;
+  width: 45%;
+  height: 180%;
+  z-index: 2;
+  transform: rotate(22deg);
+  background: linear-gradient(90deg, transparent, #ffffff75, transparent);
+  pointer-events: none;
+}
+.adventureCard:hover .cardPicture img,
+.adventureCard:focus-visible .cardPicture img {
+  transform: scale(1.055);
+  filter: saturate(1.08) brightness(1.03);
+}
+.adventureCard:hover .cardShine,
+.adventureCard:focus-visible .cardShine {
+  animation: cardShimmer 0.85s ease-out;
 }
 .cardCopy {
-  padding: 21px 24px;
+  min-height: 132px;
+  padding: 18px 64px 19px 21px;
   position: relative;
+  background: linear-gradient(180deg, #fff, #f8fcff);
 }
 .cardCopy small {
-  font-size: 9px;
-  letter-spacing: 1.3px;
-  font-weight: 850;
-  color: #91a4b8;
+  font-size: 11px;
+  letter-spacing: 1.15px;
+  font-weight: 900;
+  color: #3b7198;
 }
 .cardCopy h3 {
-  font-size: 18px;
-  color: #3d5a71;
-  margin: 9px 0 8px;
+  font-size: 21px;
+  line-height: 1.15;
+  color: #173b79;
+  margin: 7px 0 7px;
+  letter-spacing: -0.55px;
 }
 .cardCopy p {
-  font-size: 12px;
-  color: #91a3b5;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 650;
+  color: #607d96;
 }
 .cardCopy > b {
   position: absolute;
-  right: 24px;
-  bottom: 28px;
-  font-size: 18px;
-  color: #98adbe;
+  right: 18px;
+  bottom: 25px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #39c8ff, #1484e8);
+  border: 3px solid #fff;
+  box-shadow: 0 5px 0 #0871c6, 0 8px 14px #1687ee38;
+  font-size: 22px;
+  color: #fff;
+  transition: transform 0.2s;
+}
+.adventureCard:hover .cardCopy > b,
+.adventureCard:focus-visible .cardCopy > b {
+  transform: translateX(4px) rotate(-6deg);
+}
+@keyframes cardShimmer {
+  from { left: -55%; }
+  to { left: 125%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .adventureCard,
+  .cardPicture img,
+  .cardCopy > b { transition: none; }
+  .adventureCard:hover .cardShine,
+  .adventureCard:focus-visible .cardShine { animation: none; }
 }
 .encourage {
   margin: 30px 0 0;
@@ -916,29 +973,28 @@ p {
   }
   .adventureGrid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  .cardPicture {
-    height: 120px;
-  }
-  .cardPicture > span {
-    font-size: 48px;
+    gap: 16px;
   }
   .cardCopy {
-    padding: 16px;
+    min-height: 122px;
+    padding: 15px 54px 16px 16px;
   }
   .cardCopy small {
-    font-size: 8px;
-    letter-spacing: 0.7px;
+    font-size: 10px;
+    letter-spacing: 0.75px;
   }
   .cardCopy h3 {
-    font-size: 15px;
+    font-size: 18px;
   }
   .cardCopy p {
-    font-size: 10px;
+    font-size: 12px;
   }
   .cardCopy > b {
-    display: none;
+    right: 13px;
+    bottom: 20px;
+    width: 36px;
+    height: 36px;
+    font-size: 19px;
   }
   .headingLine h2 {
     font-size: 21px;
@@ -1001,6 +1057,28 @@ p {
   }
   .parentPage article {
     padding: 23px;
+  }
+}
+@media (max-width: 560px) {
+  .adventureGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .adventureCard {
+    width: 100%;
+    border-radius: 24px;
+  }
+  .cardCopy {
+    min-height: 118px;
+    padding: 16px 60px 17px 18px;
+  }
+  .cardCopy h3 { font-size: 20px; }
+  .cardCopy p { font-size: 13px; }
+  .cardCopy > b {
+    width: 40px;
+    height: 40px;
+    right: 16px;
+    bottom: 22px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
