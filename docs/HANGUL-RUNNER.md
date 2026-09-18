@@ -30,7 +30,7 @@ collection, records의 다른 키는 유지. records.hangulRunner(version 1)에 
    teal jelly/purple sprout/rock/log/thorn/crate/gold coin/star/star-fruit/cloud/flowers/portal.
 3. scenery: transparent 2x2 parallax atlas: distant floating mountains,
    ivory teal-roof castle island, cliff waterfall, dense rounded forest.
-すべて original design, no franchise character/object, no labels or UI.
+All original design, no franchise character/object, no labels or UI.
 
 ## 검증 명령
 node tests/hangul-runner.test.cjs
@@ -43,3 +43,17 @@ npm test
 피격 무적 1.6초. 낙하 후 0.85초에 체크포인트 재시작.
 작은 상태 HP 소진 시 HP 3으로 재도전, 글자/아이템 중복 획득 없음.
 콘텐츠 확장은 stages에 항목 추가. 새 지형은 buildStage에서 배치.
+
+## 2026-09-18 검증 기록
+- 엔진 테스트 11개: 통과. 7개 단계 모두 정상 이동/점프만으로 완주.
+- 입력 테스트: 3회 생성/종료, 두 포인터 동시 입력/취소/blur 후 해제 통과.
+- 로컬 PC 브라우저 실제 키보드 Stage 1 완주: 14/14 글자, 모험 별 9,
+  코인 18, 124초, HP 1, 평가 2별. 다음 단계 진입과 재진입 시 해금 유지 확인.
+- 로컬 PC 및 390px 프레임 각각 열기/조작/닫기/재진입 3회 확인.
+  열린 세션 RAF 소유 1개/입력 리스너 22개, 닫힌 세션 모두 0.
+  자체 반복 타이머 없음. AudioContext/ResizeObserver/RAF도 종료 시 해제.
+- 모바일 390px dialog clientWidth=scrollWidth=359px. 가로 넘침 없음.
+- tests/runner-responsive.html은 로컬 반응형 확인용. 운영 CSP는 iframe 삽입을
+  차단하므로 운영에서 해당 fixture를 사용하지 않는다.
+- 홈/학습/core.js/기타 게임 함수/기존 CSS/Vercel 보안 설정 원문 동일 검증.
+- 실제 iOS/Android 장치 및 운영 모바일 터치 실기기 테스트는 이 환경에서 미실시.
