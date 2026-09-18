@@ -113,6 +113,10 @@ const Session = {
     this.frames.add(id);
     return id;
   },
+  cleanup(fn) {
+    this.cleanups.push(fn);
+    return fn;
+  },
   key(fn) {
     this.keys.push(fn);
     document.addEventListener("keydown", fn);
