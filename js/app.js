@@ -57,6 +57,14 @@ const GAMES = [
     "assets/game-cards/block-factory.webp",
     "시안이가 빛나는 블록 게임을 완성하는 모습",
   ],
+  [
+    "robot",
+    "로봇 메이커",
+    "ROBOT ARENA",
+    "내 로봇을 조립하고 배틀해요",
+    "assets/game-cards/robot-maker.webp",
+    "시안이가 자신만의 로봇을 조립하는 모습",
+  ],
 ];
 const escapeText = (s) =>
   String(s).replace(
@@ -139,6 +147,7 @@ function launch(id) {
     claw: playClaw,
     shape: playShape,
     tetris: playTetris,
+    robot: playRobot,
   }[id];
   if (fn) fn();
 }
