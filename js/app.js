@@ -65,6 +65,14 @@ const GAMES = [
     "assets/game-cards/robot-maker.webp",
     "시안이가 자신만의 로봇을 조립하는 모습",
   ],
+  [
+    "autobattler",
+    "스타 보드",
+    "3D AUTO BATTLE",
+    "친구를 모아 별빛 체스 전투!",
+    "assets/game-cards/star-board.webp",
+    "오리지널 기계 친구들이 별빛 체스판에서 모험하는 모습",
+  ],
 ];
 const escapeText = (s) =>
   String(s).replace(
@@ -148,6 +156,7 @@ function launch(id) {
     shape: playShape,
     tetris: playTetris,
     robot: playRobot,
+    autobattler: playAutoBattler,
   }[id];
   if (fn) fn();
 }
