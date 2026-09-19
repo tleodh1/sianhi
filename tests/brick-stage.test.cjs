@@ -9,4 +9,5 @@ const types=new Set(B.stages.flatMap(s=>s.bricks.map(b=>b.type)));
 for(const t of ["normal","strong","hard","metal","moving","explosive","star","multiball","mystery"])assert.ok(types.has(t),t);
 const s={records:{},stars:5};vm.runInContext(fs.readFileSync("js/games/brick/storage.js","utf8"),c);c.state=s;
 const delta=B.complete(s,1,1000,3,42);assert.equal(delta,3);assert.equal(s.records.starBreaker.unlocked,2);assert.equal(s.stars,8);
+const game=fs.readFileSync("js/games/brick/game.js","utf8"),css=fs.readFileSync("css/games/brick.css","utf8");assert.match(game,/starRewardParticle/);assert.match(game,/starCountPop/);assert.match(css,/starBrick\.star \.brickSymbol/);assert.match(css,/starRewardBurst/);
 console.log("PASS 30-stage brick data, all brick types, boss and additive progress");
