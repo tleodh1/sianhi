@@ -17,7 +17,7 @@
    for(const c of this.stage.currents||[])if(p.x>=c.x&&p.x<c.x+c.w){p.velocityX+=c.vx;p.velocityY+=c.vy*dt;}
    for(const gate of this.stage.gates||[])if(this.sequence<gate.required&&p.x+p.w>gate.x&&p.x<gate.x+20){p.x=gate.x-p.w;p.velocityX=0;}
   }
-  canCollect(item){if(item.kind!=='letter'||!this.stage.ordered)return true;
+  canCollect(item){if(item.kind!=='letter'||(!this.stage.ordered&&!this.stage.boss))return true;
    if(item.index!==this.sequence){if(this.goalHint<=0){this.goalHint=2;this.emit('order',{text:this.stage.words[this.sequence]});}return false;}this.sequence++;return true;
   }
   afterPhysics(dt){if(this.freeMotion&&this.poseTime<=0)this.player.pose='run';if(H.tickBoss&&this.stage.boss)H.tickBoss(this,dt);}
