@@ -11,7 +11,7 @@
     function loop(now){if(ended)return;const dt=(now-last)/1000;last=now;if(!document.hidden)engine.tick(dt);for(const kind of ['attack','skillCharge','launch','hit','guardHit','guard'])if((engine.events[kind]||0)>(heard[kind]||0)){heard[kind]=engine.events[kind];sound(kind==='guardHit'?'hit':kind);}view.render();
       root.querySelector('[data-php]').style.setProperty('--hp',`${engine.player.hp/engine.player.stats.hp*100}%`);
       root.querySelector('[data-ehp]').style.setProperty('--hp',`${engine.enemy.hp/engine.enemy.stats.hp*100}%`);
-      root.querySelector('[data-state]').textContent=engine.player.attackState?.skill?'SKILL!':engine.player.guard?'방어 중':difficulty.toUpperCase();
+      root.querySelector('[data-state]').textContent=engine.player.attackState?.skill?`CHARGE · ${engine.player.attackState.skillType}`:engine.player.guard?'ENERGY SHIELD':difficulty.toUpperCase();
       root.querySelector('.battleEnergy').textContent=`HP ${Math.ceil(engine.player.hp)} · 에너지 ${Math.floor(engine.player.energy)} · 공격 대기 ${engine.player.cooldown.toFixed(1)}초`;
       if(engine.over){const win=engine.result==='win',reward=R.recordBattle(build,difficulty,win),result=root.querySelector('.battleResult');result.hidden=false;result.innerHTML=`<h2>${win?'아레나 승리!':'멋진 도전이었어요!'}</h2><p>${reward?`별 ${reward}개를 얻었어요!`:'배틀 기록을 저장했어요.'}</p><button data-again>다시 배틀</button><button data-maker>메이커로</button>`;disposeControls();result.querySelector('[data-again]').onclick=()=>R.startBattle(root,build,difficulty);result.querySelector('[data-maker]').onclick=()=>R.start(build);return;}
       Session.frame(loop);
