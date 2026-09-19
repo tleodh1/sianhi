@@ -1,0 +1,12 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),vm=require("node:vm");
+const c=vm.createContext({globalThis:{}});vm.runInContext(fs.readFileSync("js/games/brick/data.js","utf8"),c);
+const B=c.globalThis.SianBrick || c.SianBrick;
+assert.equal(B.stages.length,30);
+assert.equal(B.stages[29].boss,true);
+assert.ok(B.stages[29].bricks.some(b=>b.type==="boss"));
+assert.ok(B.stages.every(s=>s.bricks.length>=10));
+const types=new Set(B.stages.flatMap(s=>s.bricks.map(b=>b.type)));
+for(const t of ["normal","strong","hard","metal","moving","explosive","star","multiball","mystery"])assert.ok(types.has(t),t);
+const s={records:{},stars:5};vm.runInContext(fs.readFileSync("js/games/brick/storage.js","utf8"),c);c.state=s;
+const delta=B.complete(s,1,1000,3,42);assert.equal(delta,3);assert.equal(s.records.starBreaker.unlocked,2);assert.equal(s.stars,8);
+console.log("PASS 30-stage brick data, all brick types, boss and additive progress");
