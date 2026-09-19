@@ -13,7 +13,7 @@ assert(
 );
 for (const level of A.levels) {
   for (const portrait of [true, false]) {
-    const e = new A.Engine(level.id, portrait);
+    const e = new A.Engine(level.id, portrait, Math.random, { rotation: false });
     assert.equal(e.order.length, e.total);
     assert.equal(new Set(e.order).size, e.total);
     assert(!e.select(-1));
@@ -43,5 +43,19 @@ assert.equal(
   -1,
 );
 console.log(
-  "PASS 20+ sourced artworks, 5 difficulties/2 orientations, wrong placement, completion, hint cap, snap bounds",
+  "PASS 20+ sourced artworks, 8 difficulties/2 orientations, wrong placement, completion, hint cap, snap bounds",
 );
+assert.deepEqual(Array.from(A.levels, (l) => l.cols * l.rows), [6,9,12,16,20,30,42,56]);
+const rotating = new A.Engine("master42", false, () => 0.26, { rotation: true, mode: "challenge" });
+assert.equal(rotating.rotationEnabled, true);
+assert.equal(rotating.rotations[0], 90);
+rotating.select(0);
+assert.equal(rotating.place(0), false);
+assert.equal(rotating.rotate(0), 180);
+assert.equal(rotating.rotate(0), 270);
+assert.equal(rotating.rotate(0), 0);
+assert.equal(rotating.place(0), true);
+assert.equal(rotating.viewLimit(), 3);
+assert.equal(rotating.autoLimit(), 2);
+assert.match(A.jigsawClip(8, 7, 6), /^polygon\(/);
+assert.equal(A.pieceKind(0, 7, 6), "corner");
