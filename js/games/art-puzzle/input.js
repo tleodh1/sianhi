@@ -1,10 +1,12 @@
 (function (A) {
   A.Input = class {
-    constructor(root, engine, scope, onPlace, onSelect) {
+    constructor(root, engine, scope, onPlace, onSelect, onZoom = () => {}) {
       this.root = root;
       this.engine = engine;
       this.active = null;
       this.ghost = null;
+      this.pinch = new Map();
+      this.pinchDistance = 0;
       const reset = () => this.cancel();
       scope.cleanups.push(reset);
       scope.on(window, "blur", reset);
@@ -12,6 +14,15 @@
         if (document.hidden) reset();
       });
       scope.on(root, "pointerdown", (e) => {
+        if (e.pointerType === "touch" && e.target.closest(".art-board-stage")) {
+          this.pinch.set(e.pointerId, { x: e.clientX, y: e.clientY });
+          if (this.pinch.size === 2) {
+            const p=[...this.pinch.values()];
+            this.pinchDistance=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
+            this.cancel();
+            return;
+          }
+        }
         const piece = e.target.closest("[data-piece]");
         if (!piece || piece.disabled || this.active !== null) return;
         e.preventDefault();
@@ -29,6 +40,15 @@
         piece.classList.add("art-picked");
       });
       scope.on(root, "pointermove", (e) => {
+        if (this.pinch.has(e.pointerId)) {
+          this.pinch.set(e.pointerId,{x:e.clientX,y:e.clientY});
+          if(this.pinch.size===2){
+            e.preventDefault();
+            const p=[...this.pinch.values()], next=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
+            if(this.pinchDistance>0&&Math.abs(next-this.pinchDistance)>8){onZoom(next/this.pinchDistance);this.pinchDistance=next;}
+            return;
+          }
+        }
         const a = this.active;
         if (!a || a.id !== e.pointerId) return;
         e.preventDefault();
@@ -52,6 +72,8 @@
         }
       });
       scope.on(root, "pointerup", (e) => {
+        this.pinch.delete(e.pointerId);
+        if(this.pinch.size<2)this.pinchDistance=0;
         const a = this.active;
         if (!a || a.id !== e.pointerId) return;
         if (a.moved) {
@@ -68,6 +90,7 @@
         this.cancel();
       });
       scope.on(root, "pointercancel", (e) => {
+        this.pinch.delete(e.pointerId);
         if (this.active?.id === e.pointerId) reset();
       });
       scope.on(root, "lostpointercapture", (e) => {
