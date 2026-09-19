@@ -13,14 +13,21 @@
   burst(x,y,z,color='spark',amount=18){for(let i=0;i<amount;i++)this.particles.push({kind:color,x,y,z,life:.25+Math.random()*.3,vx:(Math.random()-.5)*6,vy:1+Math.random()*4,vz:(Math.random()-.5)*6,scale:.07+Math.random()*.13});}
   hit(target,amount,source){if(target.hurt>0||target.dash>0)return false;const guarded=target.guard;target.hp=clamp(target.hp-Math.max(1,amount-target.stats.defense*.12)*(guarded?.22:1),0,target.stats.hp);target.hurt=.25;target.flash=.15;if(source){const dx=target.x-source.x,dz=target.z-source.z,d=Math.hypot(dx,dz)||1;target.knockX=dx/d*(guarded?1.2:3.5);target.knockZ=dz/d*(guarded?1.2:3.5);}this.burst(target.x,target.y+1.45,target.z,guarded?'guard':'spark',guarded?10:22);this.shake=guarded?.08:.18;this.emit(guarded?'guardHit':'hit');return true;}
   schedule(time,run){this.pending.push({time,run});}
-  projectile(f,damage,kind='energy',speed=12){this.projectiles.push({owner:f,kind,x:f.x+Math.sin(f.angle)*.75,z:f.z+Math.cos(f.angle)*.75,y:f.y+(kind==='shockwave'?.18:1.45),vx:Math.sin(f.angle)*speed,vz:Math.cos(f.angle)*speed,life:2,damage,radius:kind==='shockwave'?1:.68});this.burst(f.x,f.y+1.4,f.z,kind==='shockwave'?'wave':'muzzle',10);this.emit('launch');}
+  projectile(f,damage,kind='energy',speed=12,target){
+   const aim=target||(f===this.player?this.enemy:this.player),dx=aim.x-f.x,dz=aim.z-f.z,d=Math.hypot(dx,dz)||1,direction={x:dx/d,z:dz/d};
+   f.angle=Math.atan2(direction.x,direction.z);
+   const lifetime=kind==='shockwave'?1.5:2.2;
+   this.projectiles.push({owner:f,kind,position:{x:f.x+direction.x*.82,y:f.y+(kind==='shockwave'?.18:1.45),z:f.z+direction.z*.82},velocity:{x:direction.x*speed,y:0,z:direction.z*speed},direction,speed,damage,lifetime,life:lifetime,radius:kind==='shockwave'?1:.68,x:f.x+direction.x*.82,z:f.z+direction.z*.82,y:f.y+(kind==='shockwave'?.18:1.45)});
+   this.burst(f.x+direction.x*.72,f.y+1.4,f.z+direction.z*.72,kind==='shockwave'?'wave':'muzzle',10);this.emit('launch');
+  }
   melee(f,target,w,skill,multiplier=1){const dx=target.x-f.x,dz=target.z-f.z,d=Math.hypot(dx,dz),front=d===0?1:(dx*Math.sin(f.angle)+dz*Math.cos(f.angle))/d;const bonus=skill?(f.build.parts.weapon==='sword'?1.1:.7):0;if(d<w.range+bonus&&front>.2&&Math.abs(target.y-f.y)<1.35){this.hit(target,(w.damage+f.stats.power*.2)*(skill?1.8:1)*multiplier,f);return true;}this.emit('miss');return false;}
   attack(f,skill=false){
    if(this.over||f.cooldown>0||f.guard||(skill&&f.energy<30))return false;const weapon=f.build.parts.weapon,w=weapons[weapon]||weapons.blaster,target=f===this.player?this.enemy:this.player,damage=w.damage+f.stats.power*.2;
    f.cooldown=w.cooldown*(skill?1.55:1);f.attackPose=skill?.62:.34;f.attackState={weapon,skill,phase:skill?'charge':'windup',duration:f.attackPose};if(skill){f.energy-=30;this.emit('skillCharge');}else this.emit('attack');
    if(weapon==='guard'&&skill){f.shieldTime=1.5;this.particles.push({kind:'barrier',owner:f,x:f.x,y:f.y+1.4,z:f.z,life:1.5,scale:1.2});this.emit('guard');return true;}
-   if(weapon==='blaster')this.schedule(skill?.38:.14,()=>this.projectile(f,damage*(skill?2.15:1),skill?'energyBall':'energy',skill?9:13));
-   else if(weapon==='hammer'&&skill)this.schedule(.34,()=>this.projectile(f,damage*1.85,'shockwave',8));
+   const aim={x:target.x,y:target.y,z:target.z};
+   if(weapon==='blaster')this.schedule(skill?.62:.18,()=>this.projectile(f,damage*(skill?2.15:1),skill?'energyBall':'energy',skill?9:13,aim));
+   else if(weapon==='hammer'&&skill)this.schedule(.58,()=>this.projectile(f,damage*1.85,'shockwave',8,aim));
    else if(weapon==='drill'&&skill)for(let i=0;i<4;i++)this.schedule(.16+i*.1,()=>this.melee(f,target,w,true,.48));
    else this.schedule(skill?.3:.16,()=>this.melee(f,target,w,skill));return true;
   }
@@ -29,7 +36,7 @@
   tick(dt){if(this.over)return;dt=clamp(dt,0,.05);this.time+=dt;this.shake=Math.max(0,this.shake-dt);this.player.guard=this.input.guard||this.player.shieldTime>0;this.move(this.player,this.input.x,this.input.z,dt);this.ai(dt);
    for(const f of [this.player,this.enemy]){for(const key of ['cooldown','hurt','flash','dash','dashCooldown','attackPose','shieldTime'])f[key]=Math.max(0,(f[key]||0)-dt);if(f.attackPose===0)f.attackState=null;f.energy=clamp(f.energy+7*dt,0,f.stats.energy);if(f.y>0||f.vy>0){f.vy-=15*dt;f.y=Math.max(0,f.y+f.vy*dt);if(f.y===0)f.vy=0;}}
    for(const action of this.pending){action.time-=dt;if(action.time<=0&&!action.done){action.done=true;action.run();}}this.pending=this.pending.filter(a=>!a.done);
-   for(const q of this.projectiles){const ox=q.x,oz=q.z;q.x+=q.vx*dt;q.z+=q.vz*dt;q.life-=dt;this.particles.push({kind:'trail',x:q.x,y:q.y,z:q.z,life:.16,vx:0,vy:0,vz:0,scale:q.kind==='energyBall'?.2:.08});const target=q.owner===this.player?this.enemy:this.player,vx=q.x-ox,vz=q.z-oz,den=vx*vx+vz*vz,f=den?clamp(((target.x-ox)*vx+(target.z-oz)*vz)/den,0,1):0,close=Math.hypot(ox+f*vx-target.x,oz+f*vz-target.z)<q.radius;const vertical=q.kind==='shockwave'?target.y<.45:q.y>=target.y+.1&&q.y<=target.y+2.8;if(close&&vertical){if(this.hit(target,q.damage,q.owner)){this.burst(target.x,target.y+1.4,target.z,q.kind==='shockwave'?'wave':'blast',28);}q.life=0;}}
+   for(const q of this.projectiles){const ox=q.x,oz=q.z;q.x+=q.velocity.x*dt;q.z+=q.velocity.z*dt;q.position.x=q.x;q.position.y=q.y;q.position.z=q.z;q.life-=dt;q.lifetime=q.life;this.particles.push({kind:q.kind==='shockwave'?'waveTrail':'trail',x:q.x,y:q.y,z:q.z,life:.16,vx:0,vy:0,vz:0,scale:q.kind==='energyBall'?.2:.08});const target=q.owner===this.player?this.enemy:this.player,vx=q.x-ox,vz=q.z-oz,den=vx*vx+vz*vz,f=den?clamp(((target.x-ox)*vx+(target.z-oz)*vz)/den,0,1):0,close=Math.hypot(ox+f*vx-target.x,oz+f*vz-target.z)<q.radius;const vertical=q.kind==='shockwave'?target.y<.45:q.y>=target.y+.1&&q.y<=target.y+2.8;if(close&&vertical){if(this.hit(target,q.damage,q.owner)){this.burst(target.x,target.y+1.4,target.z,q.kind==='shockwave'?'wave':'blast',28);this.particles.push({kind:'impactRing',x:target.x,y:target.y+1.35,z:target.z,life:.3,vx:0,vy:0,vz:0,scale:.35});}q.life=0;}}
    this.projectiles=this.projectiles.filter(q=>q.life>0);this.particles=this.particles.filter(p=>{p.life-=dt;if(p.owner){p.x=p.owner.x;p.y=p.owner.y+1.4;p.z=p.owner.z;}else{p.x+=(p.vx||0)*dt;p.z+=(p.vz||0)*dt;p.y+=(p.vy||0)*dt;if(p.vy)p.vy-=7*dt;}return p.life>0;});if(this.player.hp<=0||this.enemy.hp<=0){this.over=true;this.result=this.enemy.hp<=0?'win':'lose';}
   }
  };
