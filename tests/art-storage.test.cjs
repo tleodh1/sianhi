@@ -14,11 +14,14 @@ const A = c.SianArt,
       runner: { stage: 5 },
       clawMachine: { inventory: { deer: 2 } },
       shape: { old: true },
+      artPuzzle: { version: 1, works: { legacy: { completed: true, levels: { challenge: { stars: 2, bestSeconds: 91 } } } }, unlocked: ["legacy"] },
     },
     collection: ["keep"],
   },
   original = JSON.parse(JSON.stringify(s));
 A.progress(s);
+assert.equal(s.records.artPuzzle.version, 2);
+assert.equal(s.records.artPuzzle.works.legacy.levels.challenge.bestSeconds, 91);
 const e = new A.Engine();
 for (let i = 0; i < 6; i++) {
   e.select(i);
@@ -31,7 +34,7 @@ const reload = JSON.parse(JSON.stringify(s));
 assert.equal(A.progress(reload).works[A.artworks[0].id].levels.easy.stars, 3);
 for (const key of ["level", "progress", "stage100", "collection"])
   assert.deepEqual(s[key], original[key]);
-for (const key of Object.keys(original.records))
+for (const key of Object.keys(original.records).filter((key) => key !== "artPuzzle"))
   assert.deepEqual(s.records[key], original.records[key]);
 assert.ok(A.progress(s).unlocked.length >= 20);
 A.unlock(s, A.artworks[11].id);
