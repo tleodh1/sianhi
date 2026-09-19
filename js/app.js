@@ -204,7 +204,10 @@ function parentPage() {
     }
   };
 }
-document.querySelector(".close").onclick = closeGame;
+document.querySelector(".close").onclick = () => {
+  closeGame();
+  go("home");
+};
 document
   .querySelectorAll("[data-nav]")
   .forEach((b) => (b.onclick = () => go(b.dataset.nav)));

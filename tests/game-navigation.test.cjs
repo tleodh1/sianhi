@@ -1,0 +1,10 @@
+const fs = require("node:fs");
+const assert = require("node:assert/strict");
+const games = fs.readFileSync("js/games.js", "utf8");
+const app = fs.readFileSync("js/app.js", "utf8");
+const open = games.slice(games.indexOf("function openGameWorld"), games.indexOf("function gameShell"));
+assert.match(open, /closeGame\(\)/);
+assert.match(open, /go\("games"\)/);
+assert.doesNotMatch(open, /pixelWorld|pixelGame|data-pg/);
+assert.match(app, /document\.querySelector\("\.close"\)\.onclick[\s\S]*go\("home"\)/);
+console.log("PASS all game back links use the current game world and X returns home");

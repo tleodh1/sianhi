@@ -1,22 +1,6 @@
 function openGameWorld() {
-  Session.begin();
-
-  gameBody.innerHTML = `<div class="pixelWorld"><div class="pixelTitle"><span>★ ★ ★ ★ ★</span><h2>시안Hi 게임월드</h2><p>원하는 게임을 골라서 출발!</p></div><div class="pixelGames">
- <button class="pixelGame pgMath" data-pg="brick"><b>🧱</b><strong>벽돌깨기</strong><small>별 공으로 벽돌을 모두 깨요!</small></button>
- <button class="pixelGame pgHangul" data-pg="runner"><b>🏃</b><strong>한글 달리기</strong><small>점프해서 글자를 모아요!</small></button>
- <button class="pixelGame pgEnglish" data-pg="memory"><b>🃏</b><strong>영어 카드 뒤집기</strong><small>같은 알파벳 짝을 찾아요!</small></button>
- <button class="pixelGame pgCoding" data-pg="claw"><b>🕹️</b><strong>인형뽑기</strong><small>코인을 넣고 집게로 인형을 뽑아요!</small></button>
- <button class="pixelGame pgShape" data-pg="shape"><b>🧩</b><strong>퍼즐 맞추기</strong><small>공룡·동물·자동차·로봇 그림 퍼즐!</small></button>
- <button class="pixelGame pgTetris" data-pg="tetris"><b>🟦</b><strong>테트리스</strong><small>블록을 움직여 줄을 완성해요!</small></button>
- <button class="pixelGame pgRobot" data-pg="robot"><b>🤖</b><strong>로봇 메이커</strong><small>부품을 조립해 나만의 로봇을 만들어요!</small></button></div><div class="pixelHint">★ 모든 게임을 바로 플레이할 수 있어요.</div></div>`;
-  game.showModal();
-  gameBody.querySelector('[data-pg="brick"]').onclick = playBrick;
-  gameBody.querySelector('[data-pg="runner"]').onclick = playRunner;
-  gameBody.querySelector('[data-pg="memory"]').onclick = playMemory;
-  gameBody.querySelector('[data-pg="claw"]').onclick = playClaw;
-  gameBody.querySelector('[data-pg="shape"]').onclick = playShape;
-  gameBody.querySelector('[data-pg="tetris"]').onclick = playTetris;
-  gameBody.querySelector('[data-pg="robot"]').onclick = playRobot;
+  closeGame();
+  if (typeof go === "function") go("games");
 }
 function gameShell(title, body, controls = "") {
   Session.begin();
