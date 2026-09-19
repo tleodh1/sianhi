@@ -5,7 +5,7 @@ const c = vm.createContext({});
 for (const f of ["data", "engine"])
   vm.runInContext(fs.readFileSync(`js/games/art-puzzle/${f}.js`, "utf8"), c);
 const A = c.SianArt;
-assert.equal(new Set(A.artworks.map((a) => a.id)).size, 12);
+assert.ok(new Set(A.artworks.map((a) => a.id)).size >= 20);
 assert(
   A.artworks.every(
     (a) => a.publicDomain && a.source && a.originalTitle && a.country,
@@ -43,5 +43,5 @@ assert.equal(
   -1,
 );
 console.log(
-  "PASS 12 sourced artworks, 5 difficulties/2 orientations, wrong placement, completion, hint cap, snap bounds",
+  "PASS 20+ sourced artworks, 5 difficulties/2 orientations, wrong placement, completion, hint cap, snap bounds",
 );

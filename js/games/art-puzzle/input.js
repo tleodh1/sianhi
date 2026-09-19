@@ -26,6 +26,7 @@
           y: e.clientY,
           moved: false,
         };
+        piece.classList.add("art-picked");
       });
       scope.on(root, "pointermove", (e) => {
         const a = this.active;
@@ -46,6 +47,8 @@
           }
           this.ghost.style.left = e.clientX + "px";
           this.ghost.style.top = e.clientY + "px";
+          const tilt=Math.max(-7,Math.min(7,(e.clientX-a.x)/18));
+          this.ghost.style.setProperty("--tilt",tilt+"deg");
         }
       });
       scope.on(root, "pointerup", (e) => {
@@ -92,6 +95,7 @@
         const { piece, id } = this.active;
         this.active = null;
         if (piece.hasPointerCapture?.(id)) piece.releasePointerCapture(id);
+        piece.classList.remove("art-picked");
       }
       this.ghost?.remove();
       this.ghost = null;

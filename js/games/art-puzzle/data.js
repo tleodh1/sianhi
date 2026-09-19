@@ -1,6 +1,11 @@
 var SianArt = globalThis.SianArt || {};
 SianArt.artworks = [
   {
+    id: "starry-night", title: "별이 빛나는 밤", originalTitle: "The Starry Night", artist: "빈센트 반 고흐", artistKey: "van-gogh", country: "네덜란드", year: "1889", museum: "뉴욕 현대미술관 (MoMA)", difficulty: "easy",
+    story: "고흐가 밤하늘을 힘차게 움직이는 것처럼 그렸어요. 별과 달, 소용돌이치는 선을 찾아보세요.", look: "커다란 소용돌이와 노란 별, 아래쪽의 조용한 마을을 찾아보세요.", image: "assets/art-puzzle/starry-night.jpg", source: "https://www.moma.org/collection/works/79802", publicDomain: true,
+    imageSource: "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg", imageLicense: "Public domain",
+  },
+  {
     id: "28560",
     title: "침실",
     originalTitle: "The Bedroom",
@@ -18,6 +23,13 @@ SianArt.artworks = [
       "https://commons.wikimedia.org/wiki/File:1926.417_-_The_Bedroom_Vincent_van_Gogh_1889.jpg",
     imageLicense: "Public domain",
   },
+  { id:"80607",title:"고흐의 자화상",originalTitle:"Self-Portrait",artist:"빈센트 반 고흐",artistKey:"van-gogh",country:"네덜란드",year:"1887",museum:"시카고 미술관",difficulty:"normal",story:"고흐가 거울을 보며 자기 모습을 그렸어요. 짧고 빠른 붓질이 얼굴 주위를 흐릅니다.",look:"배경과 옷에 반복되는 파란 붓자국을 찾아보세요.",image:"https://www.artic.edu/iiif/2/47c5bcb8-62ef-e5d7-55e7-f5121f409a30/full/843,/0/default.jpg",source:"https://www.artic.edu/artworks/80607",publicDomain:true,imageSource:"https://www.artic.edu/artworks/80607",imageLicense:"CC0 / Public Domain" },
+  { id:"14586",title:"시인의 정원",originalTitle:"The Poet's Garden",artist:"빈센트 반 고흐",artistKey:"van-gogh",country:"네덜란드",year:"1888",museum:"시카고 미술관",difficulty:"normal",story:"햇빛 아래 정원에 나무와 길이 펼쳐져요. 고흐는 자연의 리듬을 굵은 색으로 담았어요.",look:"정원의 길과 키 큰 나무가 어디로 이어지는지 살펴보세요.",image:"https://www.artic.edu/iiif/2/d4bc1723-7cbc-d36d-a9cb-f84553f2a6f6/full/843,/0/default.jpg",source:"https://www.artic.edu/artworks/14586",publicDomain:true,imageSource:"https://www.artic.edu/artworks/14586",imageLicense:"CC0 / Public Domain" },
+  { id:"61603",title:"파리 오페라의 발레",originalTitle:"Ballet at the Paris Opéra",artist:"에드가 드가",artistKey:"degas",country:"프랑스",year:"1877",museum:"시카고 미술관",difficulty:"hard",story:"무대 위 무용수들의 움직임을 특별한 시점에서 바라본 그림이에요.",look:"흰 치마가 만드는 원과 악기의 긴 선을 찾아보세요.",image:"https://www.artic.edu/iiif/2/cb34b0a8-bc51-d063-aab1-47c7debf3a7b/full/843,/0/default.jpg",source:"https://www.artic.edu/artworks/61603",publicDomain:true,imageSource:"https://www.artic.edu/artworks/61603",imageLicense:"CC0 / Public Domain" },
+  { id:"11723",title:"화장하는 여인",originalTitle:"Woman at Her Toilette",artist:"베르트 모리조",artistKey:"morisot",country:"프랑스",year:"1875–1880",museum:"시카고 미술관",difficulty:"master",story:"밝고 부드러운 색으로 일상의 조용한 순간을 그렸어요.",look:"거울처럼 반짝이는 부분과 빠르게 칠한 붓자국을 살펴보세요.",image:"https://www.artic.edu/iiif/2/78c80988-6524-cec7-c661-a4c0a706d06f/full/843,/0/default.jpg",source:"https://www.artic.edu/artworks/11723",publicDomain:true,imageSource:"https://www.artic.edu/artworks/11723",imageLicense:"CC0 / Public Domain" },
+  { id:"13916",title:"발코니에서",originalTitle:"On the Balcony",artist:"베르트 모리조",artistKey:"morisot",country:"프랑스",year:"1871–1872",museum:"시카고 미술관",difficulty:"hard",story:"발코니 너머의 풍경과 사람의 모습을 함께 담았어요.",look:"가까운 난간과 멀리 보이는 풍경의 차이를 찾아보세요.",image:"https://www.artic.edu/iiif/2/b5529ef6-c95d-9993-cc2e-bc9b209fed67/full/843,/0/default.jpg",source:"https://www.artic.edu/artworks/13916",publicDomain:true,imageSource:"https://www.artic.edu/artworks/13916",imageLicense:"CC0 / Public Domain" },
+  { id:"153798",title:"정원의 여인",originalTitle:"Woman in a Garden",artist:"베르트 모리조",artistKey:"morisot",country:"프랑스",year:"1882–1883",museum:"시카고 미술관",difficulty:"normal",story:"초록 정원 속 인물을 가볍고 생생한 붓질로 표현했어요.",look:"인물의 옷과 잎사귀 사이에 숨어 있는 밝은 색을 찾아보세요.",image:"https://www.artic.edu/iiif/2/5edb357d-2e8f-8673-d9e8-4b1150af3895/full/843,/0/default.jpg",source:"https://www.artic.edu/artworks/153798",publicDomain:true,imageSource:"https://www.artic.edu/artworks/153798",imageLicense:"CC0 / Public Domain" },
+  { id:"16571",title:"생라자르역에 도착한 기차",originalTitle:"Arrival of the Normandy Train, Gare Saint-Lazare",artist:"클로드 모네",artistKey:"monet",country:"프랑스",year:"1877",museum:"시카고 미술관",difficulty:"master",story:"기차역의 증기와 빛이 섞이는 순간을 모네가 빠르게 그렸어요.",look:"기차, 지붕, 푸른 증기가 겹치는 곳을 찾아보세요.",image:"https://www.artic.edu/iiif/2/0f1cc0e0-e42e-be16-3f71-2022da38cb93/full/843,/0/default.jpg",source:"https://www.artic.edu/artworks/16571",publicDomain:true,imageSource:"https://www.artic.edu/artworks/16571",imageLicense:"CC0 / Public Domain" },
   {
     id: "111436",
     title: "사과 바구니",

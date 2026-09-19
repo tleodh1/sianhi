@@ -4,7 +4,7 @@ dialog#game.art-dialog {
   max-height: 96dvh !important;
   padding: 26px !important;
   border: 1px solid #d9c7aa !important;
-  background: #faf6ed !important;
+  background: radial-gradient(circle at 50% 0,#f7e8c9,#b67b43 48%,#59351f) !important;
   color: #4f473a !important;
   overflow: auto !important;
 }
@@ -25,6 +25,7 @@ dialog#game.art-dialog {
   --muted: #86785e;
   color: var(--ink);
 }
+.art-studio{position:relative;padding:16px;border-radius:22px;background:linear-gradient(145deg,#80502f,#be8853 48%,#704127);box-shadow:inset 0 2px 0 #ffe3aa88,inset 0 -12px 25px #35180c66,0 18px 35px #2f160c66}.art-studio .art-toolbar{color:#fff}.art-studio .art-time{color:#ffedbd}.art-gallery-tools{position:sticky;top:0;z-index:5;padding:10px;border-radius:14px;background:#faf6edee;backdrop-filter:blur(10px);box-shadow:0 5px 14px #4e38251e}.art-gallery-tools label{display:flex;align-items:center;gap:8px}.art-gallery-tools input{width:100%;min-height:44px;border:1px solid #d5c4a6;border-radius:11px;padding:8px 12px;font:inherit}.art-filter{display:flex;gap:6px;overflow-x:auto;padding-top:8px}.art-filter button{white-space:nowrap;min-height:38px;padding:7px 11px;font-size:11px}.art-filter button.active{background:#668978;color:#fff}.art-card-copy em{align-self:flex-start;font-style:normal;font-size:9px;letter-spacing:1px;color:#fff;background:#9c7849;border-radius:20px;padding:3px 7px}
 .art-app button,
 .art-app select {
   font:
@@ -297,8 +298,10 @@ dialog#game.art-dialog {
   display: flex;
   justify-content: center;
   padding: 14px;
-  background: radial-gradient(ellipse at top, #fffdf8, #eee5d5);
-  border-radius: 15px;
+  background:linear-gradient(145deg,#6c3e24,#bd8552 50%,#57311e);
+  border-radius: 22px;
+  border:9px ridge #d9a96c;
+  box-shadow:inset 0 14px 25px #30170b66,0 12px 20px #32180b88;
   min-width: 0;
 }
 .art-board {
@@ -309,8 +312,10 @@ dialog#game.art-dialog {
   grid-template-columns: repeat(var(--cols), 1fr);
   grid-template-rows: repeat(var(--rows), 1fr);
   gap: 0;
-  background: #dfd5c4;
-  box-shadow: 0 5px 20px #66543521;
+  background:linear-gradient(145deg,#e5d4b8,#bba482);
+  border:6px solid #4b2b1d;
+  box-shadow:inset 0 7px 18px #4a2d2055,0 9px 0 #3b2116,0 16px 25px #1d0f0b88;
+  transform:perspective(1000px) rotateX(2deg);
   transition: box-shadow 0.8s;
 }
 .art-app .art-slot {
@@ -319,7 +324,8 @@ dialog#game.art-dialog {
   min-width: 0;
   border-radius: 0;
   background: #f4eedf;
-  border: 1px dashed #cbbda3;
+  border: 1px dashed #ab8e66;
+  box-shadow:inset 1px 1px 4px #5c3a2533;
   aspect-ratio: auto;
   overflow: hidden;
   touch-action: none;
@@ -338,6 +344,7 @@ dialog#game.art-dialog {
   border: 1px solid #fff8;
   background: transparent;
 }
+.art-slot.art-snapped{z-index:4;animation:art-snap .65s cubic-bezier(.2,1.6,.4,1);box-shadow:0 0 0 4px #fff,0 0 25px #ffd85e!important}.art-board.art-wrong{animation:art-wrong .28s ease}.art-slot.art-help-flight{animation:art-help-flight .75s ease-out}
 .art-slot.art-placed img {
   opacity: 1;
 }
@@ -361,17 +368,20 @@ dialog#game.art-dialog {
   gap: 12px;
   max-height: 48vh;
   overflow: auto;
-  padding: 8px;
+  padding: 15px;
+  border-radius:16px;
+  background:linear-gradient(145deg,#4c2c20,#79513a);
+  box-shadow:inset 0 8px 18px #1f0d0866,0 7px 0 #3e2419;
   scrollbar-width: thin;
 }
 .art-app .art-piece {
   padding: 0;
   border: 2px solid #fffc;
-  border-radius: 4px;
+  border-radius: 7px;
   min-height: 44px;
   min-width: 44px;
   aspect-ratio: var(--tile-ratio);
-  box-shadow: 0 4px 8px #56463130;
+  box-shadow:inset 2px 2px 0 #fff8,inset -2px -2px 0 #30180c55,0 6px 0 #2d180f,0 10px 14px #1c0c0870;
   touch-action: none;
   user-select: none;
   cursor: grab;
@@ -380,6 +390,7 @@ dialog#game.art-dialog {
     box-shadow 0.15s;
   overflow: hidden;
 }
+.art-app .art-piece:before,.art-app .art-drag-ghost:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,#fff5,transparent 25%);pointer-events:none}.art-app .art-piece.art-picked{transform:translateY(-9px) scale(1.08);box-shadow:0 13px 0 #2d180f,0 20px 26px #1c0c08aa}
 .art-piece img,
 .art-drag-ghost img {
   width: 100%;
@@ -397,7 +408,7 @@ dialog#game.art-dialog {
   position: fixed;
   z-index: 100;
   pointer-events: none;
-  transform: translate(-50%, -60%) scale(1.12);
+  transform:translate(-50%,-72%) rotate(var(--tilt,0deg)) scale(1.12);
   padding: 0;
   border: 2px solid #fff;
   box-shadow: 0 12px 28px #463c4660;
@@ -406,6 +417,7 @@ dialog#game.art-dialog {
   opacity: 0.95;
   min-height: 0;
 }
+.art-view-modal{position:fixed;inset:0;z-index:150;display:grid;place-content:center;text-align:center;padding:35px;background:#160e0bd9;backdrop-filter:blur(10px);color:#fff}.art-view-modal>.art-frame{width:min(80vw,700px);height:min(65vh,620px);background:#2e2018;border-width:12px}.art-view-modal>button{position:absolute;top:20px;right:20px;width:48px;height:48px;padding:0;border-radius:50%;font-size:28px}.art-view-modal h2{margin:15px 0 5px}.art-view-modal p,.art-view-modal small{margin:4px;max-width:700px}
 .art-help {
   font-size: 12px;
   color: #8c7a5e;
@@ -501,6 +513,7 @@ dialog#game.art-dialog {
     transform: scale(1);
   }
 }
+@keyframes art-snap{0%{transform:translateY(-22px) scale(1.1)}55%{transform:translateY(2px) scale(.97)}100%{transform:none}}@keyframes art-wrong{25%{transform:perspective(1000px) rotateX(2deg) translateX(-5px)}75%{transform:perspective(1000px) rotateX(2deg) translateX(5px)}}@keyframes art-help-flight{0%{transform:translate(80px,70px) scale(1.15);opacity:.3}70%{transform:translate(0,0) scale(1.05)}100%{transform:none;opacity:1}}
 @media (max-width: 700px) {
   .art-play {
     display: block;

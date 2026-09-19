@@ -1,0 +1,3 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),vm=require("node:vm");const c=vm.createContext({globalThis:{}});vm.runInContext(fs.readFileSync("js/games/art-puzzle/data.js","utf8"),c);const art=c.SianArt.artworks;
+assert.ok(art.length>=20);assert.ok(art.some(a=>a.id==="starry-night"));assert.equal(new Set(art.map(a=>a.id)).size,art.length);assert.ok(art.every(a=>a.publicDomain&&a.source&&a.image&&a.story&&a.look));
+console.log(`PASS ${art.length} public-domain artwork records including The Starry Night`);

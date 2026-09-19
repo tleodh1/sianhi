@@ -33,7 +33,7 @@ for (const key of ["level", "progress", "stage100", "collection"])
   assert.deepEqual(s[key], original[key]);
 for (const key of Object.keys(original.records))
   assert.deepEqual(s.records[key], original.records[key]);
-assert.equal(A.progress(s).unlocked.length, 12);
+assert.ok(A.progress(s).unlocked.length >= 20);
 A.unlock(s, A.artworks[11].id);
 assert(A.progress(s).unlocked.includes(A.artworks[11].id));
 assert.equal(A.reward(s, A.artworks[1], new A.Engine()), 0);
