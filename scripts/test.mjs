@@ -41,3 +41,4 @@ console.log(
 require("../tests/runner-adventure.test.cjs");
 require("../tests/arithmetic-options.test.cjs");
 require("../tests/learning-bank.test.cjs");
+require("../tests/learning-responsive.test.cjs");

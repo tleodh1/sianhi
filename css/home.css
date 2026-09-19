@@ -892,7 +892,7 @@ p {
     height: 36px;
   }
   .skyWorld {
-    min-height: 785px;
+    min-height: 980px;
     background-size: auto 640px;
     background-position: 55% 0;
     background-color: #b6e2f8;
@@ -926,7 +926,7 @@ p {
   }
   .chapter {
     left: 20px;
-    bottom: 300px;
+    bottom: 535px;
   }
   .chapter strong {
     font-size: 34px;
@@ -934,16 +934,26 @@ p {
   .islandMenu {
     left: 18px;
     right: 18px;
-    bottom: 47px;
+    bottom: 32px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap: 10px;
   }
   .islandMenu .islandButton {
+    min-width:0;
+    min-height:82px;
+    flex-direction:row;
+    text-align:left;
     gap: 10px;
-    padding: 13px 3px;
+    padding: 13px 11px;
     border-radius: 15px;
   }
+  .islandMenu .islandButton>div{min-width:0}
   .islandButton b {
-    font-size: 11px;
+    display:block;
+    font-size: 13px;
+    white-space:normal;
+    word-break:keep-all;
+    line-height:1.25;
   }
   .homeContent,
   .pageWrap {
@@ -1009,9 +1019,13 @@ p {
     font-size: 12px;
   }
   .learningGrid {
+    grid-template-columns:1fr;
     gap: 12px;
   }
   .learningGrid .islandButton {
+    min-width:0;
+    flex-direction:row;
+    text-align:left;
     padding: 18px 12px;
     gap: 10px;
   }
@@ -1022,8 +1036,12 @@ p {
     font-size: 17px;
   }
   .learningGrid .islandButton b {
-    font-size: 13px;
+    display:block;
+    font-size:16px;
+    white-space:normal;
+    word-break:keep-all;
   }
+  .learningGrid .islandButton small{display:block;font-size:14px;line-height:1.45;word-break:keep-all}
   .recordStats {
     gap: 10px;
   }
