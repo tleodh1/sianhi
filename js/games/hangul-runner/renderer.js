@@ -21,17 +21,21 @@
     constructor(canvas,art){this.canvas=canvas;this.g=canvas.getContext('2d',{alpha:false});this.art=art;this.width=960;this.height=540;this.dpr=1;}
     resize(width){this.width=width<620?640:960;this.height=540;this.dpr=Math.min(2,window.devicePixelRatio||1);this.canvas.width=this.width*this.dpr;this.canvas.height=this.height*this.dpr;}
     sprite(i,x,y,w,h,flip){draw(this.g,this.art.sprites[i],x,y,w,h,flip);}
-    paint(e){const g=this.g,w=this.width,h=this.height,c=e.cameraX,t=e.elapsed;g.setTransform(this.dpr,0,0,this.dpr,0,0);
-      const sky=g.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#68c6f7');sky.addColorStop(.62,'#b5e7f5');sky.addColorStop(1,'#ecf9fa');g.fillStyle=sky;g.fillRect(0,0,w,h);
+    paint(e){const g=this.g,w=this.width,h=this.height,c=e.cameraX,t=e.elapsed,theme=e.stage.theme||'forest';g.setTransform(this.dpr,0,0,this.dpr,0,0);
+      const palettes={forest:['#68c6f7','#b5e7f5','#ecf9fa'],ocean:['#075f9d','#13a9bd','#063c72'],sky:['#7999f4','#d6c2ff','#fff0d0'],underground:['#241c3a','#493052','#141d2c']},colors=palettes[theme]||palettes.forest;
+      const sky=g.createLinearGradient(0,0,0,h);sky.addColorStop(0,colors[0]);sky.addColorStop(.62,colors[1]);sky.addColorStop(1,colors[2]);g.fillStyle=sky;g.fillRect(0,0,w,h);
+      if(theme==='ocean'){g.fillStyle='#d5ffff55';for(let i=0;i<16;i++){g.beginPath();g.arc((i*173-c*.12)%1100,60+(i*83+t*22)%430,5+i%4*3,0,Math.PI*2);g.fill();}}
+      if(theme==='sky'){for(let i=-1;i<6;i++){const x=i*210-(c*.1+t*12)%210;g.fillStyle='#fff9';g.beginPath();g.ellipse(x,95+(i%3)*85,95,30,0,0,Math.PI*2);g.fill();}}
+      if(theme==='underground'){g.fillStyle='#89ffd555';for(let i=0;i<12;i++){g.beginPath();g.arc((i*127-c*.2)%1050,90+(i%5)*90,4+i%3*2,0,Math.PI*2);g.fill();}}
       // Independent layers, camera ratios: cloud .06, mountain .13, castle .21,
       // waterfall .34, forest .53, platform 1, foreground 1.12.
-      for(let i=-1;i<5;i++){const x=i*420-(c*.06+t*4)%420;this.sprite(13,x,35+(i%2)*55,185,92);}
+      if(theme==='forest'){for(let i=-1;i<5;i++){const x=i*420-(c*.06+t*4)%420;this.sprite(13,x,35+(i%2)*55,185,92);}
       for(let i=-1;i<4;i++)draw(g,this.art.back[0],i*760-(c*.13)%760,75,850,470);
       draw(g,this.art.back[1],560-(c*.21)%1500,65,245,294);
       for(let i=-1;i<4;i++){let x=i*680-(c*.34)%680;draw(g,this.art.back[2],x,170,320,410);
         // Subtle moving highlights give waterfalls a continuous flow.
         g.save();g.globalAlpha=.15;g.fillStyle='#fff';for(let k=0;k<6;k++)g.fillRect(x+125+k*12,280+(t*100+k*29)%210,3,26);g.restore();}
-      for(let i=-1;i<5;i++)draw(g,this.art.back[3],i*460-(c*.53)%460,242,520,287);
+      for(let i=-1;i<5;i++)draw(g,this.art.back[3],i*460-(c*.53)%460,242,520,287);}
       for(const a of e.stage.platforms){const x=a.x-c;if(x+a.w<-40||x>w+40)continue;
         if(a.kind==='ground'){
           // Texture tiles meet exactly at collider tops; split terrain leaves real holes.
@@ -45,10 +49,12 @@
       for(const a of e.stage.hazards){const x=a.x-c;if(x<-80||x>w+80)continue;const i={thorn:8,rock:6,log:7,crate:9}[a.kind];this.sprite(i,x-10,a.y-16,a.w+20,a.h+20);}
       for(const a of e.stage.enemies){const x=a.x-c;if(x<-80||x>w+80)continue;const bounce=Math.sin(t*7+a.phase)*2;this.sprite(a.kind==='jelly'?4:5,x-6,a.y-9+bounce,a.w+12,a.h+12,a.dir<0);}
       for(const item of e.stage.items){if(e.collected.has(item.id))continue;const x=item.x-c;if(x<-100||x>w+100)continue;const bob=Math.sin(t*3+item.x)*3;
-        if(item.kind==='letter'){
+        if(item.kind==='letter'||item.kind==='decoy'){
           g.save();g.shadowColor='#f7d465';g.shadowBlur=12;const grad=g.createLinearGradient(x,item.y,x+62,item.y+62);grad.addColorStop(0,'#fff8c7');grad.addColorStop(.5,'#ffe5a0');grad.addColorStop(1,'#e9ac47');g.fillStyle=grad;g.beginPath();g.roundRect(x,item.y+bob,62,62,13);g.fill();g.shadowBlur=0;g.strokeStyle='#fff9dd';g.lineWidth=3;g.stroke();g.fillStyle='#573c28';g.textAlign='center';g.textBaseline='middle';g.font=`800 ${item.text.length>3?16:item.text.length>1?21:34}px Pretendard, sans-serif`;g.fillText(item.text,x+31,item.y+32+bob);g.restore();
         }else {const i={coin:10,star:11,power:12}[item.kind];const cw=item.kind==='coin'?item.w*(.7+.3*Math.abs(Math.cos(t*2))):item.w;this.sprite(i,x+(item.w-cw)/2,item.y+bob,cw,item.h);}
       }
+      for(const q of e.projectiles||[]){g.fillStyle=theme==='ocean'?'#8eeaff':theme==='sky'?'#fff18d':'#ff8d79';g.beginPath();g.arc(q.x-c+17,q.y+17,17,0,Math.PI*2);g.fill();}
+      if(e.boss){const bx=w-115,by=145;g.save();g.shadowColor=e.stage.world.color;g.shadowBlur=25;g.fillStyle=e.stage.world.color;g.beginPath();g.arc(bx,by,68+Math.sin(t*3)*3,0,Math.PI*2);g.fill();g.shadowBlur=0;g.fillStyle='#fff';g.textAlign='center';g.font='900 18px Pretendard';g.fillText(e.stage.boss.name,bx,by+7);g.fillStyle='#2a2032';g.fillRect(bx-72,by+82,144,13);g.fillStyle='#ffdb55';g.fillRect(bx-70,by+84,140*(e.boss.hp/e.boss.maxHp),9);const question=e.stage.boss.questions[Math.min(e.boss.question,e.stage.boss.questions.length-1)];g.font='900 28px Pretendard';g.fillText(question?.[0]||'완성!',bx,by-88);g.restore();}
       const goal=e.stage.goal;this.sprite(15,goal.x-c-20,goal.y-15,goal.w+40,goal.h+27);
       g.textAlign='center';g.font='800 15px Pretendard, sans-serif';g.fillStyle='#155773';g.fillText('별빛 도착점',goal.x-c+goal.w/2,goal.y-30);
       const p=e.player;let frame={idle:8,jump:9,fall:10,land:11,hurt:12,'power-up':13,small:12,dead:14,celebrate:15}[p.pose];if(p.pose==='run')frame=Math.floor(t*12)%8;
@@ -58,7 +64,7 @@
       for(const v of e.particles){g.globalAlpha=Math.min(1,v.life*2);this.sprite(11,v.x-c-5,v.y-5,10,10);}g.globalAlpha=1;
       for(let i=0;i<5;i++){const x=i*340-(c*1.12)%340;this.sprite(14,x,502+Math.sin(i)*7,105,55);}
       // Draw distance/position in the scene so assistive status matches visible gameplay.
-      g.fillStyle='rgba(255,255,255,.82)';g.beginPath();g.roundRect(16,16,150,30,15);g.fill();g.fillStyle='#235570';g.textAlign='left';g.font='700 13px Pretendard, sans-serif';g.fillText('별빛 숲 · '+Math.floor(p.x/10)+' m',29,36);
+      g.fillStyle='rgba(255,255,255,.82)';g.beginPath();g.roundRect(16,16,170,30,15);g.fill();g.fillStyle='#235570';g.textAlign='left';g.font='700 13px Pretendard, sans-serif';g.fillText(e.stage.world.name+' · '+Math.floor(p.x/10)+' m',29,36);
     }
   };
 })(HangulRunner);
