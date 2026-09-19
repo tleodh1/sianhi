@@ -1,7 +1,7 @@
 dialog#game.claw-dialog {
   width: min(900px, 98vw) !important;
   max-width: 98vw !important;
-  padding: 12px !important;
+  padding: 6px !important;
   background: #f4fbf8 !important;
   border: 2px solid #c7e4dc !important;
   max-height: 96dvh !important;
@@ -295,3 +295,4 @@ dialog#game.claw-dialog {
   white-space: nowrap;
   font-size: 12px;
 }
+
