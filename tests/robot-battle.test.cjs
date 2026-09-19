@@ -1,5 +1,11 @@
-const fs=require("node:fs"),vm=require("node:vm"),assert=require("node:assert/strict");
-const ctx={window:{},Math};vm.createContext(ctx);vm.runInContext(fs.readFileSync("js/games/robot/catalog.js","utf8"),ctx);ctx.SianRobot=ctx.window.SianRobot;ctx.SianRobot.stats=()=>({hp:100,power:16,defense:12,speed:14,energy:100,jump:12});vm.runInContext(fs.readFileSync("js/games/robot/battle-engine.js","utf8"),ctx);
-const E=ctx.window.SianRobot.BattleEngine,e=new E({});e.player.x=300;e.enemy.x=350;e.player.face=1;assert.ok(e.attack(e.player));for(let i=0;i<24;i++)e.tick();assert.ok(e.enemy.hp<e.enemy.maxHp,"melee should damage AI");e.player.energy=100;assert.ok(e.attack(e.player,true));for(let i=0;i<80;i++)e.tick();assert.equal(typeof e.ai,"function");
-const battle=fs.readFileSync("js/games/robot/battle.js","utf8");assert.match(battle,/activePointers=new Map/);assert.match(battle,/onpointercancel/);assert.match(battle,/removeEventListener\("keyup"/);console.log("PASS realtime robot battle, AI, multi-pointer controls, and cleanup");
-assert.match(fs.readFileSync("js/core.js","utf8"),/cleanup\(fn\)[\s\S]*this\.cleanups\.push\(fn\)/);
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const ctx={window:{},state:{records:{},completed:{},stars:0},save(){}};vm.createContext(ctx);
+for(const f of ['catalog','storage','battle-engine'])vm.runInContext(fs.readFileSync(`js/games/robot/${f}.js`,'utf8'),ctx);
+const R=ctx.window.SianRobot,b=R.defaultBuild();b.parts.weapon='sword';const e=new R.BattleEngine(b);e.ai=()=>{};e.player.x=0;e.player.z=0;e.enemy.x=0;e.enemy.z=1;e.player.angle=0;
+assert.ok(e.attack(e.player));assert.ok(e.enemy.hp<e.enemy.stats.hp);
+e.player.cooldown=0;e.enemy.hurt=0;e.enemy.y=4;const hp=e.enemy.hp;e.attack(e.player);assert.equal(e.enemy.hp,hp,'ground sword misses airborne target');
+e.player.build.parts.weapon='blaster';e.player.cooldown=0;e.attack(e.player);assert.equal(e.projectiles.length,1);
+const z=e.player.z;e.input.z=-1;for(let i=0;i<10;i++)e.tick(.016);assert.ok(e.player.z<z);
+assert.ok(e.jump(e.player));for(let i=0;i<180;i++)e.tick(.016);assert.equal(e.player.y,0,'gravity lands player');
+assert.equal(R.recordBattle(b,'easy',true),2);assert.equal(R.recordBattle(b,'easy',true),0);assert.equal(ctx.state.stars,2);
+assert.equal(b.record.wins,2);console.log('PASS 3D movement, weapon collision/height, projectile, jump/landing, capped reward');

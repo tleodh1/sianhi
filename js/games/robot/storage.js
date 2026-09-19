@@ -13,3 +13,11 @@
     out.record={wins:0,losses:0,...out.record};out.id=out.id||base.id;out.name=String(out.name||'별빛 로봇').slice(0,14);return out;
   };
 })(window.SianRobot);
+(function(R){
+  R.recordBattle=function(build,difficulty,win){
+    build.record[win?'wins':'losses']++;
+    const key='robot-win-'+difficulty;let reward=0;
+    if(win&&!state.completed[key]){reward=2;state.completed[key]=Date.now();state.stars+=reward;}
+    R.store.saveRobot(build);return reward;
+  };
+})(window.SianRobot);
