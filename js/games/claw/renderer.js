@@ -78,7 +78,7 @@
       const g = this.g,
         p = C.project(toy.x, toy.z, toy.height + extraHeight),
         s = this.art.toys[def.sprite],
-        h = def.radius * 2.65 * p.scale * (toy.scale || 1),
+        h = def.radius * 2.9 * p.scale * (toy.scale || 1),
         w = (h * s.w) / s.h;
       g.save();
       g.translate(p.x, p.y);

@@ -41,10 +41,10 @@ var SianClaw = globalThis.SianClaw || {};
     sprite,
   }));
   C.layout = function () {
-    const ids=[...C.catalog.map(d=>d.id),'dragon','dino','robot','whale','bunny','panda','star-monster'];
-    const xs=[-205,-160,-112,-62,-12,43,96,151,198,-184,-132,-75,-20,34,88,141,188,-202,-151,-99,-46,8,61,113,166,207,-126,-35,56,145];
-    const tilts=[-1.18,.18,-.42,.08,.72,-.14,.31,-.86,.12,.48,-.2,1.35,-.1,.25,-.68,.05,.92,-.3,.16,-1.42,.38,-.08,.65,-.24,.1,-.74,.22,1.18,-.17,.44];
-    return ids.map((id,i)=>({instanceId:`toy-${i}`,id,x:xs[i],z:[.82,.53,.2][Math.floor(i/10)]+((i%4)-1.5)*.012,height:i%7===0?10:i%11===0?18:0,vy:0,tilt:tilts[i],scale:[.78,.9,1.04,1.18,1.42,1.62][(i*5+Math.floor(i/10))%6],pose:i%6===0?'side':i%9===0?'upside-down':i%5===0?'lean':'upright',won:false}));
+    const heroes=['dragon','robot','whale','dino','electric-monster','shark','panda','star-monster','bunny','puppy','phoenix','astronaut','dragon'];
+    const ids=[...C.catalog.map(d=>d.id),...heroes];
+    const tilts=[-1.18,.18,-.42,.08,.72,-.14,.31,-.86,.12,.48,-.2,1.35,-.1,.25,-.68,.05,.92,-.3,.16,-1.42,.38,-.08,.65,-.24,.1,-.74,.22,1.18,-.17,.44,-.55,.84,-1.25,.29,.63,-.36];
+    return ids.map((id,i)=>{const layer=Math.floor(i/12),column=i%12,z=[.84,.54,.19][layer]+((i%3)-1)*.018,x=-218+column*39+(layer%2?17:0);return {instanceId:`toy-${i}`,id,x,z,height:i%7===0?12:i%11===0?20:0,vy:0,tilt:tilts[i],scale:[.94,1.06,1.18,1.34,1.55,1.82][(i*5+layer)%6]+(layer===2?.12:0),pose:i%6===0?'side':i%9===0?'upside-down':i%5===0?'lean':'upright',won:false};});
   };
   C.clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 })(SianClaw);

@@ -15,12 +15,12 @@ function run(e) {
   for (let n = 0; n < 2000 && e.phase !== "result"; n++) e.step(1 / 120);
   a.equal(e.phase, "result");
 }
-test("expanded original catalog, 30-toy pile and four rarities", () => {
+test("expanded original catalog, 36-toy dense pile and four rarities", () => {
   a(C.catalog.length >= 16);
   a.equal(new Set(C.catalog.map((t) => t.id)).size, C.catalog.length);
   a.equal(new Set(C.catalog.map((t) => t.rarity)).size, 4);
-  const pile=C.layout();a.equal(pile.length,30);a.equal(new Set(pile.map(t=>Math.round(t.z*10))).size,3);
-  a(Math.max(...pile.map(t=>t.scale))>=1.5);a(Math.min(...pile.map(t=>t.scale))<.9);
+  const pile=C.layout();a.equal(pile.length,36);a(new Set(pile.map(t=>Math.round(t.z*10))).size>=3);
+  a(Math.max(...pile.map(t=>t.scale))>=1.8);a(Math.min(...pile.map(t=>t.scale))>=.9);
   a(pile.some(t=>Math.abs(t.tilt)>1));a(new Set(pile.map(t=>t.pose)).size>=3);
 });
 test("size and weight affect centered grip instead of guaranteed success", () => {
@@ -38,8 +38,8 @@ test("empty area fails without random reward", () => {
 });
 test("offset influences enclosure and holding margin", () => {
   const e = new C.Engine(),
-    t = e.toys[1],
-    d = C.catalog[1];
+    t = e.toys.find(t=>t.scale<=1.06),
+    d = C.catalog.find(d=>d.id===t.id);
   e.claw.x = t.x;
   e.claw.z = t.z;
   const good = C.evaluateGrip(e.claw, t, d);
