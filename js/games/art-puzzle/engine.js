@@ -113,7 +113,7 @@
     const bottom = r === rows - 1 ? 0 : (id * 17 + cols * 11 + rows * 7) % 2 ? 1 : -1;
     const bump = (side, type) => type === 0 ? [] : side === "top" ? [[38,8],[42,type>0?0:16],[58,type>0?0:16],[62,8]] : side === "right" ? [[92,38],[type>0?100:84,42],[type>0?100:84,58],[92,62]] : side === "bottom" ? [[62,92],[58,type>0?100:84],[42,type>0?100:84],[38,92]] : [[8,62],[type>0?0:16,58],[type>0?0:16,42],[8,38]];
     const points=[[8,8],...bump("top",top),[92,8],...bump("right",right),[92,92],...bump("bottom",bottom),[8,92],...bump("left",left)];
-    return `polygon(${points.map(p=>p.join("% ")).join(",")})`;
+    return `polygon(${points.map(([x,y])=>`${x}% ${y}%`).join(",")})`;
   };
   A.snap = function (x, y, rect, cols, rows, tolerance = 0.64) {
     const w = rect.width / cols,
