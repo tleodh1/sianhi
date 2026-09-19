@@ -288,7 +288,8 @@ dialog#game.claw-dialog {
 .claw-app footer {
   background: transparent !important;
   color: #607e73 !important;
-  padding: 10px 0 0 !important;
+  padding: 4px 0 0 !important;
+  line-height: 1.2;
 }
 .claw-pad button {
   white-space: nowrap;
