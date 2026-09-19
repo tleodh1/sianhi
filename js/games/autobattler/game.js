@@ -91,7 +91,7 @@
 
   function bindArena() {
     const canvas = document.querySelector("[data-auto-canvas]"); canvas.ondragover = (e) => { if (e.dataTransfer.types.includes("text/unit")) e.preventDefault(); }; canvas.ondrop = (e) => { e.preventDefault(); const tile = view.pickTile(e.clientX, e.clientY); if (tile) moveTo(e.dataTransfer.getData("text/unit"), tile); view.highlight(false); };
-    canvas.onclick = (e) => { if (dragUid || run.phase !== "PREP") return; const uid = view.pickUnit(e.clientX, e.clientY); if (uid) selectUnit(uid); };
+    canvas.onclick = (e) => { if (dragUid || run.phase !== "PREP") return; const uid = view.pickUnit(e.clientX, e.clientY); if (uid) selectUnit(uid); else if (selectedUid) { const tile = view.pickTile(e.clientX, e.clientY); if (tile) moveTo(selectedUid, tile); } };
     const bench = document.querySelector("[data-bench]"); bench.ondragover = (e) => { if (e.dataTransfer.types.includes("text/unit")) e.preventDefault(); }; bench.ondrop = (e) => { e.preventDefault(); moveToBench(e.dataTransfer.getData("text/unit")); };
     const pointerMove = (e) => { if (dragUid) e.preventDefault(); };
     const pointerUp = (e) => { if (!dragUid || run.phase !== "PREP") return; const rect = canvas.getBoundingClientRect(); if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) { const tile = view.pickTile(e.clientX, e.clientY); if (tile) moveTo(dragUid, tile); } dragUid = null; view.highlight(false); };
