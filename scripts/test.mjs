@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import vm from "node:vm";
 import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
 for (const p of fs.readdirSync("js").filter((p) => p.endsWith(".js")))
   new vm.Script(fs.readFileSync("js/" + p, "utf8"));
 const learning = fs.readFileSync("js/learning.js", "utf8");
@@ -36,3 +38,4 @@ for (const file of [
 console.log(
   "PASS: syntax, 800 stage answers, coding command budget, local image/font assets",
 );
+require("../tests/runner-adventure.test.cjs");
