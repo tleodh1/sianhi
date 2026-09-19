@@ -6,7 +6,7 @@ a.equal(H.worlds.length,4);a.equal(H.worldStages.length,16);a.deepEqual([...new 
 for(const id of ['1-4','2-4','3-4','4-4']){
  const e=new H.WorldEngine(H.buildWorldStage(id));
  for(let i=0;i<e.stage.words.length;i++){const item=e.stage.items.find(v=>v.id===`letter-${i}`);e.player.x=item.x;e.player.y=item.y;e.step(1/120,{});}
- a.equal(e.letterCount,e.stage.words.length,`${id} collects every correct answer`);a.equal(e.boss.hp,0,`${id} boss is defeated by answers`);
+ a.equal(e.letterCount,e.stage.words.length,`${id} collects every correct answer`);a.equal(e.boss.hp,0,`${id} boss is defeated by answers`);a.equal(e.boss.unlocked,true,`${id} exit unlocks only after boss defeat`);a.ok(e.events.bossHit>=1);a.equal(e.events.doorUnlock,1);
  e.player.x=e.stage.goal.x;e.player.y=e.stage.goal.y;e.step(1/120,{});a.equal(e.status,'clear',`${id} can clear after boss defeat`);
 }
 const underground=new H.WorldEngine(H.buildWorldStage('4-2'));underground.player.x=300;underground.player.y=300;underground.step(1/120,{jump:true});a.equal(underground.mode,'swim');

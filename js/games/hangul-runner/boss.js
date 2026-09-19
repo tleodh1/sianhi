@@ -9,11 +9,14 @@
    wrong.forEach((text,j)=>stage.items.push({id:`decoy-${i}-${j}`,question:i,kind:'decoy',text,x:x+105+j*100,y:y+(j?70:-65),w:58,h:58}));
   });return stage;
  };
- H.tickBoss=function(e,dt){if(!e.boss)e.boss={hp:e.stage.words.length,maxHp:e.stage.words.length,question:0,attackClock:1.6,name:e.stage.boss.name};
-  const b=e.boss;b.question=e.letterCount;b.attackClock-=dt;e.answerCooldown=Math.max(0,e.answerCooldown-dt);
+ H.tickBoss=function(e,dt){if(!e.boss)e.boss={hp:e.stage.words.length,maxHp:e.stage.words.length,question:0,attackClock:1.6,name:e.stage.boss.name,hitTime:0,defeatTime:0,unlocked:false};
+  const b=e.boss,previousHp=b.hp;b.question=e.letterCount;b.attackClock-=dt;b.hitTime=Math.max(0,b.hitTime-dt);e.answerCooldown=Math.max(0,e.answerCooldown-dt);
   for(const d of e.stage.items.filter(i=>i.kind==='decoy'&&!e.collected.has(i.id))){if(d.question===b.question&&hit(e.player,d)&&e.answerCooldown<=0){e.collected.add(d.id);e.answerCooldown=1;e.damage();e.emit('wrong',{item:d});}}
   if(b.attackClock<=0&&b.hp>0){b.attackClock=Math.max(.8,2.2-b.question*.2);const fromRight=e.player.x+e.viewport*.65;e.projectiles.push({x:fromRight,y:70+Math.random()*340,w:34,h:34,vx:-130-b.question*18,kind:e.stage.boss.style});e.emit('bossAttack');}
   e.projectiles=e.projectiles.filter(p=>{p.x+=p.vx*dt;if(hit(e.player,p)){e.damage();return false;}return p.x>e.cameraX-80;});
   b.hp=Math.max(0,b.maxHp-e.letterCount);
+  if(b.hp<previousHp){b.hitTime=.55;e.burst(e.cameraX+e.viewport-120,150);e.emit('bossHit',{damage:previousHp-b.hp,hp:b.hp});}
+  if(b.hp===0&&!b.unlocked){b.unlocked=true;b.defeatTime=1.2;e.projectiles.length=0;e.emit('bossDefeat',{name:b.name});e.emit('doorUnlock');}
+  b.defeatTime=Math.max(0,b.defeatTime-dt);
  };
 })(HangulRunner);
