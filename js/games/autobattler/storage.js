@@ -5,7 +5,7 @@
     return { version: VERSION, bestStage: 1, games: 0, wins: 0, collection: {}, tutorialSeen: false, activeRun: null };
   }
   function get() {
-    const root = global.state || {};
+    const root = state;
     root.records = root.records && typeof root.records === "object" ? root.records : {};
     const raw = root.records.autoBattler;
     const record = raw && typeof raw === "object" ? { ...fresh(), ...raw } : fresh();
@@ -13,9 +13,9 @@
     return record;
   }
   function saveRecord(record) {
-    if (!global.state.records) global.state.records = {};
-    global.state.records.autoBattler = record;
-    if (typeof global.save === "function") global.save();
+    if (!state.records) state.records = {};
+    state.records.autoBattler = record;
+    if (typeof save === "function") save();
   }
   function createRun() {
     return {

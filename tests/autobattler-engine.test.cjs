@@ -3,7 +3,7 @@ const vm = require("node:vm");
 const assert = require("node:assert/strict");
 
 const window = { state: { records: {} }, save() {} };
-const ctx = vm.createContext({ window, Math, Date, console });
+const ctx = vm.createContext({ window, state: window.state, save: window.save, Math, Date, console });
 for (const file of ["data", "storage", "engine"]) {
   vm.runInContext(fs.readFileSync(`js/games/autobattler/${file}.js`, "utf8"), ctx);
 }
