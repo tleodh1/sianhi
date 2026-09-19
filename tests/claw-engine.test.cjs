@@ -22,6 +22,7 @@ test("expanded original catalog, 36-toy dense pile and four rarities", () => {
   const pile=C.layout();a.equal(pile.length,36);a(new Set(pile.map(t=>Math.round(t.z*10))).size>=3);
   a(Math.max(...pile.map(t=>t.scale))>=1.8);a(Math.min(...pile.map(t=>t.scale))>=.9);
   a(pile.some(t=>Math.abs(t.tilt)>1));a(new Set(pile.map(t=>t.pose)).size>=3);
+  for(const t of pile){const d=C.catalog.find(x=>x.id===t.id),foot=Math.min(66,d.radius*t.scale*.58);a(t.x>=C.machine.left+foot&&t.x<=C.machine.right-foot);a(t.z>=C.machine.front&&t.z<=C.machine.back);a(t.height>=C.machine.floor);}
 });
 test("size and weight affect centered grip instead of guaranteed success", () => {
   const d=C.catalog.find(d=>d.id==='dragon'),small={x:0,z:.5,scale:.8},large={x:0,z:.5,scale:1.62},claw={x:0,z:.5,strength:1.7,sway:0};
@@ -104,4 +105,9 @@ test("movement, front/back, sway settling, free refill", () => {
   for (let i = 0; i < 90; i++) e.step(1 / 120);
   a.equal(e.claw.sway, 0);
 });
+test("large plush remains inside the physical floor and side bounds after a slip",()=>{
+  const e=new C.Engine(),t=e.toys.reduce((a,b)=>a.scale>b.scale?a:b),d=C.catalog.find(x=>x.id===t.id);t.x=C.machine.right;t.height=-30;C.constrainToy(t);const foot=Math.min(66,d.radius*t.scale*.58);a(t.x<=C.machine.right-foot);a.equal(t.height,C.machine.floor);e.held=t;e.claw.sway=.2;e.releaseToy("test");a(t.x<=C.machine.right-foot);a(t.z<=C.machine.back);a(t.height>=C.machine.floor);
+});
+const rendererSource=fs.readFileSync("js/games/claw/renderer.js","utf8");
+a.match(rendererSource,/p\.y - h \/ 2/,"plush rotation uses its centre rather than the floor pivot");
 console.log(total + " claw engine tests passed");

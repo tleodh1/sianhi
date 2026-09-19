@@ -40,11 +40,24 @@ var SianClaw = globalThis.SianClaw || {};
     story,
     sprite,
   }));
+  C.machine = { left: -238, right: 238, front: 0.1, back: 0.9, floor: 0 };
+  C.constrainToy = function (toy) {
+    const def = C.catalog.find((d) => d.id === toy.id);
+    if (!def) return toy;
+    const footprint = Math.min(66, def.radius * (toy.scale || 1) * 0.58);
+    toy.x = C.clamp(toy.x, C.machine.left + footprint, C.machine.right - footprint);
+    toy.z = C.clamp(toy.z, C.machine.front, C.machine.back);
+    toy.height = Math.max(C.machine.floor, toy.height || 0);
+    return toy;
+  };
+  C.grabReach = function (toy, def) {
+    return C.clamp(def.radius * (toy.scale || 1) * 0.72 + 25, 54, 82);
+  };
   C.layout = function () {
     const heroes=['dragon','robot','whale','dino','electric-monster','shark','panda','star-monster','bunny','puppy','phoenix','astronaut','dragon'];
     const ids=[...C.catalog.map(d=>d.id),...heroes];
     const tilts=[-1.18,.18,-.42,.08,.72,-.14,.31,-.86,.12,.48,-.2,1.35,-.1,.25,-.68,.05,.92,-.3,.16,-1.42,.38,-.08,.65,-.24,.1,-.74,.22,1.18,-.17,.44,-.55,.84,-1.25,.29,.63,-.36];
-    return ids.map((id,i)=>{const layer=Math.floor(i/12),column=i%12,z=[.84,.54,.19][layer]+((i%3)-1)*.018,x=-218+column*39+(layer%2?17:0);return {instanceId:`toy-${i}`,id,x,z,height:i%7===0?12:i%11===0?20:0,vy:0,tilt:tilts[i],scale:[.94,1.06,1.18,1.34,1.55,1.82][(i*5+layer)%6]+(layer===2?.12:0),pose:i%6===0?'side':i%9===0?'upside-down':i%5===0?'lean':'upright',won:false};});
+    return ids.map((id,i)=>{const layer=Math.floor(i/9),column=i%9,z=[.86,.64,.41,.18][layer]+((i%3)-1)*.014,x=-208+column*52+(layer%2?8:0),toy={instanceId:`toy-${i}`,id,x,z,height:i%7===0?12:i%11===0?20:0,vy:0,tilt:tilts[i],scale:[.94,1.06,1.18,1.34,1.55,1.82][(i*5+layer)%6]+(layer===3?.08:0),pose:i%6===0?'side':i%9===0?'upside-down':i%5===0?'lean':'upright',won:false};return C.constrainToy(toy);});
   };
   C.clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 })(SianClaw);

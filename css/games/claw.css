@@ -5,7 +5,8 @@ dialog#game.claw-dialog {
   background: #f4fbf8 !important;
   border: 2px solid #c7e4dc !important;
   max-height: 96dvh !important;
-  overflow: auto !important;
+  overflow: hidden !important;
+  overscroll-behavior: contain;
 }
 #game.claw-dialog > .close {
   position: absolute !important;
@@ -202,6 +203,7 @@ dialog#game.claw-dialog {
 @media (max-width: 480px) {
   dialog#game.claw-dialog {
     padding: 12px !important;
+    max-height: calc(100svh - 8px) !important;
   }
   .claw-app h2 {
     font-size: 20px;

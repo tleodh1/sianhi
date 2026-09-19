@@ -65,6 +65,8 @@ assert.match(rendererSource, /enemy \? "#ff5c68" : "#4ee5aa"/, "combat nameplate
 assert.match(rendererSource, /function contain\(unit\)/, "combat movement is clamped to board bounds");
 assert.match(responsiveCss, /grid-template-rows:50px 32px minmax\(250px,1fr\) 54px 112px 62px/, "short desktop viewport keeps every play section visible");
 assert.doesNotMatch(responsiveCss, /\.autoGame[^}]*transform\s*:\s*scale/, "one-screen layout does not scale the entire game");
+assert.match(rendererSource, /innerWidth < 700 \? 2 : 1\.8/, "mobile WebGL uses a Retina-aware capped pixel ratio");
+assert.match(responsiveCss, /grid-template-rows:44px 32px 240px 52px 92px 50px/, "mobile game uses compact fixed play sections instead of stretching the board");
 const foreignRecords = { korean: { stage: 44 }, claw: { collection: ["dragon"] }, robot: { saved: "hero" } };
 window.state.records = { ...foreignRecords, autoBattler: { ...S.get(), activeRun: run } };
 const starRecord = S.get();

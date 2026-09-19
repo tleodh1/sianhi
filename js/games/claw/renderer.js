@@ -81,13 +81,15 @@
         h = def.radius * 2.9 * p.scale * (toy.scale || 1),
         w = (h * s.w) / s.h;
       g.save();
-      g.translate(p.x, p.y);
+      // Rotate around the plush centre. Rotating around the feet made upside-down
+      // large toys extend below the cabinet floor on narrow Safari screens.
+      g.translate(p.x, p.y - h / 2);
       g.rotate((toy.tilt || 0)+(toy.pose==='upside-down'?Math.PI:0));
       if (glow) {
         g.shadowColor = C.rarities[def.rarity].color;
         g.shadowBlur = 20;
       }
-      g.drawImage(s.image, s.x, s.y, s.w, s.h, -w / 2, -h, w, h);
+      g.drawImage(s.image, s.x, s.y, s.w, s.h, -w / 2, -h / 2, w, h);
       g.restore();
       return { x: p.x, y: p.y, w, h };
     }
@@ -289,7 +291,7 @@
       g.save();
       g.translate(p.x + sway, p.y - 15);
       g.rotate(Math.sin(e.elapsed * 6) * c.sway * 0.3);
-      const spread = 13 + c.open * 29;
+      const spread = 16 + c.open * 36;
       // Rear finger is drawn behind the central housing.
       this.finger(
         [
@@ -312,11 +314,11 @@
         this.finger(
           [
             [dir * 14, 2],
-            [dir * spread, 24],
-            [dir * (8 + c.open * 25), 48 - c.open * 9],
+            [dir * spread, 28],
+            [dir * (10 + c.open * 31), 57 - c.open * 10],
           ],
           metal,
-          9,
+          10,
         );
         g.fillStyle = "#536f78";
         g.beginPath();

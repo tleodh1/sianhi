@@ -31,7 +31,7 @@
     let renderer;
     try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" }); }
     catch (error) { console.warn("Star Board: WebGL unavailable, using 2D fallback.", error.message); return createFallback(container, hooks); }
-    renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth < 700 ? 1.35 : 1.8));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth < 700 ? 2 : 1.8));
     renderer.shadowMap.enabled = innerWidth > 700;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;

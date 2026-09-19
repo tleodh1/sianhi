@@ -60,3 +60,19 @@
   .autoGame{grid-template-rows:46px 34px minmax(232px,1fr) 58px 132px 66px}
   .shopCards{grid-auto-columns:minmax(100px,38vw)}.benchSlots{grid-template-columns:repeat(9,64px)}.benchSlot,.unitToken{height:56px}
 }
+
+/* iPhone Safari: size the dialog from real sections, not a stretched canvas row. */
+@media(max-width:700px){
+  #game:has(.autoGame){width:100vw;height:auto;max-height:calc(100svh - 8px);margin:auto;padding:0;overflow:hidden}
+  #game:has(.autoGame) #gameBody{height:auto;overflow:hidden}
+  .autoGame{height:auto;grid-template-rows:44px 32px 240px 52px 92px 50px;overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  .autoTopbar{padding:3px 44px 3px 7px}.autoLogo{width:32px;height:32px}.autoRound b{font-size:16px}.autoStats span{min-height:34px;font-size:13px}.autoStats b{font-size:14px}
+  .autoVersus{gap:7px;padding:2px 7px}.autoVersus b{font-size:13px}.autoVersus small{max-width:90px;font-size:12px}.autoVersus strong{font-size:17px}
+  .mobilePanelToggle{top:7px;min-width:58px;min-height:42px;padding:7px;font-size:14px}.teamZone{left:0;right:0;width:max-content;margin:auto;transform:none;font-size:11px}.teamZone.player{bottom:29px}.arenaHint{left:0;right:0;width:max-content;max-width:88%;margin:auto;transform:none;padding:5px 9px;font-size:12px}
+  .autoBattleDock{grid-template-columns:54px minmax(0,1fr);gap:6px;padding:3px 7px}.autoBattleDock small{font-size:12px}.autoBattleDock>div:first-child b{font-size:15px}.autoBattleButton{min-height:46px;border-radius:12px}.autoBattleButton span{font-size:20px}.autoBattleButton b{font-size:16px}.autoBattleButton small{font-size:12px}
+  .autoShop{grid-template-columns:62px minmax(0,1fr);gap:5px;padding:3px 6px}.shopHeading{padding:0}.shopHeading small{font-size:11px}.shopHeading b{font-size:13px}.shopHeading button{margin-top:3px;padding:4px 2px;font-size:12px}.shopCards{grid-auto-columns:94px;gap:5px;padding:1px 3px 3px 1px}.shopCard{grid-template-rows:38px 1fr;border-radius:9px}.miniBot{width:27px;height:34px}.shopCopy{padding:2px 5px}.shopCopy .rarity,.shopCopy small{display:none}.shopCopy>b{font-size:13px}.shopCard>strong{right:5px;bottom:3px;font-size:12px}
+  .autoBench{grid-template-columns:44px minmax(0,1fr);gap:4px;padding:3px 6px}.benchLabel{display:grid}.benchLabel small{font-size:11px}.benchLabel b{font-size:13px}.benchSlots{grid-template-columns:repeat(9,48px);gap:4px;padding:0}.benchSlot,.unitToken{height:44px;border-radius:7px;font-size:13px}.tokenBot{width:19px;height:25px}.unitToken>b{display:none}.unitToken>span{font-size:11px}
+}
+@media(max-width:360px){
+  .autoGame{grid-template-rows:42px 30px 218px 50px 88px 48px}.autoTopbar{padding-right:42px}.autoStats span{padding-inline:3px}.autoVersus small{max-width:68px}.mobilePanelToggle{min-width:52px}.shopCards{grid-auto-columns:88px}.benchSlots{grid-template-columns:repeat(9,44px)}.benchSlot,.unitToken{height:42px}
+}
