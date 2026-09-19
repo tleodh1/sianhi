@@ -39,3 +39,4 @@ console.log(
   "PASS: syntax, 800 stage answers, coding command budget, local image/font assets",
 );
 require("../tests/runner-adventure.test.cjs");
+require("../tests/arithmetic-options.test.cjs");

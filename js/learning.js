@@ -148,6 +148,41 @@ state.stage100 = state.stage100 || {};
 LEARNING_SUBJECTS.forEach((n) => {
   if (!state.stage100[n]) state.stage100[n] = 1;
 });
+let arithmeticAnswerBag = [];
+let arithmeticLastPosition = -1;
+function nextArithmeticAnswerPosition() {
+  if (!arithmeticAnswerBag.length) {
+    arithmeticAnswerBag = [0, 1, 2, 3];
+    for (let i = arithmeticAnswerBag.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arithmeticAnswerBag[i], arithmeticAnswerBag[j]] = [
+        arithmeticAnswerBag[j],
+        arithmeticAnswerBag[i],
+      ];
+    }
+    if (arithmeticAnswerBag[0] === arithmeticLastPosition)
+      [arithmeticAnswerBag[0], arithmeticAnswerBag[1]] = [
+        arithmeticAnswerBag[1],
+        arithmeticAnswerBag[0],
+      ];
+  }
+  arithmeticLastPosition = arithmeticAnswerBag.shift();
+  return arithmeticLastPosition;
+}
+function randomizeArithmeticOptions(question) {
+  const answer = Number(question.ans);
+  const options = [...new Set(question.opts.map(Number))].filter(Number.isFinite);
+  for (let distance = 1; options.length < 4; distance++) {
+    for (const candidate of [answer - distance, answer + distance]) {
+      if (candidate >= 0 && !options.includes(candidate)) options.push(candidate);
+      if (options.length === 4) break;
+    }
+  }
+  const wrong = options.filter((value) => value !== answer).slice(0, 3);
+  const position = nextArithmeticAnswerPosition();
+  wrong.splice(position, 0, answer);
+  return { ...question, opts: wrong, answerPosition: position };
+}
 function advancedQuestion(subject, stage) {
   const n = stage;
   if (subject === "연산") {
@@ -306,19 +341,19 @@ function stageQuestion(subject, stage) {
     if (stage <= 10) {
       const a = (n % 5) + 1,
         b = Math.min(9 - a, (n % 4) + 1);
-      return stage % 2
+      return randomizeArithmeticOptions(stage % 2
         ? number(a + " + " + b + " = ?", a + b)
-        : number(a + b + " − " + b + " = ?", a);
+        : number(a + b + " − " + b + " = ?", a));
     }
     if (stage <= 20)
-      return number(
+      return randomizeArithmeticOptions(number(
         (n % 9) + 1 + " + " + (((n * 3) % 9) + 1) + " = ?",
         (n % 9) + 1 + ((n * 3) % 9) + 1,
-      );
+      ));
     if (stage <= 30) {
       const a = (n % 9) + 8,
         b = (n % 7) + 1;
-      return number(a + " − " + b + " = ?", a - b);
+      return randomizeArithmeticOptions(number(a + " − " + b + " = ?", a - b));
     }
   }
   if (subject === "한글" && stage <= 20) {
@@ -414,7 +449,8 @@ function stageQuestion(subject, stage) {
       ],
     };
   }
-  return advancedQuestion(subject, stage);
+  const question = advancedQuestion(subject, stage);
+  return subject === "연산" ? randomizeArithmeticOptions(question) : question;
 }
 function openStageMap(subject) {
   Session.begin();
