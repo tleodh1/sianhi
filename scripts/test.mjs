@@ -3,8 +3,8 @@ import vm from "node:vm";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
-for (const p of fs.readdirSync("js").filter((p) => p.endsWith(".js")))
-  new vm.Script(fs.readFileSync("js/" + p, "utf8"));
+function syntax(dir){for(const p of fs.readdirSync(dir)){const full=dir+'/'+p,stat=fs.statSync(full);if(stat.isDirectory())syntax(full);else if(p.endsWith('.js'))new vm.Script(fs.readFileSync(full,'utf8'));}}
+syntax("js");
 const learning = fs.readFileSync("js/learning.js", "utf8");
 const ctx = vm.createContext({ state: { stage100: {} } });
 vm.runInContext(learning, ctx);
@@ -40,3 +40,4 @@ console.log(
 );
 require("../tests/runner-adventure.test.cjs");
 require("../tests/arithmetic-options.test.cjs");
+require("../tests/learning-bank.test.cjs");
