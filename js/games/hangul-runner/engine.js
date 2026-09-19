@@ -6,7 +6,7 @@
     constructor(stage,options={}) {
       this.stage=stage; this.onEvent=options.onEvent||(()=>{}); this.viewport=options.viewport||960;
       this.player={x:60,y:348,w:38,h:72,velocityX:0,velocityY:0,gravity:1500,jumpForce:650,isGrounded:true,hp:3,powerState:'small',facing:1,pose:'idle',invincible:0};
-      this.collected=new Set();this.coins=0;this.stars=0;this.elapsed=0;this.cameraX=0;this.checkpoint=stage.checkpoints[0];this.deaths=0;
+      this.collected=new Set();this.coins=0;this.stars=0;this.elapsed=0;this.cameraX=0;this.checkpoint=stage.checkpoints[0];this.deaths=0;this.combo=0;this.comboTime=0;
       this.status='playing';this.jumpHeld=false;this.coyote=.1;this.jumpBuffer=0;this.poseTime=0;this.particles=[];this.goalHint=0;this.deathTimer=0;this.events={};
     }
     emit(type,data={}) {this.events[type]=(this.events[type]||0)+1;this.onEvent({type,...data});}
@@ -22,7 +22,7 @@
     burst(x,y){for(let n=0;n<12;n++)this.particles.push({x,y,vx:Math.cos(n*Math.PI/6)*100,vy:Math.sin(n*Math.PI/6)*100-60,life:.65});}
     step(dt,input={}) {
       dt=Math.min(.025,Math.max(0,dt));if(this.status==='clear'||this.status==='paused')return;
-      this.particles=this.particles.filter(v=>{v.x+=v.vx*dt;v.y+=v.vy*dt;v.vy+=130*dt;v.life-=dt;return v.life>0;});
+      this.particles=this.particles.filter(v=>{v.x+=v.vx*dt;v.y+=v.vy*dt;v.vy+=130*dt;v.life-=dt;return v.life>0;});for(const item of this.stage.items)item.pop=Math.max(0,(item.pop||0)-dt);this.comboTime=Math.max(0,this.comboTime-dt);if(!this.comboTime)this.combo=0;
       if(this.status==='dead'){this.deathTimer-=dt;if(this.deathTimer<=0){if(this.player.hp<=0)this.player.hp=3;this.respawn();}return;}
       this.elapsed+=dt;const p=this.player;const oldY=p.y;const wasGrounded=p.isGrounded;
       p.invincible=Math.max(0,p.invincible-dt);this.poseTime=Math.max(0,this.poseTime-dt);this.goalHint=Math.max(0,this.goalHint-dt);
@@ -38,18 +38,28 @@
       // Solid cliff sides prevent walking through land from below; floating ledges are one-way.
       for(const a of this.stage.platforms){if(a.oneWay||!hit(p,a)||oldY+p.h<=a.y+1)continue;
         if(p.velocityX>0)p.x=a.x-p.w;else if(p.velocityX<0)p.x=a.x+a.w;}
+      for(const b of this.stage.blocks||[]){if(b.removed||b.hidden&&!b.revealed||!hit(p,b)||oldY+p.h<=b.y+2)continue;if(p.velocityX>0)p.x=b.x-p.w;else if(p.velocityX<0)p.x=b.x+b.w;}
       p.velocityY=Math.min(950,p.velocityY+p.gravity*dt);p.y+=p.velocityY*dt;p.isGrounded=false;
+      for(const b of this.stage.blocks||[]){if(b.removed)continue;b.bump=Math.max(0,(b.bump||0)-dt);b.crack=Math.max(0,(b.crack||0)-dt);if(b.hidden&&!b.revealed&&p.velocityY>=0)continue;if(p.x+p.w<=b.x+3||p.x>=b.x+b.w-3)continue;
+        if(p.velocityY<0&&oldY>=b.y+b.h-2&&p.y<=b.y+b.h){p.y=b.y+b.h;p.velocityY=90;b.revealed=true;b.bump=.22;this.emit('blockHit',{block:b});
+          if(b.kind==='breakable'){if(p.powerState==='big'||b.fragile){b.removed=true;this.burst(b.x+b.w/2,b.y+b.h/2);this.emit('blockBreak',{block:b});}else{b.cracked=true;b.crack=.35;this.emit('blockCrack',{block:b});}}
+          if(b.kind==='reward'&&!b.used){b.used=true;const reward=this.stage.items.find(i=>i.id===b.rewardId);if(reward){reward.contained=false;reward.x=b.x+(b.w-reward.w)/2;reward.y=b.y-reward.h-8;reward.pop=1;}this.emit('rewardPop',{block:b,reward});}
+        }}
       for(const a of this.stage.platforms){if(p.x+p.w>a.x+2&&p.x<a.x+a.w-2&&p.velocityY>=0&&oldY+p.h<=a.y+1&&p.y+p.h>=a.y){p.y=a.y-p.h;p.velocityY=0;p.isGrounded=true;break;}}
+      for(const b of this.stage.blocks||[]){if(b.removed||(!b.revealed&&b.hidden))continue;if(p.x+p.w>b.x+2&&p.x<b.x+b.w-2&&p.velocityY>=0&&oldY+p.h<=b.y+1&&p.y+p.h>=b.y){p.y=b.y-p.h;p.velocityY=0;p.isGrounded=true;break;}}
       if(!wasGrounded&&p.isGrounded){this.setPose('land',.1);this.emit('land');}
       if(this.poseTime<=0)this.setPose(!p.isGrounded?(p.velocityY<0?'jump':'fall'):(p.velocityX?'run':'idle'));
-      for(const item of this.stage.items){if(this.collected.has(item.id)||!hit(p,item)||(this.canCollect&&!this.canCollect(item)))continue;this.collected.add(item.id);this.burst(item.x+item.w/2,item.y+item.h/2);
+      for(const item of this.stage.items){if(item.contained||this.collected.has(item.id)||!hit(p,item)||(this.canCollect&&!this.canCollect(item)))continue;this.collected.add(item.id);this.burst(item.x+item.w/2,item.y+item.h/2);
         if(item.kind==='coin')this.coins++;if(item.kind==='star')this.stars++;if(item.kind==='power'){p.powerState='big';this.setPose('power-up',.45);}this.emit(item.kind,{item});}
-      for(const e of this.stage.enemies){e.x+=e.dir*e.speed*dt;if(e.x>e.right){e.x=e.right;e.dir=-1;}if(e.x<e.left){e.x=e.left;e.dir=1;}e.y=e.baseY-(e.kind==='sprout'?Math.max(0,Math.sin(this.elapsed*2.5+e.phase))*65:0);if(hit(p,e))this.damage();}
+      for(const e of this.stage.enemies){if(e.defeated){e.defeatTime-=dt;continue;}const speed=e.state==='rolling'?(e.rollSpeed||330):e.speed;e.x+=e.dir*speed*dt;if(e.x>e.right){e.x=e.right;e.dir=-1;}if(e.x<e.left){e.x=e.left;e.dir=1;}if(e.state!=='shell')e.y=e.baseY-(e.kind==='sprout'?Math.max(0,Math.sin(this.elapsed*2.5+e.phase))*65:0);if(!hit(p,e))continue;
+        const stomp=p.velocityY>0&&oldY+p.h<=e.y+Math.min(16,e.h*.4);if(stomp){p.y=e.y-p.h;p.velocityY=-390;p.isGrounded=false;this.combo++;this.comboTime=2;this.burst(e.x+e.w/2,e.y+8);if(e.armored&&e.state!=='shell'){e.state='shell';e.speed=0;e.h=Math.max(28,e.h-12);e.y=e.baseY+12;this.emit('enemyShell',{enemy:e,combo:this.combo});}else if(e.state==='shell'){e.state='rolling';e.dir=p.x<e.x?1:-1;this.emit('enemyRoll',{enemy:e,combo:this.combo});}else{e.defeated=true;e.defeatTime=.45;this.emit('enemyStomp',{enemy:e,combo:this.combo});}continue;}
+        if(e.state==='shell'){e.state='rolling';e.dir=p.x<e.x?1:-1;p.velocityX=-e.dir*110;this.emit('enemyRoll',{enemy:e,combo:this.combo});}else this.damage();}
+      for(const roller of this.stage.enemies.filter(e=>!e.defeated&&e.state==='rolling')){for(const target of this.stage.enemies){if(target===roller||target.defeated||!hit(roller,target))continue;target.defeated=true;target.defeatTime=.45;roller.dir*=-1;this.combo++;this.comboTime=2;this.burst(target.x+target.w/2,target.y+target.h/2);this.emit('enemyCombo',{enemy:target,combo:this.combo});}for(const b of this.stage.blocks||[]){if(b.removed||b.kind!=='breakable'||!hit(roller,b))continue;b.removed=true;roller.dir*=-1;this.burst(b.x+b.w/2,b.y+b.h/2);this.emit('rollingBreak',{block:b});}}
       for(const h of this.stage.hazards){if(h.kind==='crate')h.x=h.origin+Math.sin(this.elapsed*1.5)*h.range;if(hit(p,h))this.damage();}
       for(const cp of this.stage.checkpoints)if(p.x>=cp.x&&cp.x>this.checkpoint.x){this.checkpoint=cp;this.emit('checkpoint',{checkpoint:cp});}
       if(p.y>720){p.hp--;this.die();}
       if(this.afterPhysics)this.afterPhysics(dt,input);
-      const target=Math.max(0,Math.min(this.stage.length-this.viewport,p.x-this.viewport*.4));this.cameraX+=(target-this.cameraX)*Math.min(1,dt*10);
+      const lookAhead=p.facing>0?this.viewport*.31:this.viewport*.5,target=Math.max(0,Math.min(this.stage.length-this.viewport,p.x-lookAhead));this.cameraX+=(target-this.cameraX)*Math.min(1,dt*10);
       if(hit(p,this.stage.goal)){
         if(this.letterCount===this.stage.words.length&&(!this.canFinish||this.canFinish())){this.status='clear';p.velocityX=0;this.setPose('celebrate');this.emit('clear',{result:this.result()});}
         else if(this.goalHint<=0){this.goalHint=4;this.emit('missing');}

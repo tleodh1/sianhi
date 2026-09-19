@@ -15,8 +15,8 @@
   state.records=state.records||{};state.records.hangulRunner={...old,adventure:p};state.stars=(Number(state.stars)||0)+earned;return earned;
  };
  H.buildWorldStage=function(id){const d=H.worldStages.find(s=>s.id===id);if(!d)throw Error('Unknown adventure stage '+id);
-  const world=H.worlds.find(w=>w.id===d.worldId),span=d.span||650;
-  const stage={...d,world,words:[...d.words],length:d.words.length*span+500,platforms:[],items:[],enemies:[],hazards:[],checkpoints:[{x:60,y:420,id:0}],currents:[],gates:[]};
+  const world=H.worlds.find(w=>w.id===d.worldId),span=d.span||900;
+  const length=d.words.length*span+700,stage={...d,span,world,words:[...d.words],length,sections:[{id:'start',x:0},{id:'move',x:span*.55},{id:'enemy',x:span*1.25},{id:'blocks',x:span*2.05},{id:'platform',x:Math.min(length-1200,span*3.05)},{id:'final',x:length-700}],platforms:[],blocks:[],items:[],enemies:[],hazards:[],checkpoints:[{x:60,y:420,id:0}],currents:[],gates:[]};
   d.words.forEach((text,i)=>{const x=i*span,water=d.mode==='swim',flight=d.mode==='fly';
    stage.platforms.push({x,y:420,w:span-(d.gap||90),h:300,kind:'ground'});
    if(water)stage.platforms[stage.platforms.length-1].y=510;
@@ -27,8 +27,8 @@
    if(i%2===0)stage.items.push({id:'power-'+i,kind:'power',x:x+110,y:ly,w:40,h:45});
    if(i>0&&i%2===0)stage.checkpoints.push({id:i/2,x:x+40,y:water?300:420});
   });
-  stage.platforms.push({x:d.words.length*span,y:d.mode==='swim'?510:420,w:500,h:300,kind:'ground'});
-  stage.goal={x:stage.length-200,y:d.mode==='swim'?210:250,w:110,h:170};
+  stage.platforms.push({x:d.words.length*span,y:d.mode==='swim'?510:420,w:700,h:300,kind:'ground'});
+  stage.goal={x:stage.length-155,y:d.mode==='swim'?335:330,w:54,h:90,kind:'beacon',active:false};
   if(H.decorateWorldStage)H.decorateWorldStage(stage);if(H.prepareBoss)H.prepareBoss(stage);return stage;
  };
 })(HangulRunner);
