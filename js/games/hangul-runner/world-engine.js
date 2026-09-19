@@ -16,7 +16,8 @@
     p.y=Math.max(32,Math.min(460-p.h,p.y));if(p.y<=32&&p.velocityY<0)p.velocityY=0;
    }
    for(const c of this.stage.currents||[])if(p.x>=c.x&&p.x<c.x+c.w){p.velocityX+=c.vx;p.velocityY+=c.vy*dt;}
-   for(const gate of this.stage.gates||[])if(this.sequence<gate.required&&p.x+p.w>gate.x&&p.x<gate.x+20){p.x=gate.x-p.w;p.velocityX=0;}
+   // Ordered learning remains a collection rule, never an invisible movement wall.
+   for(const gate of this.stage.gates||[])if(this.sequence<gate.required&&p.x+p.w>gate.x&&!gate.warned){gate.warned=true;this.emit('orderGuide',{text:this.stage.words[this.sequence],x:gate.x});}
   }
   canCollect(item){if(item.kind!=='letter'||(!this.stage.ordered&&!this.stage.boss))return true;
    if(item.index!==this.sequence){if(this.goalHint<=0){this.goalHint=2;this.emit('order',{text:this.stage.words[this.sequence]});}return false;}this.sequence++;return true;

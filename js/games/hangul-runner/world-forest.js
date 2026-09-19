@@ -14,8 +14,10 @@
    const letterReward=i===1&&s.number>1,rewardId=letterReward?`letter-${i}`:`block-reward-${i}`;const rowY=265-(i%2)*44;for(let j=0;j<3;j++)s.blocks.push({id:`block-${i}-${j}`,x:x+315+j*58,y:rowY,w:54,h:50,kind:j===0?'breakable':j===1?'reward':'hard',fragile:s.number===1&&i===0,rewardId:j===1?rewardId:null,revealed:true});
    if(s.number>=2&&i%2===1)s.blocks.push({id:`rolling-wall-${i}`,x:x+820,y:370,w:54,h:50,kind:'breakable',fragile:false,revealed:true});
    if(letterReward)letter.contained=true;else s.items.push({id:rewardId,kind:'coin',x:0,y:0,w:30,h:36,contained:true});
-   if(i===0&&s.number>=2)s.enemies.push({id:`walker-${i}`,x:x+480,y:376,w:44,h:44,left:x+430,right:x+650,dir:1,speed:52,kind:'sprout',baseY:376,phase:i,state:'walk'});
-   if(i>0)s.enemies.push({id:`enemy-${i}`,x:x+690,y:376,w:48,h:44,left:x+610,right:x+span-70,dir:-1,speed:45,kind:s.number>=2?'seed-shell':'sprout',baseY:376,phase:i,state:'walk',armored:s.number>=2,rollSpeed:340});
+   const level=s.number,mainKind=level===1?'berry-bandit':level===2?'seed-shell':level===3?(i%2?'pipe-snapper':'seed-shell'):(i%3===0?'fire-imp':i%3===1?'pipe-snapper':'seed-shell');
+   if(i===0||level>=2)s.enemies.push({id:`walker-${i}`,x:x+480,y:376,w:48,h:48,left:x+420,right:x+650,dir:1,speed:42+level*7,kind:level===1?'berry-bandit':i%2?'berry-bandit':mainKind,baseY:376,phase:i,state:'walk',level,hp:level>=4?2:1,flying:level===1&&i%2===1});
+   if(i>0)s.enemies.push({id:`enemy-${i}`,x:x+690,y:376,w:52,h:48,left:x+610,right:x+span-70,dir:-1,speed:38+level*6,kind:mainKind,baseY:376,phase:i,state:'walk',armored:mainKind==='seed-shell',rollSpeed:330+level*18,level,hp:level>=3&&mainKind!=='seed-shell'?2:1});
+   if(level>=3&&i%2===0)s.enemies.push({id:`ambush-${i}`,x:x+790,y:388,w:46,h:50,left:x+790,right:x+790,dir:-1,speed:0,kind:'pipe-snapper',baseY:408,phase:i+2,state:'ambush',level,hp:level>=4?2:1});
    if(s.number===1&&i<2)s.hazards.push({kind:'log',x:x+690,y:395,w:36,h:25});
    if(s.secret&&i%2===1){s.blocks.push({id:`hidden-${i}`,x:x+120,y:205,w:54,h:50,kind:'reward',hidden:true,revealed:false,rewardId:`secret-star-${i}`});s.items.push({id:`secret-star-${i}`,kind:'star',x:0,y:0,w:34,h:38,contained:true});s.platforms.push({x:x+70,y:255,w:175,h:28,kind:'floating',oneWay:true});}
    if(i>0&&i%2===0)s.checkpoints.push({id:10+i,x:x+45,y:420});

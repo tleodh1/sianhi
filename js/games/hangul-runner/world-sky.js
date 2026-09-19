@@ -8,6 +8,6 @@
  const previous=H.decorateWorldStage;H.decorateWorldStage=s=>{previous?.(s);if(s.worldId!==3)return;
   if(s.hybrid)s.runZones=s.words.map((_,i)=>({x:i*650,w:290}));
   s.platforms.forEach((a,i)=>{a.kind='floating';a.oneWay=true;a.h=55;if(s.moving){a.originX=a.x;a.originY=a.y;a.motion={x:30,y:60,speed:.65+i*.05};}});
-  s.words.forEach((_,i)=>{if(s.current)s.currents.push({x:i*650+250,w:350,vx:i%2?-55:65,vy:-20});s.enemies.push({x:i*650+425,y:130+(i%3)*85,w:48,h:48,left:i*650+310,right:i*650+550,dir:1,speed:65,kind:'storm',baseY:130+(i%3)*85,phase:i});});
+  s.words.forEach((_,i)=>{const x=i*650,level=s.number,kind=['cloud-rascal','storm-bat','spark-drake'][(i+level-1)%3];if(s.current)s.currents.push({x:x+250,w:350,vx:i%2?-55:65,vy:-20});s.enemies.push({x:x+425,y:130+(i%3)*85,w:50,h:48,left:x+300,right:x+565,dir:i%2?1:-1,speed:48+level*10,kind,baseY:130+(i%3)*85,phase:i,level,hp:level>=3&&kind==='spark-drake'?2:1,flying:true});if(level>=3&&i%2===0)s.enemies.push({x:x+560,y:245,w:46,h:44,left:x+500,right:x+625,dir:-1,speed:62+level*8,kind:'storm-bat',baseY:245,phase:i+4,level,hp:level===4?2:1,flying:true});});
  };
 })(HangulRunner);

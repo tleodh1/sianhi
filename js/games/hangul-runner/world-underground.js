@@ -9,7 +9,8 @@
   if(s.water)s.waterZones=s.words.map((_,i)=>({x:i*650+260,w:300,surface:245}));
   s.words.forEach((_,i)=>{const x=i*650;
    s.hazards.push({kind:i%2?'steam':'gear',x:x+455,y:370,w:48,h:50});
-   s.enemies.push({x:x+350,y:376,w:44,h:44,left:x+315,right:x+475,dir:i%2?1:-1,speed:48,kind:'bat',baseY:376,phase:i});
+   const level=s.number,kind=['tunnel-bat','gear-shell','fire-imp','pipe-snapper'][(i+level-1)%4];s.enemies.push({x:x+350,y:376,w:50,h:48,left:x+300,right:x+500,dir:i%2?1:-1,speed:40+level*9,kind,baseY:kind==='tunnel-bat'?270:kind==='pipe-snapper'?405:372,phase:i,level,hp:level>=3?2:1,flying:kind==='tunnel-bat',armored:kind==='gear-shell',rollSpeed:350+level*18});
+   if(level>=2&&i%2===1)s.enemies.push({x:x+525,y:372,w:48,h:48,left:x+485,right:x+610,dir:-1,speed:45+level*8,kind:level>=3?'fire-imp':'gear-shell',baseY:372,phase:i+3,level,hp:level>=4?2:1,armored:level<3,rollSpeed:370});
    if(s.moving){const a={x:x+265,y:285-(i%2)*80,w:160,h:34,kind:'metal',oneWay:true,originX:x+265,originY:285-(i%2)*80,motion:{x:i%2?55:0,y:i%2?0:55,speed:.8+i*.08}};s.platforms.push(a);}
    if(s.maze&&i%2){s.platforms.push({x:x+80,y:210,w:190,h:34,kind:'pipe',oneWay:true});s.gates.push({x:x+545,required:i+1});}
   });
