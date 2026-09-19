@@ -15,23 +15,17 @@ function run(e) {
   for (let n = 0; n < 2000 && e.phase !== "result"; n++) e.step(1 / 120);
   a.equal(e.phase, "result");
 }
-test("12 unique original toys and four rarities", () => {
-  a.equal(C.catalog.length, 12);
-  a.equal(new Set(C.catalog.map((t) => t.id)).size, 12);
+test("expanded original catalog, 30-toy pile and four rarities", () => {
+  a(C.catalog.length >= 16);
+  a.equal(new Set(C.catalog.map((t) => t.id)).size, C.catalog.length);
   a.equal(new Set(C.catalog.map((t) => t.rarity)).size, 4);
+  const pile=C.layout();a.equal(pile.length,30);a.equal(new Set(pile.map(t=>Math.round(t.z*10))).size,3);
+  a(Math.max(...pile.map(t=>t.scale))>=1.5);a(Math.min(...pile.map(t=>t.scale))<.9);
+  a(pile.some(t=>Math.abs(t.tilt)>1));a(new Set(pile.map(t=>t.pose)).size>=3);
 });
-test("centered drops succeed for every weight and size", () => {
-  for (const d of C.catalog) {
-    const e = new C.Engine();
-    const t = e.toys.find((t) => t.id === d.id);
-    e.claw.x = t.x;
-    e.claw.z = t.z;
-    a(e.drop());
-    run(e);
-    a.equal(e.result.toyId, d.id);
-    a(e.result.success);
-    a.equal(e.events.delivery, 1);
-  }
+test("size and weight affect centered grip instead of guaranteed success", () => {
+  const d=C.catalog.find(d=>d.id==='dragon'),small={x:0,z:.5,scale:.8},large={x:0,z:.5,scale:1.62},claw={x:0,z:.5,strength:1.7,sway:0};
+  const easy=C.evaluateGrip(claw,small,d),hard=C.evaluateGrip(claw,large,d);a(easy.margin>hard.margin);a(hard.load>easy.load);
 });
 test("empty area fails without random reward", () => {
   const e = new C.Engine();
@@ -57,8 +51,8 @@ test("offset influences enclosure and holding margin", () => {
 });
 test("marginal grip lifts then slips physically", () => {
   const e = new C.Engine(),
-    t = e.toys[1];
-  e.claw.x = t.x + 27;
+    t = e.toys[0];
+  e.claw.x = t.x - 35;
   e.claw.z = t.z;
   e.drop();
   run(e);
@@ -66,6 +60,9 @@ test("marginal grip lifts then slips physically", () => {
   a(e.events.slip);
   a.equal(e.result.success, false);
   a.equal(t.won, false);
+});
+test("failed toys keep their changed position for the next attempt",()=>{
+ const e=new C.Engine(),t=e.toys[0],x=t.x;e.claw.x=t.x-50;e.claw.z=t.z;e.drop();run(e);a.equal(t.won,false);a.notEqual(t.x,x);
 });
 test("drop debounces and aim locks during sequence", () => {
   const e = new C.Engine();

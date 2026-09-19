@@ -3,12 +3,14 @@
   const approach = (a, b, s) =>
     Math.abs(b - a) <= s ? b : a + Math.sign(b - a) * s;
   C.evaluateGrip = function (claw, toy, def) {
+    const scale=toy.scale||1,effectiveRadius=def.radius*scale;
     const distance = Math.hypot(claw.x - toy.x, (claw.z - toy.z) * 210);
-    const enclosure = C.clamp(1 - distance / (def.radius + 24), 0, 1);
-    const sizeFit = C.clamp(1 - Math.abs(def.radius - 37) / 62, 0.65, 1);
+    const enclosure = C.clamp(1 - distance / (effectiveRadius + 24), 0, 1);
+    const sizeFit = C.clamp(1 - Math.abs(effectiveRadius - 42) / 80, 0.52, 1);
     const force = claw.strength * enclosure * sizeFit;
-    const load = def.mass * (0.65 + claw.sway * 0.7);
-    return { distance, enclosure, sizeFit, force, load, margin: force - load };
+    const load = def.mass * Math.pow(scale,1.35) * (0.65 + claw.sway * 0.7);
+    const interference=toy.interference||0;
+    return { distance, enclosure, sizeFit, force, load, interference, margin: force - load-interference };
   };
   C.Engine = class {
     constructor(options = {}) {
@@ -75,11 +77,12 @@
           d: C.catalog.find((d) => d.id === t.id),
           distance: Math.hypot(this.claw.x - t.x, (this.claw.z - t.z) * 210),
         }))
-        .filter((o) => o.distance < o.d.radius + 24)
+        .filter((o) => o.distance < o.d.radius*(o.t.scale||1) + 24)
         .sort((a, b) => a.distance - b.distance);
       this.target = candidates[0]?.t || null;
+      if(this.target){const d=C.catalog.find(d=>d.id===this.target.id);this.target.interference=this.toys.filter(t=>t!==this.target&&!t.won&&Math.hypot(t.x-this.target.x,(t.z-this.target.z)*210)<(d.radius*(this.target.scale||1)+C.catalog.find(x=>x.id===t.id).radius*(t.scale||1))*.72).length*.055;}
       this.targetHeight = this.target
-        ? C.catalog.find((d) => d.id === this.target.id).radius * 0.7 + 8
+        ? C.catalog.find((d) => d.id === this.target.id).radius * (this.target.scale||1) * 0.7 + 8
         : 10;
       this.enter("descend");
       this.emit("attempt");
@@ -143,7 +146,7 @@
       } else if (this.phase === "close") {
         c.open = C.clamp(1 - this.phaseTime / 0.65, 0.18, 1);
         if (this.target)
-          this.target.tilt = Math.sin(this.phaseTime * 13) * 0.13;
+          this.target.tilt += Math.sin(this.phaseTime * 13) * 0.018;
         if (this.phaseTime >= 0.65) {
           if (this.target) {
             this.grip = C.evaluateGrip(
@@ -154,7 +157,7 @@
             if (this.grip.enclosure > 0.2 && this.grip.margin > -0.08) {
               this.held = this.target;
               this.emit("grip", { quality: this.grip });
-            } else this.emit("miss", { reason: "off-center" });
+            } else {this.target.x=C.clamp(this.target.x+(this.claw.x-this.target.x)*.16,-225,225);this.target.z=C.clamp(this.target.z+(this.claw.z-this.target.z)*.08,.1,.93);this.target.vy=18;this.emit("miss", { reason: "off-center" });}
           } else this.emit("miss", { reason: "empty" });
           this.enter("lift");
         }

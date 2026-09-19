@@ -13,7 +13,7 @@
       image("plush-atlas.webp"),
       image("cabinet.webp"),
     ]);
-    const toys = C.catalog.map((d, i) => {
+    const toys = C.catalog.map((d) => {
       const rects = [
         [0, 0, 325, 448],
         [325, 0, 316, 448],
@@ -28,7 +28,7 @@
         [672, 833, 277, 406],
         [949, 833, 305, 406],
       ];
-      const [x, y, w, h] = rects[i];
+      const [x, y, w, h] = rects[d.sprite];
       const c = document.createElement("canvas");
       c.width = Math.ceil(w);
       c.height = Math.ceil(h);
@@ -78,11 +78,11 @@
       const g = this.g,
         p = C.project(toy.x, toy.z, toy.height + extraHeight),
         s = this.art.toys[def.sprite],
-        h = def.radius * 2.65 * p.scale,
+        h = def.radius * 2.65 * p.scale * (toy.scale || 1),
         w = (h * s.w) / s.h;
       g.save();
       g.translate(p.x, p.y);
-      g.rotate(toy.tilt || 0);
+      g.rotate((toy.tilt || 0)+(toy.pose==='upside-down'?Math.PI:0));
       if (glow) {
         g.shadowColor = C.rarities[def.rarity].color;
         g.shadowBlur = 20;

@@ -36,7 +36,7 @@
         r = C.progress(state);
         q("[data-coins]").textContent = `놀이 코인 ${r.coins}`;
         q("[data-owned]").textContent =
-          `도감 ${Object.keys(r.inventory).length} / 12`;
+          `도감 ${Object.keys(r.inventory).filter(id=>C.catalog.some(d=>d.id===id)).length} / ${C.catalog.length}`;
         q("[data-best]").textContent = `최고 연속 ${r.best}`;
       };
       const sound = (rarity) => {
