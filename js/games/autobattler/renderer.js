@@ -11,13 +11,13 @@
     const pos = (x, y) => ({ left: `${(x + .5) * 12.5}%`, top: `${(y + .5) * 12.5}%` });
     function token(unit, team) { const c = unit.data || D().characters.find((x) => x.id === unit.characterId), b = document.createElement("button"); b.className = `fallbackUnit ${team}`; b.dataset.uid = unit.uid; b.style.setProperty("--unit", c.color); b.innerHTML = `<i></i><span>${"★".repeat(unit.star)}</span><b>${c.name}</b><progress value="${unit.hp || unit.maxHp || c.hp}" max="${unit.maxHp || c.hp}"></progress>`; const p = pos(unit.x ?? unit.tile.x, unit.y ?? unit.tile.y); Object.assign(b.style, p); layer.appendChild(b); unitMap.set(unit.uid, { root: b, unit }); return b; }
     function clear() { layer.innerHTML = ""; unitMap.clear(); if (timer) clearInterval(timer); }
-    function setPlanningUnits(units) { clear(); units.filter((u) => u.tile).forEach((u) => token(u, "player")); }
+    function setPlanningTeams(player, enemy) { clear(); player.filter((u) => u.tile).forEach((u) => token(u, "player")); enemy.filter((u) => u.tile).forEach((u) => token(u, "enemy")); }
     function startBattle(player, enemy) {
       clear(); const combat = [...player.map((u, i) => E().buildCombatUnit(u, "player", i)), ...enemy.map((u, i) => E().buildCombatUnit(u, "enemy", i, hooks.stagePower || 1))]; combat.forEach((u) => token(u, u.team)); let ticks = 0;
-      timer = setInterval(() => { ticks++; const aliveP = combat.filter((u) => u.alive && u.team === "player"), aliveE = combat.filter((u) => u.alive && u.team === "enemy"); if (!aliveP.length || !aliveE.length || ticks > 32) { clearInterval(timer); timer = null; hooks.onBattleEnd?.(aliveP.length >= aliveE.length, combat); return; } for (const u of [...aliveP, ...aliveE]) { const targets = u.team === "player" ? aliveE : aliveP, target = targets[Math.floor(Math.random() * targets.length)]; if (!target) continue; const attacker = unitMap.get(u.uid)?.root, victim = unitMap.get(target.uid)?.root; attacker?.classList.add("attacking"); setTimeout(() => attacker?.classList.remove("attacking"), 180); target.hp -= Math.max(8, u.attack - target.defense * .25); target.mana += 28; victim?.classList.add("hit"); setTimeout(() => victim?.classList.remove("hit"), 180); const bar = victim?.querySelector("progress"); if (bar) bar.value = Math.max(0, target.hp); hooks.onCombatEvent?.({ type: target.mana >= 100 ? "skill" : "damage", source: u, target }); if (target.mana >= 100) { target.mana = 0; target.hp -= u.attack * .65; } if (target.hp <= 0) { target.alive = false; victim?.classList.add("defeated"); } } }, 360);
+      timer = setInterval(() => { ticks++; const aliveP = combat.filter((u) => u.alive && u.team === "player"), aliveE = combat.filter((u) => u.alive && u.team === "enemy"); hooks.onCombatState?.(aliveP.length, aliveE.length); if (!aliveP.length || !aliveE.length || ticks > 32) { clearInterval(timer); timer = null; hooks.onBattleEnd?.(aliveP.length >= aliveE.length, combat); return; } for (const u of [...aliveP, ...aliveE]) { const targets = u.team === "player" ? aliveE : aliveP, target = targets[Math.floor(Math.random() * targets.length)]; if (!target) continue; const attacker = unitMap.get(u.uid)?.root, victim = unitMap.get(target.uid)?.root; attacker?.classList.add("attacking"); setTimeout(() => attacker?.classList.remove("attacking"), 180); const dealt = Math.max(8, u.attack - target.defense * .25); target.hp -= dealt; target.mana += 28; victim?.classList.add("hit"); const number = document.createElement("em"); number.className = "floatNumber damage"; number.textContent = `-${Math.round(dealt)}`; victim?.appendChild(number); setTimeout(() => { victim?.classList.remove("hit"); number.remove(); }, 520); const bar = victim?.querySelector("progress"); if (bar) bar.value = Math.max(0, target.hp); hooks.onCombatEvent?.({ type: target.mana >= 100 ? "skill" : (u.range > 1 ? "projectile" : "damage"), source: u, target, amount: Math.round(dealt) }); if (target.mana >= 100) { target.mana = 0; target.hp -= u.attack * .65; victim?.classList.add("skillHit"); } if (target.hp <= 0) { target.alive = false; victim?.classList.add("defeated"); hooks.onCombatEvent?.({ type: "defeat", target }); } } }, 360);
     }
     function locate(clientX, clientY) { const rect = container.getBoundingClientRect(), x = Math.floor((clientX - rect.left) / rect.width * 8), y = Math.floor((clientY - rect.top) / rect.height * 8); return x >= 0 && x < 8 && y >= 0 && y < 8 ? { x, y } : null; }
-    return { setPlanningUnits, startBattle, highlight(on) { container.classList.toggle("highlight", on); }, pickTile: locate, pickUnit(clientX, clientY) { const el = document.elementFromPoint(clientX, clientY)?.closest?.("[data-uid]"); return el?.dataset.uid || null; }, select(uid) { selected = uid; unitMap.forEach((v, key) => v.root.classList.toggle("selected", key === selected)); }, resize() {}, isBattling: () => !!timer, destroy() { if (timer) clearInterval(timer); container.innerHTML = ""; } };
+    return { setPlanningTeams, startBattle, highlight(on) { container.classList.toggle("highlight", on); }, pickTile: locate, pickUnit(clientX, clientY) { const el = document.elementFromPoint(clientX, clientY)?.closest?.("[data-uid]"); return el?.dataset.uid || null; }, select(uid) { selected = uid; unitMap.forEach((v, key) => v.root.classList.toggle("selected", key === selected)); }, resize() {}, isBattling: () => !!timer, destroy() { if (timer) clearInterval(timer); container.innerHTML = ""; } };
   }
 
   function create(container, hooks = {}) {
@@ -27,7 +27,7 @@
     scene.background = new THREE.Color(0x050b23);
     scene.fog = new THREE.FogExp2(0x06102c, 0.018);
     const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 120);
-    camera.position.set(0, 13.8, 14.5); camera.lookAt(0, 0, -0.4);
+    camera.position.set(0, 12.2, 12.8); camera.lookAt(0, 0.25, -0.4);
     let renderer;
     try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" }); }
     catch (error) { console.warn("Star Board: WebGL unavailable, using 2D fallback.", error.message); return createFallback(container, hooks); }
@@ -82,16 +82,17 @@
         const horn1 = addPart(root, new THREE.ConeGeometry(0.1, 0.5, 6), primary, -0.22, 2.37, -0.02); horn1.rotation.z = -0.3;
         const horn2 = addPart(root, new THREE.ConeGeometry(0.1, 0.5, 6), primary, 0.22, 2.37, -0.02); horn2.rotation.z = 0.3;
       }
-      const scale = 0.58 * (star === 2 ? 1.1 : star === 3 ? 1.22 : 1); root.scale.setScalar(scale);
-      const aura = new THREE.Mesh(new THREE.TorusGeometry(0.56, 0.045, 6, 24), new THREE.MeshBasicMaterial({ color: star === 3 ? 0xffd950 : c.color, transparent: true, opacity: star > 1 ? 0.78 : 0.24 })); aura.rotation.x = Math.PI / 2; aura.position.y = 0.05; root.add(aura); root.userData.aura = aura;
+      const scale = 0.72 * (star === 2 ? 1.11 : star === 3 ? 1.24 : 1); root.scale.setScalar(scale); root.userData.baseScale = scale;
+      const teamColor = team === "player" ? 0x36d9ff : 0xff704f;
+      const aura = new THREE.Mesh(new THREE.TorusGeometry(0.62, star === 3 ? 0.075 : 0.052, 8, 28), new THREE.MeshBasicMaterial({ color: star > 1 ? (star === 3 ? 0xffd950 : c.color) : teamColor, transparent: true, opacity: star > 1 ? 0.9 : 0.68 })); aura.rotation.x = Math.PI / 2; aura.position.y = 0.05; root.add(aura); root.userData.aura = aura;
       return root;
     }
     function clearUnits() { for (const v of unitViews.values()) scene.remove(v.root); unitViews.clear(); }
-    function setPlanningUnits(units) {
+    function setPlanningTeams(player, enemy) {
       battle = false; combatUnits = []; clearUnits();
-      for (const u of units) {
-        if (!u.tile) continue; const c = D().characters.find((x) => x.id === u.characterId); const root = makeModel(c, u.star, "player");
-        root.position.copy(gridPos(u.tile.x, u.tile.y)); root.userData.uid = u.uid; scene.add(root); unitViews.set(u.uid, { root, unit: u, hpBar: null });
+      for (const [team, units] of [["player", player], ["enemy", enemy]]) for (const u of units) {
+        if (!u.tile) continue; const c = D().characters.find((x) => x.id === u.characterId); const preview = E().buildCombatUnit(u, team, 0, team === "enemy" ? hooks.stagePower || 1 : 1); const root = makeModel(c, u.star, team);
+        root.position.copy(gridPos(u.tile.x, u.tile.y)); root.rotation.y = team === "enemy" ? Math.PI : 0; root.userData.uid = u.uid; const hpBar = hpSprite(preview); root.add(hpBar); scene.add(root); unitViews.set(u.uid, { root, unit: u, hpBar }); updateHp(unitViews.get(u.uid), preview);
       }
     }
     function hpSprite(unit) {
@@ -120,11 +121,14 @@
     function burst(position, color, count = 12, size = 0.08) {
       for (let i = 0; i < count; i++) { const mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(size), new THREE.MeshBasicMaterial({ color, transparent: true })); mesh.position.copy(position); scene.add(mesh); effects.push({ mesh, life: 0.45 + Math.random() * 0.35, velocity: new THREE.Vector3((Math.random() - 0.5) * 4, Math.random() * 3.5, (Math.random() - 0.5) * 4) }); }
     }
+    function floatingNumber(target, text, color) {
+      const canvas = document.createElement("canvas"); canvas.width = 160; canvas.height = 72; const ctx = canvas.getContext("2d"); ctx.font = "900 38px sans-serif"; ctx.textAlign = "center"; ctx.strokeStyle = "#071022"; ctx.lineWidth = 8; ctx.strokeText(text, 80, 45); ctx.fillStyle = color; ctx.fillText(text, 80, 45); const texture = new THREE.CanvasTexture(canvas); const mesh = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false })); const root = unitViews.get(target.uid)?.root; if (!root) return; mesh.position.copy(root.position).add(new THREE.Vector3(0, 2.1, 0)); mesh.scale.set(1.3, .58, 1); scene.add(mesh); effects.push({ mesh, life: .8, velocity: new THREE.Vector3(0, .9, 0), float: true });
+    }
     function damage(target, amount, source, skill = false) {
       if (!target.alive) return; let value = Math.max(5, amount - target.defense * 0.32);
       if (target.shield > 0) { const blocked = Math.min(target.shield, value); target.shield -= blocked; value -= blocked; hooks.onCombatEvent?.({ type: "shield", target }); }
       target.hp -= value; target.mana = Math.min(100, target.mana + 12);
-      const view = unitViews.get(target.uid); if (view) { view.root.userData.hit = 0.22; burst(view.root.position.clone().add(new THREE.Vector3(0, 1, 0)), skill ? 0xffdb55 : 0x6fe8ff, skill ? 22 : 9, skill ? 0.11 : 0.07); updateHp(view, target); }
+      const view = unitViews.get(target.uid); if (view) { view.root.userData.hit = 0.22; burst(view.root.position.clone().add(new THREE.Vector3(0, 1, 0)), skill ? 0xffdb55 : 0x6fe8ff, skill ? 22 : 9, skill ? 0.11 : 0.07); floatingNumber(target, `-${Math.round(value)}`, skill ? "#ffe66d" : "#ffffff"); updateHp(view, target); }
       hooks.onCombatEvent?.({ type: "damage", target, source, amount: Math.round(value), skill });
       if (target.hp <= 0) { target.alive = false; if (view) view.root.userData.defeat = 0; hooks.onCombatEvent?.({ type: "defeat", target }); }
     }
@@ -135,8 +139,9 @@
     }
     function cast(unit, enemies, allies) {
       unit.mana = 0; const target = nearest(unit, enemies); if (!target) return;
+      const casterView = unitViews.get(unit.uid); if (casterView) { burst(casterView.root.position.clone().add(new THREE.Vector3(0, 1.1, 0)), 0xffe66d, 18, .075); casterView.root.userData.charge = .32; }
       const power = unit.attack * (1.55 + unit.star * 0.25);
-      if (unit.data.skill === "heal") { const friend = allies.filter((u) => u.alive).sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0]; if (friend) { friend.hp = Math.min(friend.maxHp, friend.hp + power); const v = unitViews.get(friend.uid); burst(v.root.position.clone().add(new THREE.Vector3(0, 1, 0)), 0x64ffac, 16); updateHp(v, friend); } }
+      if (unit.data.skill === "heal") { const friend = allies.filter((u) => u.alive).sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0]; if (friend) { const before = friend.hp; friend.hp = Math.min(friend.maxHp, friend.hp + power); const v = unitViews.get(friend.uid); burst(v.root.position.clone().add(new THREE.Vector3(0, 1, 0)), 0x64ffac, 16); floatingNumber(friend, `+${Math.round(friend.hp - before)}`, "#63ffad"); updateHp(v, friend); } }
       else if (unit.data.skill === "shield") { allies.filter((u) => u.alive).forEach((a) => { a.shield += power * 0.9; updateHp(unitViews.get(a.uid), a); }); burst(unitViews.get(unit.uid).root.position, 0x63dfff, 24, 0.09); }
       else if (unit.data.skill === "haste") { allies.filter((u) => u.alive).forEach((a) => { a.speed *= 1.08; }); burst(unitViews.get(unit.uid).root.position, 0xa9edff, 16); }
       else if (unit.data.skill === "dash") { damage(target, power, unit, true); unit.x = target.x + (unit.team === "player" ? -0.45 : 0.45); unit.y = target.y; }
@@ -144,17 +149,20 @@
       else if (unit.data.skill === "nova") { enemies.filter((e) => e.alive).forEach((e) => damage(e, power * 0.58, unit, true)); }
       else projectile(unit, target, power, true, unit.data.skill === "fireball" ? 0xff633e : 0xffdf62);
     }
+    function chooseTarget(unit, enemies) { const alive = enemies.filter((x) => x.alive); if (unit.data.role === "ASSASSIN") return alive.sort((a, b) => unit.team === "player" ? b.y - a.y : a.y - b.y)[0]; if (unit.data.role === "MAGE") return alive.sort((a, b) => Math.abs(a.x - 3.5) - Math.abs(b.x - 3.5))[0]; return nearest(unit, alive); }
     function updateCombat(dt) {
       elapsed += dt; const aliveP = combatUnits.filter((u) => u.alive && u.team === "player"), aliveE = combatUnits.filter((u) => u.alive && u.team === "enemy");
+      hooks.onCombatState?.(aliveP.length, aliveE.length);
       if (!aliveP.length || !aliveE.length || elapsed > 45) { battle = false; hooks.onBattleEnd?.(aliveP.length >= aliveE.length, combatUnits); return; }
       for (const u of combatUnits) {
         const view = unitViews.get(u.uid); if (!u.alive) { if (view) { view.root.userData.defeat += dt; view.root.rotation.z += dt * 2.4; view.root.scale.multiplyScalar(0.97); if (view.root.userData.defeat > 0.8) view.root.visible = false; } continue; }
-        const enemies = u.team === "player" ? aliveE : aliveP, allies = u.team === "player" ? aliveP : aliveE; const target = enemies.find((e) => e.uid === u.targetUid && e.alive) || nearest(u, enemies); if (!target) continue; u.targetUid = target.uid;
+        const enemies = u.team === "player" ? aliveE : aliveP, allies = u.team === "player" ? aliveP : aliveE; const target = enemies.find((e) => e.uid === u.targetUid && e.alive) || chooseTarget(u, enemies); if (!target) continue; u.targetUid = target.uid;
         const dx = target.x - u.x, dy = target.y - u.y, dist = Math.hypot(dx, dy); u.cooldown -= dt;
-        if (dist > u.range * 0.9) { const pace = dt * (u.data.role === "ASSASSIN" ? 1.55 : 1.05); u.x += dx / dist * pace; u.y += dy / dist * pace; }
+        if (["RANGER", "MAGE", "SUPPORT", "ENGINEER"].includes(u.data.role) && dist < Math.max(1.4, u.range * .55)) { const pace = dt * .72; u.x -= dx / Math.max(.1, dist) * pace; u.y -= dy / Math.max(.1, dist) * pace; }
+        else if (dist > u.range * 0.9) { const pace = dt * (u.data.role === "ASSASSIN" ? 1.55 : u.data.role === "GUARDIAN" ? .82 : 1.05); u.x += dx / dist * pace; u.y += dy / dist * pace; }
         else if (u.cooldown <= 0) { u.cooldown = 1 / u.speed; u.attacks++; u.mana = Math.min(100, u.mana + 25); if (u.mana >= 100) cast(u, enemies, allies); else if (u.range > 1) projectile(u, target, u.attack * (Math.random() < u.equipStats.crit ? 1.7 : 1)); else damage(target, u.attack, u); }
         if (u.equipStats.regen) u.hp = Math.min(u.maxHp, u.hp + u.equipStats.regen * dt);
-        if (view) { const pos = gridPos(u.x, u.y); view.root.position.lerp(pos, Math.min(1, dt * 7)); view.root.lookAt(gridPos(target.x, target.y)); view.root.userData.aura.rotation.z += dt * (u.star + 1); if (view.root.userData.hit > 0) { view.root.userData.hit -= dt; view.root.scale.setScalar((u.star === 3 ? .71 : u.star === 2 ? .64 : .58) * (1 + Math.sin(view.root.userData.hit * 50) * .06)); } updateHp(view, u); }
+        if (view) { const pos = gridPos(u.x, u.y); view.root.position.lerp(pos, Math.min(1, dt * 7)); view.root.lookAt(gridPos(target.x, target.y)); view.root.userData.aura.rotation.z += dt * (u.star + 1); if (view.root.userData.hit > 0) { view.root.userData.hit -= dt; view.root.scale.setScalar(view.root.userData.baseScale * (1 + Math.sin(view.root.userData.hit * 50) * .06)); } else view.root.scale.setScalar(view.root.userData.baseScale); updateHp(view, u); }
       }
       for (let i = projectiles.length - 1; i >= 0; i--) { const p = projectiles[i]; p.life -= dt; if (!p.target.alive || p.life <= 0) { scene.remove(p.mesh); projectiles.splice(i, 1); continue; } const dest = unitViews.get(p.target.uid).root.position.clone().add(new THREE.Vector3(0, .8, 0)); const delta = dest.sub(p.mesh.position), dist = delta.length(); if (dist < .28) { damage(p.target, p.amount, p.source, p.skill); scene.remove(p.mesh); projectiles.splice(i, 1); } else p.mesh.position.add(delta.normalize().multiplyScalar(dt * p.speed)); }
     }
@@ -166,7 +174,7 @@
     const ro = new ResizeObserver(resize); ro.observe(container); resize();
     function loop(now) { if (!active) return; const dt = Math.min(.035, (now - last) / 1000); last = now; if (battle) updateCombat(dt); effects.forEach((e) => { e.life -= dt; e.mesh.position.addScaledVector(e.velocity, dt); e.velocity.y -= dt * 5; e.mesh.material.opacity = Math.max(0, e.life * 2); }); effects.filter((e) => e.life <= 0).forEach((e) => scene.remove(e.mesh)); effects = effects.filter((e) => e.life > 0); renderer.render(scene, camera); requestAnimationFrame(loop); }
     requestAnimationFrame(loop);
-    return { setPlanningUnits, startBattle, highlight, pickTile, pickUnit, select, resize, isBattling: () => battle, destroy() { active = false; ro.disconnect(); renderer.dispose(); container.innerHTML = ""; } };
+    return { setPlanningTeams, startBattle, highlight, pickTile, pickUnit, select, resize, isBattling: () => battle, destroy() { active = false; ro.disconnect(); renderer.dispose(); container.innerHTML = ""; } };
   }
   global.AutoBattlerRenderer = { create };
 })(window);

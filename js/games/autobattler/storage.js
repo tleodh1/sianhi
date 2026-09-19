@@ -23,6 +23,7 @@
       board: [], bench: [], inventory: ["power", "gear", "armor", "crystal"],
       equipment: [], shop: [], pool: Object.fromEntries(global.AutoBattlerData.characters.map((c) => [c.id, 18 - c.grade * 2])),
       streak: 0, phase: "PREP", selectedUnit: null, selectedItems: [], result: null,
+      enemyTeam: [], enemyComposition: "", enemyStageId: null,
     };
   }
   global.AutoBattlerStorage = { get, saveRecord, createRun };

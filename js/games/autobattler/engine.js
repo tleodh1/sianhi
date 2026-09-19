@@ -148,13 +148,32 @@
   }
 
   function makeEnemy(stage, rng = Math.random) {
-    const allowedGrade = Math.min(5, 1 + Math.floor((stage.count + stage.power * 2) / 4));
-    const choices = D().characters.filter((c) => c.grade <= allowedGrade);
-    return Array.from({ length: stage.count }, (_, i) => {
-      const c = choices[Math.floor(rng() * choices.length)];
-      const star = stage.power > 1.8 && i === 0 ? 2 : 1;
-      const u = createUnit(c.id, star); u.tile = { x: Math.round((i + 1) * 7 / (stage.count + 1)), y: i % 2 }; return u;
+    const round = Math.max(0, D().stages.findIndex((s) => s.id === stage.id));
+    const allowedGrade = Math.min(5, 1 + Math.floor(round / 3));
+    const themes = [
+      { name: "방어 대형", roles: ["GUARDIAN", "RANGER", "SUPPORT"] },
+      { name: "돌진 대형", roles: ["FIGHTER", "ASSASSIN", "GUARDIAN"] },
+      { name: "마법 대형", roles: ["MAGE", "SUPPORT", "GUARDIAN"] },
+      { name: "기계 군단", trait: "Mechanical" },
+      { name: "원소 연합", traits: ["Ocean", "Electric", "Fire"] },
+    ];
+    const theme = themes[Math.floor(rng() * themes.length)];
+    const eligible = D().characters.filter((c) => c.grade <= allowedGrade);
+    const themed = eligible.filter((c) => theme.trait ? c.trait === theme.trait : theme.traits ? theme.traits.includes(c.trait) : theme.roles.includes(c.role));
+    const team = Array.from({ length: stage.count }, (_, i) => {
+      const pool = i < themed.length && themed.length ? themed : eligible;
+      const c = pool[Math.floor(rng() * pool.length)];
+      const starChance = round >= 12 ? 0.72 : round >= 7 ? 0.42 : round >= 3 ? 0.18 : 0;
+      const star = rng() < starChance ? (round >= 13 && rng() < 0.22 ? 3 : 2) : 1;
+      const u = createUnit(c.id, star);
+      const front = ["GUARDIAN", "FIGHTER"].includes(c.role);
+      u.tile = { x: Math.max(0, Math.min(7, Math.round((i + 1) * 7 / (stage.count + 1)))), y: front ? 2 : i % 2 };
+      if (round >= 6 && i === 0) u.items.push(round >= 12 ? "cannon" : "barrier");
+      if (round >= 10 && i === 1) u.items.push("rapid");
+      return u;
     });
+    team.composition = theme.name;
+    return team;
   }
 
   global.AutoBattlerEngine = { createUnit, weightedGrade, rollShop, mergeUnits, canBuy, buy, move, sell, combine, equip, buyXp, buildCombatUnit, makeEnemy, starScale };
