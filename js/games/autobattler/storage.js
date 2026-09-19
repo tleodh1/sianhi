@@ -20,11 +20,17 @@
   function createRun() {
     return {
       runId: Date.now(), stageIndex: 0, playerHp: 30, gold: 12, level: 2, xp: 0,
-      board: [], bench: [], inventory: ["power", "gear", "armor", "crystal"],
+      board: [], bench: [], inventory: [],
       equipment: [], shop: [], pool: Object.fromEntries(global.AutoBattlerData.characters.map((c) => [c.id, 18 - c.grade * 2])),
       streak: 0, phase: "PREP", selectedUnit: null, selectedItems: [], result: null,
       enemyTeam: [], enemyComposition: "", enemyStageId: null,
     };
   }
-  global.AutoBattlerStorage = { get, saveRecord, createRun };
+  function replaceRun(record) {
+    const next = createRun();
+    record.activeRun = next;
+    saveRecord(record);
+    return next;
+  }
+  global.AutoBattlerStorage = { get, saveRecord, createRun, replaceRun };
 })(window);

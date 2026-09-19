@@ -15,6 +15,7 @@ assert.equal(Object.keys(D.roles).length, 7, "seven distinct combat roles");
 assert.equal(D.stages.length, 16, "four worlds of rounds");
 
 const run = S.createRun();
+assert.equal(run.inventory.length, 0, "new run starts with an empty inventory");
 E.rollShop(run, () => 0.01);
 assert.equal(run.shop.length, 5);
 assert.ok(run.shop.every((s) => D.characters.find((c) => c.id === s.characterId).grade === 1));
@@ -55,4 +56,18 @@ assert.match(gameSource, /run\.phase !== "PREP" \|\| !run\.board\.length/, "one 
 assert.match(gameSource, /data-close-panel/, "information and workshop expose close controls");
 assert.match(responsiveCss, /@media\(max-width:520px\)/, "compact mobile layout exists");
 assert.match(responsiveCss, /grid-auto-columns:minmax\(104px,39vw\)/, "mobile shop cards scroll at full card widths");
+const foreignRecords = { korean: { stage: 44 }, claw: { collection: ["dragon"] }, robot: { saved: "hero" } };
+window.state.records = { ...foreignRecords, autoBattler: { ...S.get(), activeRun: run } };
+const starRecord = S.get();
+starRecord.collection.bolt = true;
+const restarted = S.replaceRun(starRecord);
+assert.equal(restarted.stageIndex, 0);
+assert.equal(restarted.gold, 12);
+assert.equal(restarted.level, 2);
+assert.equal(restarted.board.length, 0);
+assert.equal(restarted.bench.length, 0);
+assert.equal(starRecord.collection.bolt, true, "permanent Star Board collection survives a run reset");
+assert.deepEqual(window.state.records.korean, foreignRecords.korean, "learning progress survives a run reset");
+assert.deepEqual(window.state.records.claw, foreignRecords.claw, "claw collection survives a run reset");
+assert.deepEqual(window.state.records.robot, foreignRecords.robot, "robot data survives a run reset");
 console.log("PASS auto-battler shop, merge, placement, crafting, equipment, AI and sale loop");
