@@ -294,7 +294,9 @@ dialog#game.art-dialog {
   gap: 25px;
   align-items: start;
 }
+.art-challenge-options{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:14px 0}.art-challenge-options label{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:#f3ecdd;font-size:13px;font-weight:800}.art-challenge-options select{min-height:40px;padding:6px 9px}.art-rotation-option input{width:20px;height:20px}.art-levels button em{font-size:8px;font-style:normal;letter-spacing:1px;color:#9b6637}.art-master-badges{color:#8b642b;font-weight:800}.art-piece-filter{display:flex;gap:4px;overflow-x:auto;margin:0 0 8px}.art-piece-filter button{min-height:34px;padding:5px 7px;font-size:10px;white-space:nowrap}.art-piece-filter button.active{background:#668978;color:#fff}.art-piece.art-filtered{display:none}.art-zoom-tools{position:absolute;right:20px;top:20px;z-index:8;display:flex;align-items:center;gap:3px;padding:3px;border-radius:12px;background:#fffdeee8;box-shadow:0 4px 10px #2b160b55}.art-zoom-tools button{width:36px;height:36px;min-height:36px;padding:0}.art-zoom-tools b{min-width:48px;text-align:center;font-size:11px}.art-board-stage{width:100%;max-height:58vh;overflow:auto;display:flex;justify-content:center;align-items:flex-start;touch-action:none;border-radius:10px}.art-rotate{width:100%;margin-top:8px;min-height:40px!important}.art-rotation-mark{position:absolute;right:2px;bottom:1px;z-index:2;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#fff;color:#76522e;font-size:12px}.art-board-guide{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;opacity:var(--guide);pointer-events:none}.art-jigsaw .art-piece,.art-jigsaw .art-slot{clip-path:var(--piece-clip);-webkit-clip-path:var(--piece-clip);border-color:transparent}.art-jigsaw .art-piece{position:relative;background:#f8f2e7}.art-piece img{transform:rotate(var(--rotation));transition:transform .18s}.art-piece.art-selected img,.art-piece.art-picked img{filter:brightness(1.08) drop-shadow(0 0 4px #fff)}
 .art-board-wrap {
+  position:relative;
   display: flex;
   justify-content: center;
   padding: 14px;
@@ -521,6 +523,8 @@ dialog#game.art-dialog {
   .art-board-wrap {
     padding: 12px 5px;
   }
+  .art-board-stage{max-height:44vh;justify-content:flex-start}
+  .art-zoom-tools{right:9px;top:9px}.art-zoom-tools button{width:32px;height:32px;min-height:32px}.art-zoom-tools b{min-width:42px}
   .art-board {
     width: min(100%, calc(42vh * var(--ratio)));
   }
@@ -542,6 +546,8 @@ dialog#game.art-dialog {
     max-height: 114px;
     scroll-snap-align: start;
   }
+  .art-jigsaw .art-piece{flex-basis:68px}
+  .art-challenge-options{gap:7px}.art-challenge-options label{font-size:11px;padding:6px 8px}.art-piece-filter{margin-bottom:5px}
   .art-help {
     margin: 3px 0;
     font-size: 11px;
