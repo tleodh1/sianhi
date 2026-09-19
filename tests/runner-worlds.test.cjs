@@ -1,0 +1,5 @@
+const fs=require('fs'),vm=require('vm'),a=require('assert/strict');const ctx=vm.createContext({});
+for(const f of ['stage-data','engine','world-data','world-engine'])vm.runInContext(fs.readFileSync(`js/games/hangul-runner/${f}.js`,'utf8'),ctx);const H=ctx.HangulRunner;
+H.registerWorld({id:9,mode:'run'},[{number:1,words:['가','나'],name:'test'}]);const e=new H.WorldEngine(H.buildWorldStage('9-1'));e.step(.02,{jump:true});a(e.player.velocityY<0);
+const s={stars:12,level:6,records:{hangulRunner:{version:1,stages:{1:{rating:3}},unlocked:2},claw:{coins:9}},progress:{한글:4}};const before=JSON.stringify(s.records.claw);const p=H.worldProgress(s);a.equal(p.legacyStages[1].rating,3);a.equal(Object.keys(p.stages).length,0);
+const r={stageId:'9-1',worldId:9,rating:3,seconds:20,boss:true};a.equal(H.recordWorldClear(s,r),6);a.equal(H.recordWorldClear(s,r),0);a.equal(s.records.hangulRunner.stages[1].rating,3);a.equal(JSON.stringify(s.records.claw),before);a.equal(s.level,6);a.equal(s.progress.한글,4);console.log('PASS world registry, reused jumping, additive legacy migration and one-time rewards');

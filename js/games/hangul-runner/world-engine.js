@@ -1,0 +1,26 @@
+/* Reuses the proven runner simulation, collisions, checkpoints and damage immunity. */
+(function(H){
+ H.WorldEngine=class extends H.Engine{
+  constructor(stage,options){super(stage,options);this.sequence=0;this.flowTime=0;this.mode=stage.mode;this.freeMotion=false;this.projectiles=[];this.answerCooldown=0;}
+  beforePhysics(dt){this.flowTime+=dt;this.mode=this.stage.mode;
+   if(this.stage.waterZones){const p=this.player;this.mode=this.stage.waterZones.some(z=>p.x>=z.x&&p.x<z.x+z.w&&p.y+p.h>z.surface+Math.sin(this.elapsed*.6)*25)?'swim':'run';}
+   this.freeMotion=this.mode==='swim'||this.mode==='fly';this.player.gravity=this.freeMotion?0:1500;
+   for(const a of this.stage.platforms){if(!a.motion)continue;const oldX=a.x,oldY=a.y;a.x=a.originX+Math.sin(this.elapsed*a.motion.speed)*a.motion.x;a.y=a.originY+Math.sin(this.elapsed*a.motion.speed)*a.motion.y;
+    const p=this.player;if(p.isGrounded&&p.x+p.w>oldX&&p.x<oldX+a.w&&Math.abs(p.y+p.h-oldY)<3){p.x+=a.x-oldX;p.y+=a.y-oldY;}}
+  }
+  motion(dt,input){const p=this.player;
+   if(this.freeMotion){const speed=this.mode==='swim'?175:230;p.velocityX=((!!input.right)-(!!input.left))*speed;
+    const wanted=((!!input.down)-(!!input.jump))*speed;p.velocityY+=(wanted-p.velocityY)*Math.min(1,dt*(this.mode==='swim'?3:5));
+    p.y=Math.max(32,Math.min(460-p.h,p.y));if(p.y<=32&&p.velocityY<0)p.velocityY=0;
+   }
+   for(const c of this.stage.currents||[])if(p.x>=c.x&&p.x<c.x+c.w){p.velocityX+=c.vx;p.velocityY+=c.vy*dt;}
+   for(const gate of this.stage.gates||[])if(this.sequence<gate.required&&p.x+p.w>gate.x&&p.x<gate.x+20){p.x=gate.x-p.w;p.velocityX=0;}
+  }
+  canCollect(item){if(item.kind!=='letter'||!this.stage.ordered)return true;
+   if(item.index!==this.sequence){if(this.goalHint<=0){this.goalHint=2;this.emit('order',{text:this.stage.words[this.sequence]});}return false;}this.sequence++;return true;
+  }
+  afterPhysics(dt){if(this.freeMotion&&this.poseTime<=0)this.player.pose='run';if(H.tickBoss&&this.stage.boss)H.tickBoss(this,dt);}
+  canFinish(){return !this.stage.boss||this.boss?.hp===0;}
+  result(){return {...super.result(),worldId:this.stage.worldId,boss:!!this.stage.boss};}
+ };
+})(HangulRunner);

@@ -28,10 +28,12 @@
       p.invincible=Math.max(0,p.invincible-dt);this.poseTime=Math.max(0,this.poseTime-dt);this.goalHint=Math.max(0,this.goalHint-dt);
       this.coyote=p.isGrounded?.12:Math.max(0,this.coyote-dt);this.jumpBuffer=Math.max(0,this.jumpBuffer-dt);
       if(input.jump&&!this.jumpHeld)this.jumpBuffer=.14;this.jumpHeld=!!input.jump;
+      if(this.beforePhysics)this.beforePhysics(dt,input);
       p.velocityX=((input.right?1:0)-(input.left?1:0))*270;
       if(p.velocityX)p.facing=Math.sign(p.velocityX);
-      if(this.jumpBuffer>0&&this.coyote>0){p.velocityY=-p.jumpForce;p.isGrounded=false;this.jumpBuffer=0;this.coyote=0;this.setPose('jump');this.emit('jump');}
+      if(!this.freeMotion&&this.jumpBuffer>0&&this.coyote>0){p.velocityY=-p.jumpForce;p.isGrounded=false;this.jumpBuffer=0;this.coyote=0;this.setPose('jump');this.emit('jump');}
       if(input.down&&p.isGrounded&&this.stage.platforms.some(a=>a.oneWay&&p.x+p.w>a.x&&p.x<a.x+a.w&&Math.abs(p.y+p.h-a.y)<2)){p.y+=9;p.isGrounded=false;this.coyote=0;}
+      if(this.motion)this.motion(dt,input);
       p.x=Math.max(0,Math.min(this.stage.length-p.w,p.x+p.velocityX*dt));
       // Solid cliff sides prevent walking through land from below; floating ledges are one-way.
       for(const a of this.stage.platforms){if(a.oneWay||!hit(p,a)||oldY+p.h<=a.y+1)continue;
@@ -40,15 +42,16 @@
       for(const a of this.stage.platforms){if(p.x+p.w>a.x+2&&p.x<a.x+a.w-2&&p.velocityY>=0&&oldY+p.h<=a.y+1&&p.y+p.h>=a.y){p.y=a.y-p.h;p.velocityY=0;p.isGrounded=true;break;}}
       if(!wasGrounded&&p.isGrounded){this.setPose('land',.1);this.emit('land');}
       if(this.poseTime<=0)this.setPose(!p.isGrounded?(p.velocityY<0?'jump':'fall'):(p.velocityX?'run':'idle'));
-      for(const item of this.stage.items){if(this.collected.has(item.id)||!hit(p,item))continue;this.collected.add(item.id);this.burst(item.x+item.w/2,item.y+item.h/2);
+      for(const item of this.stage.items){if(this.collected.has(item.id)||!hit(p,item)||(this.canCollect&&!this.canCollect(item)))continue;this.collected.add(item.id);this.burst(item.x+item.w/2,item.y+item.h/2);
         if(item.kind==='coin')this.coins++;if(item.kind==='star')this.stars++;if(item.kind==='power'){p.powerState='big';this.setPose('power-up',.45);}this.emit(item.kind,{item});}
       for(const e of this.stage.enemies){e.x+=e.dir*e.speed*dt;if(e.x>e.right){e.x=e.right;e.dir=-1;}if(e.x<e.left){e.x=e.left;e.dir=1;}e.y=e.baseY-(e.kind==='sprout'?Math.max(0,Math.sin(this.elapsed*2.5+e.phase))*65:0);if(hit(p,e))this.damage();}
       for(const h of this.stage.hazards){if(h.kind==='crate')h.x=h.origin+Math.sin(this.elapsed*1.5)*h.range;if(hit(p,h))this.damage();}
       for(const cp of this.stage.checkpoints)if(p.x>=cp.x&&cp.x>this.checkpoint.x){this.checkpoint=cp;this.emit('checkpoint',{checkpoint:cp});}
       if(p.y>720){p.hp--;this.die();}
+      if(this.afterPhysics)this.afterPhysics(dt,input);
       const target=Math.max(0,Math.min(this.stage.length-this.viewport,p.x-this.viewport*.4));this.cameraX+=(target-this.cameraX)*Math.min(1,dt*10);
       if(hit(p,this.stage.goal)){
-        if(this.letterCount===this.stage.words.length){this.status='clear';p.velocityX=0;this.setPose('celebrate');this.emit('clear',{result:this.result()});}
+        if(this.letterCount===this.stage.words.length&&(!this.canFinish||this.canFinish())){this.status='clear';p.velocityX=0;this.setPose('celebrate');this.emit('clear',{result:this.result()});}
         else if(this.goalHint<=0){this.goalHint=4;this.emit('missing');}
       }
     }
