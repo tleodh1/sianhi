@@ -16,5 +16,6 @@ let {e,b}=arena('sword'),hp=e.enemy.hp;assert.ok(e.attack(e.player));assert.equa
 ({e}=arena('blaster'));e.player.build.parts.back='jet';e.enemy.z=5;e.attack(e.player,true);tick(e,.74);assert.equal(e.projectiles[0].kind,'laser','jet unit changes skill to laser beam');
 ({e}=arena('drill'));hp=e.enemy.hp;e.attack(e.player,true);tick(e,.6);assert.ok(e.enemy.hp<hp);assert.ok(e.events.hit>=1,'drill skill has repeated impact windows');
 const z=e.player.z;e.input.z=-1;tick(e,.16);assert.ok(e.player.z<z);assert.ok(e.jump(e.player));tick(e,3);assert.equal(e.player.y,0,'gravity lands player');
+assert.ok(['idle','run','jump','land','attack','skillCharge','skillFire','guard','hit','victory','defeat'].includes(e.player.motionState));
 assert.equal(R.recordBattle(b,'easy',true),2);assert.equal(R.recordBattle(b,'easy',true),0);assert.equal(ctx.state.stars,2);assert.equal(b.record.wins,2);
 console.log('PASS staged melee, charge-launch-flight-hit skills, dodge/range, reactions and rewards');

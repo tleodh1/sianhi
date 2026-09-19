@@ -13,6 +13,7 @@ const before=m.userData.parts.head.children.length;
 b.parts.head='dino';let changed=R.makeModel(b);
 assert.notEqual(changed.userData.parts.head.children.length,before);
 assert.ok(new THREE.Box3().setFromObject(changed).getSize(new THREE.Vector3()).z>.5);
+let meshCount=0,channels=new Set();changed.traverse(o=>{if(o.isMesh){meshCount++;channels.add(o.userData.channel);}});assert.ok(meshCount>=70,'hero mecha uses layered armor and mechanical detail');assert.ok(channels.has('mechanical')&&channels.has('rubber')&&channels.has('glass'),'metal, rubber, glass and energy materials are separated');assert.ok(changed.userData.core,'battle renderer can animate the shared energy core');
 const eye=changed.userData.parts.head.children[2];changed.updateMatrixWorld(true);const front=eye.getWorldPosition(new THREE.Vector3());changed.rotation.y=Math.PI;changed.updateMatrixWorld(true);const back=eye.getWorldPosition(new THREE.Vector3());assert.ok(front.z>0&&back.z<0);
 R.store.saveRobot(b);assert.equal(R.store.active().colors.head.primary,'#ff0000');assert.equal(ctx.state.records.claw.coins,7);
 R.disposeModel(m);R.disposeModel(changed);
