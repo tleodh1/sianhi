@@ -3,6 +3,23 @@
   const D = () => global.AutoBattlerData;
   const E = () => global.AutoBattlerEngine;
 
+  function createFallback(container, hooks = {}) {
+    container.classList.add("fallbackArena");
+    container.innerHTML = `<div class="fallbackGrid">${Array.from({ length: 64 }, (_, i) => `<button data-tile="${i % 8},${Math.floor(i / 8)}" class="${i >= 32 ? "friendly" : "enemy"}" aria-label="${i >= 32 ? "아군" : "적군"} 칸"></button>`).join("")}</div><div class="fallbackUnits"></div>`;
+    const layer = container.querySelector(".fallbackUnits"), tiles = [...container.querySelectorAll("[data-tile]")];
+    let unitMap = new Map(), timer = null, selected = null;
+    const pos = (x, y) => ({ left: `${(x + .5) * 12.5}%`, top: `${(y + .5) * 12.5}%` });
+    function token(unit, team) { const c = unit.data || D().characters.find((x) => x.id === unit.characterId), b = document.createElement("button"); b.className = `fallbackUnit ${team}`; b.dataset.uid = unit.uid; b.style.setProperty("--unit", c.color); b.innerHTML = `<i></i><span>${"★".repeat(unit.star)}</span><b>${c.name}</b><progress value="${unit.hp || unit.maxHp || c.hp}" max="${unit.maxHp || c.hp}"></progress>`; const p = pos(unit.x ?? unit.tile.x, unit.y ?? unit.tile.y); Object.assign(b.style, p); layer.appendChild(b); unitMap.set(unit.uid, { root: b, unit }); return b; }
+    function clear() { layer.innerHTML = ""; unitMap.clear(); if (timer) clearInterval(timer); }
+    function setPlanningUnits(units) { clear(); units.filter((u) => u.tile).forEach((u) => token(u, "player")); }
+    function startBattle(player, enemy) {
+      clear(); const combat = [...player.map((u, i) => E().buildCombatUnit(u, "player", i)), ...enemy.map((u, i) => E().buildCombatUnit(u, "enemy", i, hooks.stagePower || 1))]; combat.forEach((u) => token(u, u.team)); let ticks = 0;
+      timer = setInterval(() => { ticks++; const aliveP = combat.filter((u) => u.alive && u.team === "player"), aliveE = combat.filter((u) => u.alive && u.team === "enemy"); if (!aliveP.length || !aliveE.length || ticks > 32) { clearInterval(timer); timer = null; hooks.onBattleEnd?.(aliveP.length >= aliveE.length, combat); return; } for (const u of [...aliveP, ...aliveE]) { const targets = u.team === "player" ? aliveE : aliveP, target = targets[Math.floor(Math.random() * targets.length)]; if (!target) continue; const attacker = unitMap.get(u.uid)?.root, victim = unitMap.get(target.uid)?.root; attacker?.classList.add("attacking"); setTimeout(() => attacker?.classList.remove("attacking"), 180); target.hp -= Math.max(8, u.attack - target.defense * .25); target.mana += 28; victim?.classList.add("hit"); setTimeout(() => victim?.classList.remove("hit"), 180); const bar = victim?.querySelector("progress"); if (bar) bar.value = Math.max(0, target.hp); hooks.onCombatEvent?.({ type: target.mana >= 100 ? "skill" : "damage", source: u, target }); if (target.mana >= 100) { target.mana = 0; target.hp -= u.attack * .65; } if (target.hp <= 0) { target.alive = false; victim?.classList.add("defeated"); } } }, 360);
+    }
+    function locate(clientX, clientY) { const rect = container.getBoundingClientRect(), x = Math.floor((clientX - rect.left) / rect.width * 8), y = Math.floor((clientY - rect.top) / rect.height * 8); return x >= 0 && x < 8 && y >= 0 && y < 8 ? { x, y } : null; }
+    return { setPlanningUnits, startBattle, highlight(on) { container.classList.toggle("highlight", on); }, pickTile: locate, pickUnit(clientX, clientY) { const el = document.elementFromPoint(clientX, clientY)?.closest?.("[data-uid]"); return el?.dataset.uid || null; }, select(uid) { selected = uid; unitMap.forEach((v, key) => v.root.classList.toggle("selected", key === selected)); }, resize() {}, isBattling: () => !!timer, destroy() { if (timer) clearInterval(timer); container.innerHTML = ""; } };
+  }
+
   function create(container, hooks = {}) {
     if (!global.THREE) throw new Error("Three.js is required");
     const THREE = global.THREE;
@@ -11,7 +28,9 @@
     scene.fog = new THREE.FogExp2(0x06102c, 0.018);
     const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 120);
     camera.position.set(0, 13.8, 14.5); camera.lookAt(0, 0, -0.4);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
+    let renderer;
+    try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" }); }
+    catch (error) { console.warn("Star Board: WebGL unavailable, using 2D fallback.", error.message); return createFallback(container, hooks); }
     renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth < 700 ? 1.35 : 1.8));
     renderer.shadowMap.enabled = innerWidth > 700;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
