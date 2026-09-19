@@ -98,7 +98,8 @@
       else { run.bench = run.bench.filter((u) => u.uid !== uid); occupied.tile = null; run.board = run.board.filter((u) => u.uid !== occupied.uid); run.bench.push(occupied); unit.tile = { x: target.x, y: target.y }; run.board.push(unit); }
       return { ok: true, swapped: true };
     }
-    if (!fromBoard && run.board.length >= run.level) return { ok: false, reason: `현재 레벨에는 ${run.level}명까지 배치할 수 있어요.` };
+    const capacity=run.capacity||run.level;
+    if (!fromBoard && run.board.length >= capacity) return { ok: false, reason: `현재 팀에는 ${capacity}명까지 배치할 수 있어요.` };
     if (fromBench) run.bench = run.bench.filter((u) => u.uid !== uid);
     if (!fromBoard) run.board.push(unit);
     unit.tile = { x: target.x, y: target.y };
@@ -135,6 +136,13 @@
     const need = 4 + run.level * 2;
     if (run.xp >= need) { run.xp -= need; run.level++; }
     return true;
+  }
+
+  function buyCapacity(run) {
+    const capacity=run.capacity||run.level,cost=5+capacity*2;
+    if(capacity>=9)return {ok:false,reason:"최대 9명까지 배치할 수 있어요."};
+    if(run.gold<cost)return {ok:false,reason:`팀 확장에는 ${cost} Gold가 필요해요.`};
+    run.gold-=cost;run.capacity=capacity+1;return {ok:true,cost,capacity:run.capacity};
   }
 
   function buildCombatUnit(unit, team, index, stagePower = 1) {
@@ -176,5 +184,5 @@
     return team;
   }
 
-  global.AutoBattlerEngine = { createUnit, weightedGrade, rollShop, mergeUnits, canBuy, buy, move, sell, combine, equip, buyXp, buildCombatUnit, makeEnemy, starScale };
+  global.AutoBattlerEngine = { createUnit, weightedGrade, rollShop, mergeUnits, canBuy, buy, move, sell, combine, equip, buyXp, buyCapacity, buildCombatUnit, makeEnemy, starScale };
 })(window);

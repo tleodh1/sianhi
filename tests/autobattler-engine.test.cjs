@@ -47,6 +47,7 @@ assert.ok(earlyEnemy.every((u) => D.characters.find((c) => c.id === u.characterI
 const lateEnemy = E.makeEnemy(D.stages[15], () => 0.01);
 assert.ok(lateEnemy.some((u) => u.star > 1), "late AI upgrades stars");
 assert.ok(lateEnemy.some((u) => u.items.length), "late AI equips items");
+const capacityRun=S.createRun();capacityRun.gold=30;assert.equal(E.buyCapacity(capacityRun).ok,true);assert.equal(capacityRun.capacity,3);assert.equal(capacityRun.gold,21);
 assert.equal(E.sell(run, upgraded.uid).ok, true);
 assert.ok(run.equipment.includes("rapid"), "equipment returns on sale");
 const gameSource = fs.readFileSync("js/games/autobattler/game.js", "utf8");
@@ -54,6 +55,8 @@ const responsiveCss = fs.readFileSync("css/games/autobattler.css", "utf8");
 assert.match(gameSource, /setPlanningTeams\(run\.board, run\.enemyTeam\)/, "planning renders player and AI teams together");
 assert.match(gameSource, /run\.phase !== "PREP" \|\| !run\.board\.length/, "one deployed unit enables battle CTA");
 assert.match(gameSource, /data-close-panel/, "information and workshop expose close controls");
+assert.match(gameSource, /data-action="capacity"/, "team capacity can be purchased with gold");
+assert.doesNotMatch(gameSource, /b\.onpointerdown/, "tap selection is not hijacked by drag state");
 assert.match(responsiveCss, /@media\(max-width:520px\)/, "compact mobile layout exists");
 assert.match(responsiveCss, /grid-auto-columns:minmax\(104px,39vw\)/, "mobile shop cards scroll at full card widths");
 const foreignRecords = { korean: { stage: 44 }, claw: { collection: ["dragon"] }, robot: { saved: "hero" } };

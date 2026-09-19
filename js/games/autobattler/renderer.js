@@ -59,6 +59,7 @@
     let unitViews = new Map(), combatUnits = [], projectiles = [], effects = [], active = true, battle = false, elapsed = 0, last = performance.now(), selectedUid = null;
 
     function gridPos(x, y) { return new THREE.Vector3((x - 3.5) * 1.48, 0.22, (y - 3.5) * 1.48); }
+    function contain(unit){unit.x=Math.max(.05,Math.min(6.95,unit.x));unit.y=Math.max(.05,Math.min(6.95,unit.y));}
     function mat(color, emissive = 0x000000) { return new THREE.MeshStandardMaterial({ color, metalness: 0.68, roughness: 0.26, emissive, emissiveIntensity: 1.2 }); }
     function addPart(group, geometry, material, x, y, z, sx = 1, sy = 1, sz = 1) { const m = new THREE.Mesh(geometry, material); m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.castShadow = true; group.add(m); return m; }
     function makeModel(c, star, team) {
@@ -144,7 +145,7 @@
       if (unit.data.skill === "heal") { const friend = allies.filter((u) => u.alive).sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0]; if (friend) { const before = friend.hp; friend.hp = Math.min(friend.maxHp, friend.hp + power); const v = unitViews.get(friend.uid); burst(v.root.position.clone().add(new THREE.Vector3(0, 1, 0)), 0x64ffac, 16); floatingNumber(friend, `+${Math.round(friend.hp - before)}`, "#63ffad"); updateHp(v, friend); } }
       else if (unit.data.skill === "shield") { allies.filter((u) => u.alive).forEach((a) => { a.shield += power * 0.9; updateHp(unitViews.get(a.uid), a); }); burst(unitViews.get(unit.uid).root.position, 0x63dfff, 24, 0.09); }
       else if (unit.data.skill === "haste") { allies.filter((u) => u.alive).forEach((a) => { a.speed *= 1.08; }); burst(unitViews.get(unit.uid).root.position, 0xa9edff, 16); }
-      else if (unit.data.skill === "dash") { damage(target, power, unit, true); unit.x = target.x + (unit.team === "player" ? -0.45 : 0.45); unit.y = target.y; }
+      else if (unit.data.skill === "dash") { damage(target, power, unit, true); unit.x = target.x + (unit.team === "player" ? -0.45 : 0.45); unit.y = target.y;contain(unit); }
       else if (unit.data.skill === "freeze") { enemies.filter((e) => e.alive && Math.hypot(e.x - target.x, e.y - target.y) < 2.4).forEach((e) => { e.speed *= 0.75; damage(e, power * 0.72, unit, true); }); }
       else if (unit.data.skill === "nova") { enemies.filter((e) => e.alive).forEach((e) => damage(e, power * 0.58, unit, true)); }
       else projectile(unit, target, power, true, unit.data.skill === "fireball" ? 0xff633e : 0xffdf62);
@@ -161,7 +162,7 @@
         if (["RANGER", "MAGE", "SUPPORT", "ENGINEER"].includes(u.data.role) && dist < Math.max(1.4, u.range * .55)) { const pace = dt * .72; u.x -= dx / Math.max(.1, dist) * pace; u.y -= dy / Math.max(.1, dist) * pace; }
         else if (dist > u.range * 0.9) { const pace = dt * (u.data.role === "ASSASSIN" ? 1.55 : u.data.role === "GUARDIAN" ? .82 : 1.05); u.x += dx / dist * pace; u.y += dy / dist * pace; }
         else if (u.cooldown <= 0) { u.cooldown = 1 / u.speed; u.attacks++; u.mana = Math.min(100, u.mana + 25); if (u.mana >= 100) cast(u, enemies, allies); else if (u.range > 1) projectile(u, target, u.attack * (Math.random() < u.equipStats.crit ? 1.7 : 1)); else damage(target, u.attack, u); }
-        if (u.equipStats.regen) u.hp = Math.min(u.maxHp, u.hp + u.equipStats.regen * dt);
+        contain(u);if (u.equipStats.regen) u.hp = Math.min(u.maxHp, u.hp + u.equipStats.regen * dt);
         if (view) { const pos = gridPos(u.x, u.y); view.root.position.lerp(pos, Math.min(1, dt * 7)); view.root.lookAt(gridPos(target.x, target.y)); view.root.userData.aura.rotation.z += dt * (u.star + 1); if (view.root.userData.hit > 0) { view.root.userData.hit -= dt; view.root.scale.setScalar(view.root.userData.baseScale * (1 + Math.sin(view.root.userData.hit * 50) * .06)); } else view.root.scale.setScalar(view.root.userData.baseScale); updateHp(view, u); }
       }
       for (let i = projectiles.length - 1; i >= 0; i--) { const p = projectiles[i]; p.life -= dt; if (!p.target.alive || p.life <= 0) { scene.remove(p.mesh); projectiles.splice(i, 1); continue; } const dest = unitViews.get(p.target.uid).root.position.clone().add(new THREE.Vector3(0, .8, 0)); const delta = dest.sub(p.mesh.position), dist = delta.length(); if (dist < .28) { damage(p.target, p.amount, p.source, p.skill); scene.remove(p.mesh); projectiles.splice(i, 1); } else p.mesh.position.add(delta.normalize().multiplyScalar(dt * p.speed)); }

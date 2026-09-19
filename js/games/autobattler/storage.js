@@ -19,7 +19,7 @@
   }
   function createRun() {
     return {
-      runId: Date.now(), stageIndex: 0, playerHp: 30, gold: 12, level: 2, xp: 0,
+      runId: Date.now(), stageIndex: 0, playerHp: 30, gold: 12, level: 2, xp: 0, capacity: 2,
       board: [], bench: [], inventory: [],
       equipment: [], shop: [], pool: Object.fromEntries(global.AutoBattlerData.characters.map((c) => [c.id, 18 - c.grade * 2])),
       streak: 0, phase: "PREP", selectedUnit: null, selectedItems: [], result: null,
