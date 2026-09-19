@@ -3,7 +3,7 @@
     const old = s.records.artPuzzle || {};
     const r = {
       ...old,
-      version: 1,
+      version: 2,
       works: { ...(old.works || {}) },
       unlocked: A.artworks.map((a) => a.id),
     };
