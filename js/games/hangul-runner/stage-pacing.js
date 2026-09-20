@@ -3,7 +3,7 @@
  H.LEARNING_TILE={unit:48,maxWidth:72,height:48};
  H.learningTile=function(text){return {w:String(text).length>2?72:48,h:48};};
  const themes={1:['첫 글자 산책','성장 벽돌 정원','별빛 다리'],2:['산호 사이 수영','해초 물살 탐험','진주 조개 보물'],3:['날개 첫 비행','움직이는 구름','바람의 징검다리'],4:['수정 발판','숨은 보석 벽돌','박쥐 동굴 길'],5:['화석 다리','둥지 보물','공룡 발자국'],6:['눈꽃 미끄럼','얼음 전망대','숨은 눈별'],7:['용암 징검다리','불씨 벽돌','화산 타이밍'],8:['폭풍 발판','전기 타이밍','번개 보물'],9:['낮은 중력 도약','떠다니는 전망대','별자리 순서']};
- for(const d of H.worldStages){d.curriculumPool=[...d.words];const count=d.boss?6:d.worldId===1?4:d.number===3?6:4;
+ for(const d of H.worldStages){d.curriculumPool=[...d.words];if(d.worldId===3)d.ordered=true;const count=d.boss?6:d.worldId===1?4:d.number===3?6:4;
   const offset=d.worldId===1?0:((d.number-1)*3)%Math.max(1,d.words.length);d.words=Array.from({length:count},(_,i)=>d.curriculumPool[(offset+i)%d.curriculumPool.length]);
   d.routeTheme=d.boss?'수호자에게 가는 길':themes[d.worldId][d.number-1];d.targetSeconds=d.boss?[45,70]:[25,35];
   d.routeLength=d.mode==='swim'?4800:d.mode==='fly'?6600:7500; if(d.boss)d.routeLength=d.mode==='swim'?4200:d.mode==='fly'?7600:8200;
@@ -17,7 +17,8 @@
   // Real terrain gaps: WORLD 1 now has jumpable pits that are fatal on a miss.
   const forestPitBeats=s.worldId===1?(n===1?[4]:n===2?[2,5]:n===3?[2,4,6]:[3,5]):[];
   const skyPitBeats=s.worldId===3?(n===1?[3]:n===2?[2,5]:n===3?[1,3,5]:[2,5]):[];
-  for(let i=0;i<7;i++){const x=i*beat,isForestPit=forestPitBeats.includes(i),isSkyPit=skyPitBeats.includes(i),isFatalPit=isForestPit||isSkyPit,gap=isForestPit?(n===1?76:n===2?92:108):isSkyPit?(n===1?90:n===2?110:125):(!swim&&!sky&&n===3&&[2,4].includes(i)?85:0);s.platforms.push({x,y:swim?[510,480,500][i%3]:420,w:Math.max(120,beat-gap)+1,h:300,kind:'ground'});
+  const undergroundPitBeats=s.worldId===4?(n===1?[2,5]:n===2?[1,3,5]:n===3?[1,2,4,6]:[1,3,5]):[];
+  for(let i=0;i<7;i++){const x=i*beat,isForestPit=forestPitBeats.includes(i),isSkyPit=skyPitBeats.includes(i),isUndergroundPit=undergroundPitBeats.includes(i),isFatalPit=isForestPit||isSkyPit||isUndergroundPit,gap=isForestPit?(n===1?76:n===2?92:108):isSkyPit?(n===1?90:n===2?110:125):isUndergroundPit?(n===1?95:n===2?112:132):(!swim&&!sky&&n===3&&[2,4].includes(i)?85:0);s.platforms.push({x,y:swim?[510,480,500][i%3]:420,w:Math.max(120,beat-gap)+1,h:300,kind:'ground'});
    if(gap&&!isFatalPit){s.platforms.push({x:x+beat-180,y:340,w:110,h:24,kind:'bridge',oneWay:true});}
    if(isFatalPit){const pitStart=x+Math.max(120,beat-gap),pitWidth=gap;s.hazards.push({kind:'void',x:pitStart,y:420,w:pitWidth,h:180,fatal:true});}
   }
@@ -33,9 +34,9 @@
    const rewardKind=s.worldId===1?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):s.worldId===2?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'star':'coin'):s.worldId===3?(i%3===0?'power':i%3===1?'powerStar':'star'):(i===0?'power':'star');s.items.push({id:`route-reward-${i}`,kind:rewardKind,x:0,y:0,w:40,h:rewardKind==='power'?45:42,contained:true});
   });
   for(const fraction of (n===2?[.35,.77]:n===3?[.28,.63,.83]:[.56])){const x=end*fraction;s.platforms.push({x,y:swim?400:310,w:150,h:24,kind:'floating',oneWay:true,...(n===2?{originX:x,originY:swim?400:310,motion:{x:40,y:25,speed:.7}}:{})});}
-  const total=s.worldId===1?(s.boss?8:n===1?6:n===2?8:9):s.worldId===2?(s.boss?16:n===1?8:n===2?10:12):s.worldId===3?(s.boss?10:n===1?6:n===2?8:10):(s.boss?(swim?6:4):n===1?2:3),used=new Set();
+  const total=s.worldId===1?(s.boss?8:n===1?6:n===2?8:9):s.worldId===2?(s.boss?16:n===1?8:n===2?10:12):s.worldId===3?(s.boss?10:n===1?6:n===2?8:10):s.worldId===4?(s.boss?14:n===1?8:n===2?10:12):(s.boss?(swim?6:4):n===1?2:3),used=new Set();
   const preferred=swim?(s.boss?['inflate','ink','shark','eel','pinch','jelly']:n===1?['inflate','jelly']:n===2?['pinch','jelly','inflate']:['jelly','pinch','inflate']):null;
-  for(let i=0;i<total;i++){let e=candidates.find(a=>!used.has(a)&&preferred?.[i]===a.behavior)||candidates.find(a=>!used.has(a)&&a.behavior!==s.enemies.at(-1)?.behavior&&(a.originalKind||a.kind)!==(s.enemies.at(-1)?.originalKind||s.enemies.at(-1)?.kind))||candidates.find(a=>!used.has(a));if(!e&&s.worldId===2&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`ocean-extra-${n}-${i}`,phase:i+11,behaviorTime:i*.47};}if(!e&&s.worldId===3&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`sky-extra-${n}-${i}`,phase:i+7,behaviorTime:i*.53};}if(!e)continue;used.add(e);
+  for(let i=0;i<total;i++){let e=candidates.find(a=>!used.has(a)&&preferred?.[i]===a.behavior)||candidates.find(a=>!used.has(a)&&a.behavior!==s.enemies.at(-1)?.behavior&&(a.originalKind||a.kind)!==(s.enemies.at(-1)?.originalKind||s.enemies.at(-1)?.kind))||candidates.find(a=>!used.has(a));if(!e&&s.worldId===2&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`ocean-extra-${n}-${i}`,phase:i+11,behaviorTime:i*.47};}if(!e&&s.worldId===3&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`sky-extra-${n}-${i}`,phase:i+7,behaviorTime:i*.53};}if(!e&&s.worldId===4&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`underground-extra-${n}-${i}`,phase:i+13,behaviorTime:i*.49};}if(!e)continue;used.add(e);
    const x=end*(total===1?.48:.26+i*.56/Math.max(1,total-1));Object.assign(e,{x,left:x-65,right:x+95,speed:Math.min(65,e.speed),hp:s.worldId>=7?2:1,level:Math.min(3,e.level||1),phase:i,behaviorTime:i*.7});
    if(!swim){e.y=e.baseY=e.homeY=sky?190:420-e.h;}else{e.y=e.baseY=e.homeY=[360,130,390,145,430,170][i];}
    if(e.kind==='cactus'){e.left=e.right=x;e.drainY=floor;e.y=e.baseY=floor;s.platforms.push({x:x-8,y:floor-12,w:e.w+16,h:12,kind:'drain'});}s.enemies.push(e);
@@ -51,10 +52,12 @@
    for(const e of s.enemies){for(const h of s.hazards.filter(a=>a.kind==='pit')){const center=h.x+h.w/2;if(Math.abs(e.x-center)<120){const shift=e.x<center?-150:150;e.x+=shift;e.left+=shift;e.right+=shift;}}}
   }
   if(s.worldId===3){
-   // Required letters alternate between visible flight-route pickups and block rewards.
-   const rewardBlocks=s.blocks.filter(b=>b.kind==='reward');
+   // WORLD 3 is strictly sequential: target 1 is always encountered before target 2, etc.
+   const rewardBlocks=s.blocks.filter(b=>b.kind==='reward').sort((a,b)=>a.x-b.x);
+   const orderedLetters=s.items.filter(a=>a.kind==='letter').sort((a,b)=>a.index-b.index);
+   orderedLetters.forEach((letter,i)=>{letter.x=280+(end-900)*i/Math.max(1,orderedLetters.length-1);letter.index=i;});
    const hiddenLetterCount=s.boss?3:n===3?4:3;
-   const letterCandidates=s.items.filter(a=>a.kind==='letter').slice(0,hiddenLetterCount);
+   const letterCandidates=orderedLetters.slice(0,hiddenLetterCount);
    letterCandidates.forEach((letter,i)=>{const bi=Math.min(rewardBlocks.length-1,1+i*2),block=rewardBlocks[bi];if(!block)return;const orphan=block.rewardId;block.rewardId=letter.id;letter.contained=true;s.items=s.items.filter(a=>a.id!==orphan);});
    // Ensure both growth steps exist in remaining reward blocks.
    const remaining=rewardBlocks.filter(b=>!letterCandidates.some(l=>b.rewardId===l.id));
@@ -64,6 +67,19 @@
    const lanes=n===1?[.2,.5,.74]:n===2?[.16,.34,.58,.78]:[.14,.3,.46,.64,.81];
    lanes.forEach((fraction,i)=>{const x=end*fraction;s.platforms.push({x:x-65,y:250-(i%3)*52,w:135,h:24,kind:'floating',oneWay:true,...(n>=2&&i%2?{originX:x-65,originY:250-(i%3)*52,motion:{x:34,y:34,speed:.75+i*.04}}:{})});});
    for(const e of s.enemies){for(const h of s.hazards.filter(a=>a.kind==='void')){const center=h.x+h.w/2;if(Math.abs(e.x-center)<130){const shift=e.x<center?-165:165;e.x+=shift;e.left+=shift;e.right+=shift;}}}
+  }
+  if(s.worldId===4){
+   // Sewer/drain hazards and vertical enemy variety.
+   const pits=s.hazards.filter(a=>a.kind==='void');
+   const drainFractions=n===1?[.18,.38,.68,.86]:n===2?[.12,.29,.47,.66,.84]:[.1,.24,.39,.54,.69,.84];
+   drainFractions.forEach((fraction,i)=>{const x=end*fraction;s.platforms.push({x:x-30,y:408,w:60,h:12,kind:'drain',oneWay:false});
+    if(i%2===0)s.enemies.push({id:`sewer-cactus-${n}-${i}`,kind:'cactus',x:x-18,y:420,w:48,h:52,left:x-18,right:x-18,dir:-1,speed:0,baseY:420,homeY:420,drainY:420,phase:i+20,level:n,hp:1,retracted:true,stompable:false,behavior:'emerge'});
+    else s.enemies.push({id:`sewer-bat-${n}-${i}`,kind:'world-creature',originalKind:'tunnel-bat',artIndex:8,x:x-30,y:190-(i%3)*35,w:50,h:44,left:x-110,right:x+110,dir:i%3?1:-1,speed:70+n*5,baseY:190-(i%3)*35,homeY:190-(i%3)*35,phase:i+24,level:n,hp:1,flying:true,behavior:'dive',behaviorTime:i*.6,attackTimer:2+i%2});
+   });
+   // Additional open-drain hazards between the larger platform gaps.
+   for(const f of (n===1?[.3,.76]:n===2?[.2,.55,.78]:[.17,.33,.58,.77,.91])){const x=end*f;s.hazards.push({kind:'open-drain',x:x-22,y:402,w:44,h:28,fatal:true});}
+   // Move enemies away from the center of fatal voids to keep jumps readable.
+   for(const e of s.enemies)for(const h of pits){const center=h.x+h.w/2;if(Math.abs(e.x-center)<105){const shift=e.x<center?-135:135;e.x+=shift;e.left+=shift;e.right+=shift;}}
   }
   if(s.worldId===2){
    const rewardBlocks=s.blocks.filter(b=>b.kind==='reward');
