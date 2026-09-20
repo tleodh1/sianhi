@@ -6,7 +6,7 @@
  for(const d of H.worldStages){d.curriculumPool=[...d.words];const count=d.boss?6:d.worldId===1?4:d.number===3?6:4;
   const offset=d.worldId===1?0:((d.number-1)*3)%Math.max(1,d.words.length);d.words=Array.from({length:count},(_,i)=>d.curriculumPool[(offset+i)%d.curriculumPool.length]);
   d.routeTheme=d.boss?'수호자에게 가는 길':themes[d.worldId][d.number-1];d.targetSeconds=d.boss?[45,70]:[25,35];
-  d.routeLength=d.mode==='swim'?4800:d.mode==='fly'?6600:7500; if(d.boss)d.routeLength=d.mode==='swim'?4200:6500;
+  d.routeLength=d.mode==='swim'?4800:d.mode==='fly'?6600:7500; if(d.boss)d.routeLength=d.mode==='swim'?4200:d.mode==='fly'?7600:8200;
   d.span=(d.routeLength-700)/d.words.length;
   d.composition={terrainPattern:d.number===3?'bridge-gaps':d.number===2?'moving-lookout':'safe-trail',learningPattern:d.ordered?'ordered':'visible-route',enemyPattern:d.number===1?'sparse':'alternating',rewardPattern:d.number===2?'growth-bricks':'star-trail',specialEvent:d.worldId===2?'clam-current':d.worldId===3?'flight':d.number===3?'star-power':'bonus-brick'};
  }
@@ -32,7 +32,7 @@
   const total=s.boss?(swim?6:4):n===1?(s.worldId===1?1:2):3,used=new Set();
   const preferred=swim?(s.boss?['inflate','ink','shark','eel','pinch','jelly']:n===1?['inflate','jelly']:n===2?['pinch','jelly','inflate']:['jelly','pinch','inflate']):null;
   for(let i=0;i<total;i++){let e=candidates.find(a=>!used.has(a)&&preferred?.[i]===a.behavior)||candidates.find(a=>!used.has(a)&&a.behavior!==s.enemies.at(-1)?.behavior&&(a.originalKind||a.kind)!==(s.enemies.at(-1)?.originalKind||s.enemies.at(-1)?.kind))||candidates.find(a=>!used.has(a));if(!e)continue;used.add(e);
-   const x=end*(total===1?.48:.26+i*.56/Math.max(1,total-1)),old=e.x;Object.assign(e,{x,left:x-65,right:x+95,speed:Math.min(65,e.speed),hp:s.worldId>=7?2:1,phase:i,behaviorTime:i*.7});
+   const x=end*(total===1?.48:.26+i*.56/Math.max(1,total-1));Object.assign(e,{x,left:x-65,right:x+95,speed:Math.min(65,e.speed),hp:s.worldId>=7?2:1,level:Math.min(3,e.level||1),phase:i,behaviorTime:i*.7});
    if(!swim){e.y=e.baseY=e.homeY=sky?190:420-e.h;}else{e.y=e.baseY=e.homeY=[360,130,390,145,430,170][i];}
    if(e.kind==='cactus'){e.left=e.right=x;e.drainY=floor;e.y=e.baseY=floor;s.platforms.push({x:x-8,y:floor-12,w:e.w+16,h:12,kind:'drain'});}s.enemies.push(e);
   }
