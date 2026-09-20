@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="시안Hi">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8cd5f9"/>
+      <stop offset="1" stop-color="#8bcfb5"/>
+    </linearGradient>
+    <radialGradient id="star" cx=".35" cy=".3">
+      <stop offset="0" stop-color="#fff9cb"/>
+      <stop offset="1" stop-color="#f2bf4f"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="220" fill="url(#bg)"/>
+  <circle cx="512" cy="500" r="305" fill="#ffffff" opacity=".9"/>
+  <path d="M512 180l66 136 150 22-108 105 26 149-134-70-134 70 26-149-108-105 150-22z" fill="url(#star)" opacity=".92"/>
+  <text x="512" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="190" font-weight="900" fill="#294562">시안</text>
+  <text x="512" y="735" text-anchor="middle" font-family="Arial, sans-serif" font-size="126" font-weight="900" fill="#4d947f">Hi</text>
+</svg>
