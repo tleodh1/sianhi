@@ -5,3 +5,16 @@ for(const type of ['touch','mouse','pen'])for(const [dx,dy,target] of [[60,0,25]
 {const m=mount();m.send('pointerdown',1,350,350);m.send('pointerdown',2,450,350);m.send('pointermove',2,510,350);m.send('pointerup',2,510,350);assert.equal(m.e.phase,'ready');m.send('pointercancel',1,350,350);assert.equal(m.e.phase,'ready');}
 {const m=mount();for(const x of [350,450]){m.send('pointerdown',1,x,350);m.send('pointerup',1,x,350);}assert.deepEqual(m.e.swapPair,[24,25]);}
 console.log('PASS Pang input: touch/mouse/pen live feedback, four axes, diagonal/long drag, short snapback, tap-tap, cancel, multitouch and animation lock (synthetic events)');
+/* Special candies must render through the same cached-sprite path without throwing. */
+{const m=mount();const e=m.e;e.board[0].special='row';e.board[1].special='column';e.board[2].special='square';e.board[3].special='tnt';e.board[4].special='color';e.board[5].special='area';
+ assert.ok(m.draw().length>=0,'board with every special draws');
+ for(const type of ['touch','mouse','pen']){m.send('pointerdown',9,350,350,type);m.send('pointermove',9,410,350,type);m.draw();m.send('pointerup',9,410,350,type);}
+ assert.ok(m.draw().length>=0,'drag over specials still draws');}
+/* A swap whose only result is a 2x2 block is a legal move and is accepted by the pointer path. */
+{const m=mount();const e=m.e;const t=e.board[0].type;
+ for(const i of [1,7,8])e.board[i].type=t;e.board[8].type=(t+1)%e.config.colors;e.board[9].type=t;
+ assert.ok(P.moves(e.board).some(([a,b])=>(a===8&&b===9)||(a===9&&b===8)),'2x2-making swap is legal');
+ m.send('pointerdown',3,150,150);m.send('pointermove',3,210,150);m.send('pointerup',3,210,150);
+ assert.deepEqual(e.swapPair,[8,9]);assert.equal(e.phase,'swap');
+ for(let k=0;k<40;k++)e.tick(.05);assert.ok(e.score>0,'the 2x2 swap scores');}
+console.log('PASS Pang input: special-candy rendering, drag over specials and a 2x2-creating swipe');
