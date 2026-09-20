@@ -17,7 +17,7 @@
   // Real terrain gaps: WORLD 1 now has jumpable pits that are fatal on a miss.
   const forestPitBeats=s.worldId===1?(n===1?[4]:n===2?[2,5]:n===3?[2,4,6]:[3,5]):[];
   const skyPitBeats=s.worldId===3?(n===1?[3]:n===2?[2,5]:n===3?[1,3,5]:[2,5]):[];
-  const undergroundPitBeats=s.worldId===4?(n===1?[2,5]:n===2?[1,3,5]:n===3?[1,2,4,6]:[1,3,5]):[];
+  const undergroundPitBeats=s.worldId===4?(n===1?[4]:n===2?[2,5]:n===3?[1,3,5]:[1,2,4,6]):[];
   for(let i=0;i<7;i++){const x=i*beat,isForestPit=forestPitBeats.includes(i),isSkyPit=skyPitBeats.includes(i),isUndergroundPit=undergroundPitBeats.includes(i),isFatalPit=isForestPit||isSkyPit||isUndergroundPit,gap=isForestPit?(n===1?76:n===2?92:108):isSkyPit?(n===1?90:n===2?110:125):isUndergroundPit?(n===1?95:n===2?112:132):(!swim&&!sky&&n===3&&[2,4].includes(i)?85:0);s.platforms.push({x,y:swim?[510,480,500][i%3]:420,w:Math.max(120,beat-gap)+1,h:300,kind:'ground'});
    if(gap&&!isFatalPit){s.platforms.push({x:x+beat-180,y:340,w:110,h:24,kind:'bridge',oneWay:true});}
    if(isFatalPit){const pitStart=x+Math.max(120,beat-gap),pitWidth=gap;s.hazards.push({kind:'void',x:pitStart,y:420,w:pitWidth,h:180,fatal:true});}
@@ -34,7 +34,7 @@
    const rewardKind=s.worldId===1?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):s.worldId===2?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'star':'coin'):s.worldId===3?(i%3===0?'power':i%3===1?'powerStar':'star'):s.worldId===4?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):(i===0?'power':'star');s.items.push({id:`route-reward-${i}`,kind:rewardKind,x:0,y:0,w:40,h:rewardKind==='power'?45:42,contained:true});
   });
   for(const fraction of (n===2?[.35,.77]:n===3?[.28,.63,.83]:[.56])){const x=end*fraction;s.platforms.push({x,y:swim?400:310,w:150,h:24,kind:'floating',oneWay:true,...(n===2?{originX:x,originY:swim?400:310,motion:{x:40,y:25,speed:.7}}:{})});}
-  const total=s.worldId===1?(s.boss?8:n===1?6:n===2?8:9):s.worldId===2?(s.boss?16:n===1?8:n===2?10:12):s.worldId===3?(s.boss?10:n===1?6:n===2?8:10):s.worldId===4?(s.boss?14:n===1?8:n===2?10:12):(s.boss?(swim?6:4):n===1?2:3),used=new Set();
+  const total=s.worldId===1?(s.boss?8:n===1?6:n===2?8:9):s.worldId===2?(s.boss?16:n===1?8:n===2?10:12):s.worldId===3?(s.boss?10:n===1?6:n===2?8:10):s.worldId===4?(s.boss?28:n===1?16:n===2?20:24):(s.boss?(swim?6:4):n===1?2:3),used=new Set();
   const preferred=swim?(s.boss?['inflate','ink','shark','eel','pinch','jelly']:n===1?['inflate','jelly']:n===2?['pinch','jelly','inflate']:['jelly','pinch','inflate']):null;
   for(let i=0;i<total;i++){let e=candidates.find(a=>!used.has(a)&&preferred?.[i]===a.behavior)||candidates.find(a=>!used.has(a)&&a.behavior!==s.enemies.at(-1)?.behavior&&(a.originalKind||a.kind)!==(s.enemies.at(-1)?.originalKind||s.enemies.at(-1)?.kind))||candidates.find(a=>!used.has(a));if(!e&&s.worldId===2&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`ocean-extra-${n}-${i}`,phase:i+11,behaviorTime:i*.47};}if(!e&&s.worldId===3&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`sky-extra-${n}-${i}`,phase:i+7,behaviorTime:i*.53};}if(!e&&s.worldId===4&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`underground-extra-${n}-${i}`,phase:i+13,behaviorTime:i*.49};}if(!e)continue;used.add(e);
    const x=end*(total===1?.48:.26+i*.56/Math.max(1,total-1));Object.assign(e,{x,left:x-65,right:x+95,speed:Math.min(65,e.speed),hp:s.worldId>=7?2:1,level:Math.min(3,e.level||1),phase:i,behaviorTime:i*.7});
@@ -69,47 +69,43 @@
    for(const e of s.enemies){for(const h of s.hazards.filter(a=>a.kind==='void')){const center=h.x+h.w/2;if(Math.abs(e.x-center)<130){const shift=e.x<center?-165:165;e.x+=shift;e.left+=shift;e.right+=shift;}}}
   }
   if(s.worldId===4){
-   // WORLD 4 uses the same exploration loop as WORLD 1/2: some letters are visible,
-   // while key letters and powerups come from reward blocks instead of lying on the floor.
+   // WORLD 4 pickup mix mirrors WORLD 1/2: some on the floor, some elevated, some inside reward blocks.
    const rewardBlocks=s.blocks.filter(b=>b.kind==='reward').sort((a,b)=>a.x-b.x);
    const letters=s.items.filter(a=>a.kind==='letter').sort((a,b)=>a.index-b.index);
-   const visibleYs=n===2?[255,190,315,225,285,165]:[300,235,175,285,215,150];
-   letters.forEach((letter,i)=>{letter.y=visibleYs[(i+n)%visibleYs.length];letter.x+=((i%3)-1)*85;});
-   const hiddenCount=s.boss?3:n===3?3:n===2?2:2;
+   const letterLanes=n===1?[368,300,235,368,280,210]:n===2?[350,275,205,330,245,175]:n===3?[335,250,180,305,225,155]:[320,235,165,290,205,145];
+   letters.forEach((letter,i)=>{letter.y=letterLanes[i%letterLanes.length];letter.x+=((i%3)-1)*(n===1?55:75);});
+   const hiddenCount=s.boss?3:n===3?3:n===2?2:1;
    const hiddenLetters=letters.filter((_,i)=>i%2===1).slice(0,hiddenCount);
    hiddenLetters.forEach((letter,i)=>{const block=rewardBlocks[Math.min(rewardBlocks.length-1,1+i*2)]||rewardBlocks[i];if(!block)return;const old=block.rewardId;block.rewardId=letter.id;letter.contained=true;s.items=s.items.filter(a=>a.id!==old);});
-   // 4-3 remains ordered: visible/hidden targets still progress left-to-right.
-   if(s.ordered){letters.forEach((letter,i)=>{letter.index=i;letter.x=300+(end-1050)*i/Math.max(1,letters.length-1);});rewardBlocks.forEach((b,i)=>{const letter=hiddenLetters[i];if(letter&&b.rewardId===letter.id)b.x=Math.max(b.x,letter.x-40);});}
-   // 4-4 ~430m route: add one extra safe step so SMALL form can chain jumps into the raised block row.
+   // 4-3 remains ordered and traverses left-to-right.
+   if(s.ordered){letters.forEach((letter,i)=>{letter.index=i;letter.x=300+(end-1050)*i/Math.max(1,letters.length-1);});}
+   // 4-4 hand-tuned jump routes retained.
    if(s.boss){
-    const row430=rewardBlocks[3];
-    if(row430)s.platforms.push({x:row430.x-115,y:350,w:78,h:18,kind:'pipe',oneWay:true});
-   }
-   // 4-4 SMALL form must always have a reachable escape route before a fatal pit.
-   if(s.boss){
-    const bossVoids=s.hazards.filter(a=>a.kind==='void');
-    bossVoids.forEach((h,i)=>{const px=Math.max(80,h.x-125);s.platforms.push({x:px,y:350,w:92,h:20,kind:'pipe',oneWay:true});});
-   }
-   if(s.boss){
-    const row430=rewardBlocks[3];
+    const row430=rewardBlocks[3];if(row430)s.platforms.push({x:row430.x-115,y:350,w:78,h:18,kind:'pipe',oneWay:true});
+    for(const h of s.hazards.filter(a=>a.kind==='void')){const px=Math.max(80,h.x-125);s.platforms.push({x:px,y:350,w:92,h:20,kind:'pipe',oneWay:true});}
     if(row430){const zoneStart=row430.x-180,zoneEnd=row430.x+180;for(const e of s.enemies){if(e.x>zoneStart&&e.x<zoneEnd){const shift=e.x<row430.x?-170:170;e.x+=shift;e.left+=shift;e.right+=shift;}}}
    }
-   // Growth and power star must be earned from blocks.
+   // Growth + power star are block rewards; one ordinary star is also hidden in a block.
    const occupied=new Set(rewardBlocks.filter(b=>hiddenLetters.some(l=>b.rewardId===l.id)));
    const available=rewardBlocks.filter(b=>!occupied.has(b));
-   const setReward=(idx,kind)=>{const b=available[idx];if(!b)return;const old=b.rewardId;s.items=s.items.filter(a=>a.id!==old);const id=`underground-${kind}-${idx}`;b.rewardId=id;s.items.push({id,kind,x:0,y:0,w:40,h:kind==='power'?45:42,contained:true});};
+   const setReward=(idx,kind,id=`underground-${kind}-${idx}`)=>{const b=available[idx];if(!b)return null;const old=b.rewardId;s.items=s.items.filter(a=>a.id!==old);b.rewardId=id;let item=s.items.find(a=>a.id===id);if(!item){item={id,kind,x:0,y:0,w:kind==='coin'?26:40,h:kind==='power'?45:42,contained:true};s.items.push(item);}else item.contained=true;return b;};
    setReward(0,'power');setReward(1,'powerStar');
-   // Keep coins as a route guide, but lift them off the floor so the stage no longer looks carpeted with pickups.
-   s.items.filter(a=>a.kind==='coin'&&!a.contained).forEach((coin,i)=>{coin.y=[310,245,185,275][i%4];});
-   // Sewer/drain hazards and vertical enemy variety.
+   const blockStar=s.items.find(a=>a.id==='star-2');if(blockStar&&available[2]){const b=available[2],old=b.rewardId;s.items=s.items.filter(a=>a.id!==old||a===blockStar);b.rewardId=blockStar.id;blockStar.contained=true;}
+   // Route coins deliberately alternate floor/elevated heights rather than forming one carpet.
+   const coinLanes=n===1?[350,310,350,265,350,225]:n===2?[350,295,245,350,210,280]:n===3?[350,275,215,325,185,250]:[350,260,200,310,170,235];
+   s.items.filter(a=>a.kind==='coin'&&!a.contained).forEach((coin,i)=>{coin.y=coinLanes[i%coinLanes.length];});
+   const visibleStars=s.items.filter(a=>a.kind==='star'&&!a.contained);visibleStars.forEach((star,i)=>{star.y=i%2?220:340;});
+   // Progressive sewer hazards: each stage adds more drains and tougher spacing.
    const pits=s.hazards.filter(a=>a.kind==='void');
-   const drainFractions=n===1?[.18,.38,.68,.86]:n===2?[.12,.29,.47,.66,.84]:[.1,.24,.39,.54,.69,.84];
+   const drainFractions=n===1?[.42,.78]:n===2?[.22,.5,.78]:n===3?[.14,.34,.56,.78]:[.1,.24,.4,.56,.72,.88];
    drainFractions.forEach((fraction,i)=>{const x=end*fraction;s.platforms.push({x:x-30,y:408,w:60,h:12,kind:'drain',oneWay:false});
-    if(i%2===0)s.enemies.push({id:`sewer-cactus-${n}-${i}`,kind:'cactus',x:x-18,y:420,w:48,h:52,left:x-18,right:x-18,dir:-1,speed:0,baseY:420,homeY:420,drainY:420,phase:i+20,level:n,hp:1,retracted:true,stompable:false,behavior:'emerge'});
-    else s.enemies.push({id:`sewer-shell-${n}-${i}`,kind:'gear-shell',x:x-30,y:372,w:50,h:48,left:x-110,right:x+110,dir:i%3?1:-1,speed:52+n*5,baseY:372,homeY:372,phase:i+24,level:n,hp:n>=3?2:1,flying:false,armored:true,behavior:'patrol',behaviorTime:i*.6,rollSpeed:360+n*12});
+    if(i%2===0)s.enemies.push({id:`sewer-cactus-${n}-${i}`,kind:'cactus',x:x-18,y:420,w:48,h:52,left:x-18,right:x-18,dir:-1,speed:0,baseY:420,homeY:420,drainY:420,phase:i+20,level:n,hp:n>=3?2:1,retracted:true,stompable:false,behavior:'emerge'});
+    else s.enemies.push({id:`sewer-shell-${n}-${i}`,kind:'gear-shell',x:x-30,y:372,w:50,h:48,left:x-110,right:x+110,dir:i%3?1:-1,speed:50+n*6,baseY:372,homeY:372,phase:i+24,level:n,hp:n>=3?2:1,flying:false,armored:true,behavior:'patrol',behaviorTime:i*.6,rollSpeed:350+n*18});
    });
-   for(const f of (n===1?[.3,.76]:n===2?[.2,.55,.78]:[.17,.33,.58,.77,.91])){const x=end*f;s.hazards.push({kind:'open-drain',x:x-22,y:402,w:44,h:28,fatal:true});}
-   for(const e of s.enemies)for(const h of pits){const center=h.x+h.w/2,margin=s.boss?180:105;if(Math.abs(e.x-center)<margin){const shift=e.x<center?-(margin+45):(margin+45);e.x+=shift;e.left+=shift;e.right+=shift;}}
+   const openDrainFractions=n===1?[.64]:n===2?[.3,.72]:n===3?[.2,.48,.82]:[.16,.34,.52,.7,.9];
+   for(const f of openDrainFractions){const x=end*f;s.hazards.push({kind:'open-drain',x:x-22,y:402,w:44,h:28,fatal:true});}
+   // Preserve a readable takeoff/landing zone around every fatal void, especially at higher difficulty.
+   for(const e of s.enemies)for(const h of pits){const center=h.x+h.w/2,margin=95+n*20;if(Math.abs(e.x-center)<margin){const shift=e.x<center?-(margin+45):(margin+45);e.x+=shift;e.left+=shift;e.right+=shift;}}
   }
   if(s.worldId===2){
    const rewardBlocks=s.blocks.filter(b=>b.kind==='reward');
