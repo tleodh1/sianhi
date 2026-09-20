@@ -1,0 +1,51 @@
+(function(global){
+ const S=global.LearningSpace,M=global.MissionModel;
+ function play(subject,stage){
+  const q=M.make(subject,stage);if(!M.validate(q))throw new Error('Invalid mission '+q.id);
+  const root=S.shell(subject,stage,q.title,q.prompt,q.theme),area=root.querySelector('.spaceGameplay'),feedback=root.querySelector('.spaceFeedback');root.dataset.mode=q.mode;
+  let solved=false;const finish=()=>{if(solved)return;solved=true;S.complete(root,subject,stage,q.explanation);};
+  const wrong=(el,text='여기가 아니구나. 그림을 다시 살펴봐.')=>{if(solved)return;feedback.textContent=text;el?.classList.add('spaceShake');Session.timeout(()=>el?.classList.remove('spaceShake'),350);};
+  const piece=i=>`<button type="button" class="missionPiece" data-piece="${S.esc(i.id)}" aria-label="${S.esc(S.label(i))}">${S.object(i)}</button>`;
+  const target=t=>`<button type="button" class="missionTarget" data-target="${S.esc(t.id)}" aria-label="${S.esc(t.sample?S.label(t.sample)+' 자리':t.label)}">${t.sample?'<span class="targetSample">'+S.object(t.sample)+'</span>':'<span class="targetSocket">＋</span>'}<span class="targetCaption">${S.esc(t.sample?(q.mode==='venn'?t.label:''):t.label)}</span><span class="targetContents"></span></button>`;
+  const fruits=(n,side)=>`<div class="fruitPlate" aria-label="과일 ${n}개">${Array.from({length:n},(_,i)=>`<button class="countFruit" data-count="${side}-${i}" aria-label="${i+1}번째 과일">${S.object({kind:'fruit',color:side==='b'?'green':'red',shape:'circle',scale:.92+i%3*.035})}<span></span></button>`).join('')}</div>`;
+  function counting(){area.querySelectorAll('[data-count]').forEach(el=>el.onclick=()=>{if(el.dataset.counted)return;el.dataset.counted='true';const n=el.parentElement.querySelectorAll('[data-counted]').length;el.querySelector('span').textContent=n;S.voice(String(n));});}
+  function answerButtons(labels){return `<div class="spaceAnswerRow">${labels.map(([id,l])=>`<button type="button" data-answer="${id}">${l}</button>`).join('')}</div>`;}
+  function bindAnswer(){area.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>String(q.correct)===b.dataset.answer?finish():wrong(b));}
+  if(['compare','length','capacity','weight'].includes(q.mode)){
+   let visuals='';if(q.mode==='compare')visuals=q.groups.map((n,i)=>`<div>${fruits(n,i?'b':'a')}</div>`).join('');
+   if(q.mode==='length')visuals=q.groups.map(n=>`<div class="rulerTrack"><i style="width:${n*12}%"></i></div>`).join('');
+   if(q.mode==='capacity')visuals=q.groups.map(n=>`<div class="spaceCup" style="height:${n*16+35}px"><i></i></div>`).join('');
+   if(q.mode==='weight')visuals=`<div class="spaceScale" style="--tilt:${q.groups[0]>q.groups[1]?-12:12}deg"><div class="scaleBeam"></div><div class="scalePan left" style="--down:${q.groups[0]>q.groups[1]?24:0}px">${S.object({kind:'block',color:'blue',shape:'square',scale:.8})}</div><div class="scalePan right" style="--down:${q.groups[1]>q.groups[0]?24:0}px">${S.object({kind:'block',color:'yellow',shape:'square'})}</div></div>`;
+   area.innerHTML=`<div class="comparison ${q.mode}">${visuals}</div>`+answerButtons([['left','◀ 이쪽'],['right','이쪽 ▶']]);counting();bindAnswer();
+  }else if(q.mode==='chart'){
+   area.innerHTML=`<div class="pictureChart">${q.groups.map((n,i)=>`<button data-answer="${i}" aria-label="${i+1}번째 줄 ${n}개"><span class="chartLine">${Array.from({length:n},()=>S.object({kind:'block',shape:'circle',color:['red','blue','yellow'][i]})).join('')}</span></button>`).join('')}</div>`;bindAnswer();
+  }else if(q.mode==='odd'){
+   area.innerHTML='<div class="toyShelf">'+q.items.map(i=>`<button data-answer="${i.id}" aria-label="${S.label(i)}">${S.object(i)}</button>`).join('')+'</div>';bindAnswer();
+  }else if(q.mode==='rotation'){
+   let angle=0;area.innerHTML=`<div class="rotationStage"><span class="directionTarget" style="rotate:${q.angle}deg">➜</span><span class="rotatingBlock">➜</span></div><div class="spaceAnswerRow"><button data-rotate>↻ 90° 돌리기</button><button data-check>같아졌어!</button></div>`;
+   area.querySelector('[data-rotate]').onclick=()=>{if(solved)return;angle=(angle+90)%360;area.querySelector('.rotatingBlock').style.rotate=angle+'deg';};area.querySelector('[data-check]').onclick=e=>angle===q.angle?finish():wrong(e.currentTarget);
+  }else if(q.mode==='fraction'){
+   let selected=new Set();area.innerHTML=`<div class="fractionGoal"><b>${q.numerator}</b><span>조각을 골라 줘</span></div><div class="breadBoard" style="--cols:${q.parts===4?2:4}">${Array.from({length:q.parts},(_,i)=>`<button class="breadTile" data-slice="${i}" aria-label="빵 ${i+1}번째 조각" aria-pressed="false"></button>`).join('')}</div><button class="spaceCheck">다 골랐어</button>`;
+   area.querySelectorAll('[data-slice]').forEach(b=>b.onclick=()=>{if(solved)return;const id=b.dataset.slice;if(selected.has(id))selected.delete(id);else selected.add(id);b.setAttribute('aria-pressed',String(selected.has(id)));});area.querySelector('.spaceCheck').onclick=e=>selected.size===q.numerator?finish():wrong(e.currentTarget,'골라 놓은 조각을 하나씩 세어 봐.');
+  }else if(q.mode==='path'||q.mode==='position'){
+   let at=0;const path=q.path;area.innerHTML=`<div class="steppingBoard ${q.mode}" style="--cols:${q.mode==='path'?3:3}">${q.mode==='path'?q.items.map(i=>`<button class="steppingStone ${i.id===path[0]?'visited':''}" data-step="${i.id}" aria-label="${S.label(i)}">${S.object(i)}<small>${i.id===path[0]?'출발':''}</small></button>`).join(''):Array.from({length:9},(_,i)=>`<button class="villageTile ${i===6?'visited':''}" data-step="${i}" aria-label="마을 ${Math.floor(i/3)+1}행 ${i%3+1}열">${i===6?'⌂':i===4?'★':'·'}</button>`).join('')}</div><p class="pathProgress">출발 → ${path.length-1}번 이동</p>`;
+   area.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{if(solved)return;const id=b.dataset.step;if(id===path[at])return;const valid=q.mode==='path'?M.pathNext(q.items.find(i=>i.id===path[at]),q.items.find(i=>i.id===id))&&!b.classList.contains('visited'):id===path[at+1];if(!valid){wrong(b,'같은 특징이 딱 하나인지 살펴봐.');return;}if(q.mode==='path'&&id!==path[at+1]){wrong(b,'모든 돌을 이어 갈 수 있는 다음 길을 찾아봐.');return;}at++;b.classList.add('visited');area.querySelector('.pathProgress').textContent=at+'/'+(path.length-1)+' 이동';if(at===path.length-1)finish();});
+  }else if(q.mode==='mirror'){
+   const chosen=new Set();area.innerHTML=`<div class="mirrorBoard" style="--cols:4">${Array.from({length:16},(_,i)=>`<button data-cell="${i}" ${i%4<2?'disabled':''} aria-label="거울판 ${Math.floor(i/4)+1}행 ${i%4+1}열" aria-pressed="false">${q.filled.includes(i)?S.object({color:'blue',shape:'square'}):''}</button>`).join('')}</div><button class="spaceCheck">거울 짝 확인</button>`;
+   area.querySelectorAll('[data-cell]:not(:disabled)').forEach(b=>b.onclick=()=>{if(solved)return;const i=+b.dataset.cell;if(chosen.has(i)){chosen.delete(i);b.innerHTML='';}else{chosen.add(i);b.innerHTML=S.object({color:'blue',shape:'square'});}b.setAttribute('aria-pressed',String(chosen.has(i)));});area.querySelector('.spaceCheck').onclick=e=>chosen.size===q.correctCells.length&&q.correctCells.every(i=>chosen.has(i))?finish():wrong(e.currentTarget,'거울 선에서 몇 칸 떨어져 있는지 살펴봐.');
+  }else{
+   let context='';
+   if(['count','combine','subtract','ratio'].includes(q.mode))context=`<div class="countingTable">${q.mode==='subtract'?fruits(q.b,'a')+`<p>↗ ${q.a}개를 나눠 줘</p>`:fruits(q.a,'a')+(q.mode==='combine'?'<b>＋</b>'+fruits(q.b,'b'):'')}${q.mode==='ratio'?'<div class="ratioKey">'+S.object({color:'blue',shape:'square'})+'：'+S.object({color:'yellow',shape:'square'})+S.object({color:'yellow',shape:'square'})+'</div>':''}</div>`;
+   if(q.mode==='pattern')context='<div class="patternBridge">'+q.sequence.map(i=>'<span>'+S.object(i)+'</span>').join('')+'<b>?</b></div>';
+   if(q.mode==='clock'){const h=q.hour*30+q.minute*.5,m=q.minute*6;context=`<svg class="toyClock" viewBox="0 0 200 200" aria-label="${q.hour}시 ${q.minute}분"><circle cx="100" cy="100" r="92" fill="#fffaf0" stroke="#9dcddc" stroke-width="12"/>${Array.from({length:12},(_,i)=>`<text x="${100+72*Math.sin((i+1)*Math.PI/6)}" y="${105-72*Math.cos((i+1)*Math.PI/6)}" text-anchor="middle" font-size="15" fill="#294562">${i+1}</text>`).join('')}<path d="M100 100V53" stroke="#294562" stroke-width="8" stroke-linecap="round" transform="rotate(${h} 100 100)"/><path d="M100 100V31" stroke="#de9462" stroke-width="4" stroke-linecap="round" transform="rotate(${m} 100 100)"/><circle cx="100" cy="100" r="6" fill="#294562"/></svg>`;}
+   if(q.mode==='money')context=`<div class="priceTag">${S.object({kind:'toy',color:'blue'})}<b>${q.value}원</b></div>`;
+   if(q.mode==='area'||q.mode==='perimeter')context=`<div class="tileGarden ${q.mode}" style="--cols:${q.cols}">${Array.from({length:q.rows*q.cols},()=>'<span></span>').join('')}</div>`;
+   if(q.mode==='tree')context='<div class="branchSigns"><span>★</span><span>● ▲</span><svg viewBox="0 0 320 70" aria-hidden="true"><path d="M160 0V15M160 15L80 35M160 15L240 35M80 35L40 65M80 35L120 65M240 35L200 65M240 35L280 65" fill="none" stroke="#bcaa86" stroke-width="9" stroke-linecap="round"/></svg></div>';
+   if(q.mode==='venn')context='<div class="vennLabels"><b>★</b><b>노란색 ●</b></div>';
+   const layout=q.mode==='board'?`<div class="strategyBoard">${q.board.map((i,n)=>i?'<span class="placedPiece">'+S.object(i)+'</span>':target(q.targets.find(t=>+t.id===n))).join('')}</div>`:`<div class="targetBoard ${q.mode}">${q.targets.map(target).join('')}</div>`;
+   area.innerHTML=context+layout+'<div class="pieceTray" aria-label="옮길 물건">'+q.items.map(piece).join('')+'</div>';counting();let placed=new Set();
+   S.drag(area,{onSelect:id=>{if(!solved)feedback.textContent=S.label(q.items.find(i=>i.id===id))+' · 놓을 곳을 눌러도 돼.';},onDrop:(id,targetId,el,t)=>{if(solved||placed.has(id))return false;if(!M.accepts(q,id,targetId)){wrong(el);return false;}placed.add(id);el.disabled=true;el.classList.add('piecePlaced');const mini=document.createElement('span');mini.className='snappedToy';mini.innerHTML=S.object(q.items.find(i=>i.id===id));t.querySelector('.targetContents').append(mini);S.burst(t);feedback.textContent='좋아! 알맞은 자리를 찾았어.';if(placed.size>=(q.required||q.items.length)){if(q.mode==='tree')area.querySelector('.branchSigns').classList.add('treeComplete');finish();}return true;}});
+  }
+ }
+ global.MathSpace={play};
+})(window);
