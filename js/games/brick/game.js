@@ -4,11 +4,13 @@
     Session.begin();
     const r = B.progress(state);
     gameShell("🌠 별빛 벽돌깨기", `<section class="brickAdventure"><header><div><small>STAGE ADVENTURE</small><h2>별빛 항로</h2><p>모양과 장치를 깨고 우주 보스에게 가요!</p></div><strong>${Object.keys(r.stages).length}/30 CLEAR</strong></header><div class="brickMap">${B.stages.map(s => `<button data-stage="${s.id}" ${s.id > r.unlocked ? "disabled" : ""} class="${r.stages[s.id]?.cleared ? "cleared" : ""}"><i>${s.icon}</i><b>${s.id}</b><span>${s.name}</span><small>${r.stages[s.id] ? "★".repeat(r.stages[s.id].stars) : s.id > r.unlocked ? "🔒" : "PLAY"}</small></button>`).join("")}</div></section>`);
+    gameBody.closest("dialog").scrollTop = 0;
     gameBody.querySelectorAll("[data-stage]").forEach(b => b.onclick = () => B.play(+b.dataset.stage));
   };
   B.play = function (id) {
     const stage = B.stages[id - 1], touch = matchMedia("(pointer: coarse)").matches;
     gameShell(`STAGE ${id} · ${stage.name}`, `<div class="brickHud"><span>❤️ <b data-life>${stage.lives}</b></span><span>SCORE <b data-score>0</b></span><span>⭐ <b data-stars>0</b></span></div><div class="brickScene brickStage" aria-label="별빛 벽돌깨기 스테이지"><div class="brickField"></div><div class="brickDrops"></div><div class="brickShield"></div><div class="pixelPaddle"><i></i></div></div><p class="gameStatus">${touch ? "손가락으로 받침대를 움직여요" : "마우스·방향키로 받침대를 움직여요"}</p>`, `<button class="moveL">◀</button><button class="brickLaunch">발사</button><button class="moveR">▶</button>`);
+    gameBody.closest("dialog").scrollTop = 0;
     const scene = gameBody.querySelector(".brickScene"), field = gameBody.querySelector(".brickField"), paddle = gameBody.querySelector(".pixelPaddle"), msg = gameBody.querySelector(".gameStatus"); if(stage.boss) scene.classList.add("boss");
     const startedAt = performance.now(); let paddleX = 50, width = stage.paddle, lives = stage.lives, score = 0, foundStars = 0, running = true, fire = false, shield = false, magnet = true, held = true, lasers = 0;
     const balls = [], drops = []; const starRenderer=new B.StarRenderer(scene);Session.cleanup(()=>{running=false;starRenderer.destroy()});scene.dataset.material=['wood','crystal','ice','energy'][Math.floor((id-1)/8)];let lastFrame=0,accumulator=0;

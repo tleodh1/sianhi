@@ -14,4 +14,11 @@ assert.match(js, /손가락으로 받침대를 움직여요/);
 assert.match(css, /touch-action:none/);
 assert.match(css, /min-width:84px/);
 
+// Top-layer dialogs must stay viewport-anchored when the page is scrolled.
+const dialogRule = css.match(/dialog#game:has\(\.brickStage\)\{([^}]+)\}/)[1];
+assert.match(dialogRule, /position:fixed/);
+assert.match(dialogRule, /inset:0/);
+assert.doesNotMatch(dialogRule, /position:(relative|absolute)/);
+assert.equal((js.match(/closest\("dialog"\)\.scrollTop = 0/g) || []).length, 2);
+
 console.log("PASS brick pointer drag, keyboard, adaptive copy, mobile controls");
