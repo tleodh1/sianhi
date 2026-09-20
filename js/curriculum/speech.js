@@ -19,7 +19,7 @@
    u.voice=voices.find(v=>v.lang.replace('_','-')===u.lang)||voices.find(v=>v.lang.slice(0,2)===u.lang.slice(0,2))||null;
    u.onstart=()=>{if(token!==serial)return;clearTimeout(watchdog);ctx.started=true;mark(ctx,'speaking',u.lang.startsWith('en')?'영어 소리를 듣고 있어요.':'이야기를 듣고 있어요.');};
    u.onend=()=>{if(token!==serial)return;clearTimeout(watchdog);next();};
-   u.onerror=e=>{if(token!==serial)return;clearTimeout(watchdog);queue.length=0;mark(ctx,'error','소리를 시작하지 못했어요. 스피커를 다시 눌러 주세요.');current=null;};
+   u.onerror=e=>{if(token!==serial)return;clearTimeout(watchdog);queue.length=0;if(ctx.status)ctx.status.dataset.speechError=e.error||'unknown';mark(ctx,'error','소리를 시작하지 못했어요. 스피커를 다시 눌러 주세요.');current=null;};
    watchdog=setTimeout(()=>{if(token!==serial)return;stop();mark(ctx,'error','소리가 시작되지 않았어요. 기기 음량을 확인하고 다시 눌러 주세요.');},7000);
    // First speak remains inside the user's click event, including when voices are still loading.
    synth.speak(u);
