@@ -41,6 +41,6 @@
   for(const enemy of e.stage.enemies){if(enemy.defeated||Math.abs(enemy.x-c-w/2)>w/2+70)continue;for(let j=0;j<2;j++){const age=(t*.8+j*.5)%1;g.strokeStyle='#cffbff66';g.beginPath();g.arc(enemy.x-c-enemy.dir*age*22,enemy.y+enemy.h*.4-age*24,1.5+age*2,0,Math.PI*2);g.stroke();}}
   this.oceanLight(e,.035);
  };
- P.oceanLetter=function(item,x,bob){const g=this.g,y=item.y+bob,w=item.w,h=item.h;g.save();g.shadowColor='#fff6aa';g.shadowBlur=9;const glow=g.createLinearGradient(x,y,x,y+h);glow.addColorStop(0,'#fffde6');glow.addColorStop(1,'#ffe19b');g.fillStyle=glow;g.strokeStyle='#fff6d1';g.lineWidth=3;g.beginPath();g.roundRect(x,y,w,h,18);g.fill();g.stroke();g.shadowBlur=0;g.fillStyle='#49362b';g.textAlign='center';g.textBaseline='middle';g.font='850 30px Pretendard, sans-serif';const lines=[];let line='';for(const char of item.text){if(g.measureText(line+char).width>w-20&&line){lines.push(line);line='';}line+=char;}if(line)lines.push(line);lines.forEach((text,i)=>g.fillText(text.trim(),x+w/2,y+h/2+(i-(lines.length-1)/2)*32));g.restore();};
+ P.oceanLetter=function(item,x,bob){this.learningLetter(item,x,bob);};
  P.oceanMarine=function(a,x,t){const g=this.g,s=this.art.marine[a.marineKind==='eel'?1:0];g.save();if(a.telegraph){g.shadowColor='#ffcc59';g.shadowBlur=18;}const h=a.h*(a.defeated?.35:1),w=a.w;g.translate(x+w/2,a.y+a.h/2);if(a.dir<0)g.scale(-1,1);g.rotate(Math.sin(t*3)*.035);g.drawImage(s.image,s.x,s.y,s.w,s.h,-w/2,-h/2,w,h);g.restore();};
 })(HangulRunner);

@@ -67,3 +67,5 @@ require("../tests/learning-space.test.cjs");
 require("../tests/discovery-space.test.cjs");
 
 require("../tests/audio.test.cjs");
+
+require('../tests/runner-pacing.test.cjs');

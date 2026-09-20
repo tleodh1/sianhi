@@ -29,6 +29,6 @@
   });
   stage.platforms.push({x:d.words.length*span,y:d.mode==='swim'?510:420,w:700,h:300,kind:'ground'});
   stage.goal={x:stage.length-155,y:d.mode==='swim'?335:330,w:54,h:90,kind:'beacon',active:false};
-  if(H.decorateWorldStage)H.decorateWorldStage(stage);if(H.prepareBoss)H.prepareBoss(stage);return stage;
+  if(H.decorateWorldStage)H.decorateWorldStage(stage);if(H.finishStagePacing)H.finishStagePacing(stage);if(H.prepareBoss)H.prepareBoss(stage);return stage;
  };
 })(HangulRunner);

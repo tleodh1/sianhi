@@ -1,0 +1,6 @@
+/* Input-only QA driver: never alters physics, health, enemies or collection state. */
+(function(root){root.runnerRouteInput=function(e){const p=e.player,s=e.stage;if(e.status!=='playing')return {};const target=(e.sceneState==='BOSS_STAGE'?e.boss?.choices?.find(q=>q.correct):null)||s.items.find(i=>i.kind==='letter'&&!e.collected.has(i.id))||s.goal;const dx=target.x+target.w/2-(p.x+p.w/2),dy=target.y+target.h/2-(p.y+p.h/2);if(e.freeMotion){const obstacle=[...s.blocks,...s.platforms.filter(a=>a.kind!=='ground')].find(a=>!a.removed&&a.x<p.x+p.w+110&&a.x+a.w>p.x&&p.y+p.h>a.y-12&&p.y<a.y+a.h);return {right:dx>5,left:dx< -5,jump:!!obstacle||dy< -9,down:!obstacle&&dy>9,fire:true};}
+ const direction=dx< -10?-1:1,front=direction>0?p.x+p.w:p.x;const danger=s.enemies.some(a=>!a.defeated&&!a.retracted&&(a.x-front)*direction>-35&&(a.x-front)*direction<145&&Math.abs(a.y-p.y)<120)||s.hazards.some(a=>(a.x-front)*direction>0&&(a.x-front)*direction<130);
+ const groundAhead=s.platforms.some(a=>a.kind==='ground'&&front+direction*90>=a.x&&front+direction*90<a.x+a.w);
+ const wall=s.blocks.some(a=>!a.removed&&a.y+a.h>p.y+8&&a.y<p.y+p.h&&(a.x-front)*direction>=0&&(a.x-front)*direction<90);
+ return {right:dx>7,left:dx< -7,jump:p.isGrounded&&(danger||!groundAhead||wall||(Math.abs(dx)<90&&dy< -45)),fire:true};};})(typeof module==='object'?module.exports:window);

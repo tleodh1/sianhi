@@ -73,7 +73,7 @@
         const oldBottom=item.y+item.h;item.velocityY+=700*dt;item.y+=item.velocityY*dt;
         // Released rewards fall past their source block to an accessible lower route.
         for(const floor of this.stage.platforms.filter(a=>a.kind==='ground'||a.kind==='floating'&&a.w>500))if(item.x+item.w>floor.x&&item.x<floor.x+floor.w&&oldBottom<=floor.y&&item.y+item.h>=floor.y){item.y=floor.y-item.h;item.velocityY=0;item.dropReward=false;break;}
-      }if(item.contained||this.collected.has(item.id)||!hit(p,item)||(this.canCollect&&!this.canCollect(item)))continue;this.collected.add(item.id);this.burst(item.x+item.w/2,item.y+item.h/2);
+      }if(item.contained||this.collected.has(item.id)||!hit(p,item)||(this.canCollect&&!this.canCollect(item)))continue;this.collected.add(item.id);item.collectedAt=this.elapsed;this.burst(item.x+item.w/2,item.y+item.h/2);
         if(item.kind==='coin')this.coins++;if(item.kind==='star')this.stars++;if(item.kind==='flight'){p.flight=true;p.flightTime=12;this.setPose('power-up',.45);}if(item.kind==='power')this.grow();if(item.kind==='powerStar')this.gainPowerStar();this.emit(item.kind,{item});}
       this.tickPlayerProjectiles(dt);
       this.enemyShots=this.enemyShots.filter(s=>{s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt;if(hit(p,s)){this.damage();this.emit('enemyShotHit',{shot:s});return false;}return s.life>0&&s.x>-80&&s.x<this.stage.length+80;});
