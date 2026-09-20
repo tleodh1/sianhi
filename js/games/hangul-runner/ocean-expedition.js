@@ -1,23 +1,18 @@
-/* Nine ocean chapters extend existing IDs; no saved records are rewritten. */
+/* Four ocean stages keep the established IDs; 2-4 is the WORLD 2 boss stage. */
 (function(H){
  const chapters=[
   ['산호초','reef','얕은 산호 바다에서 첫 탐험을 시작해요.',['바다','고래','상어','문어','조개','새우','파도','모래','물고기','산호','소라','거북이']],
   ['해초 숲','kelp','흔들리는 해초 사이에서 길을 찾아요.',['해초','초록','나무','풀잎','숨바꼭질','친구','위쪽','아래쪽','가까이','멀리','천천히','함께']],
   ['조개 마을','shell','진주 조개를 열고 마을의 빛을 찾아요.',['조개','진주','마을','모래성','불가사리','소라게','돌고래','산호초','바닷속','모래사장','반짝반짝','고마워요']],
-  ['난파선','wreck','가라앉은 배의 보물길을 탐험해요.',['배','돛','닻','갑판','선장','보물','상자','지도','나침반','항해','찾았어요','돌아가요']],
-  ['해저 유적','ruins','무너진 기둥 사이에서 옛 문양을 읽어요.',['유적','기둥','돌문','계단','문양','역사','비밀','오래된 성','탐험가','차례차례','문을 열어요','길을 찾아요']],
-  ['해구','trench','깊은 바다의 작은 불빛을 따라가요.',['해구','깊이','어둠','빛','잠수함','해저동굴','바닷물','깊은 바다','빛이 보여요','천천히 내려가요','친구를 기다려요','같이 가요']],
-  ['해파리 바다','jelly','빛나는 해파리와 부드러운 물살을 만나요.',['해파리','물결','보라색','푸른빛','둥실둥실','출렁출렁','부드러워요','조심조심','바닷물이 출렁여요','물고기가 헤엄쳐요','함께 헤엄쳐요','길이 보여요']],
-  ['심해 동굴','cavern','수정이 비추는 동굴에서 마지막 길을 찾아요.',['수정','동굴','메아리','입구','출구','발견','용기','도움','수정이 반짝여요','어둠을 밝혀요','친구를 도와요','출구를 찾았어요']],
-  ['심해 수호자의 성','abyss','아홉 바다의 빛을 모아 물결왕을 만나요.',['탐험','바닷속','잠수함','수호자','물결','별빛','약속','친구','바다를 지켜요','함께 힘을 내요','빛을 되찾아요','집으로 돌아가요']]
+  ['심해 수호자의 성','abyss','난파선과 해저 유적, 해구와 동굴을 지나 물결왕을 만나요.',['탐험','바닷속','잠수함','수호자','물결','별빛','약속','친구','바다를 지켜요','함께 힘을 내요','빛을 되찾아요','집으로 돌아가요']]
  ];
  const first=H.worldStages.findIndex(s=>s.worldId===2),oldBoss=H.worldStages.find(s=>s.id==='2-4').boss;
- const defs=chapters.map(([name,oceanBiome,story,words],i)=>({id:`2-${i+1}`,worldId:2,number:i+1,name,oceanBiome,story,words,span:920,mode:'swim',theme:'ocean',gap:0,ordered:i===2,current:i>0,...(i===8?{boss:{...oldBoss,name:'심해왕 루모',questions:words.slice(0,5).map((w,j)=>[`${w} 찾기`,w,words[(j+3)%12],words[(j+6)%12]])}}:{})}));
+ const defs=chapters.map(([name,oceanBiome,story,words],i)=>({id:`2-${i+1}`,worldId:2,number:i+1,name,oceanBiome,story,words,span:920,mode:'swim',theme:'ocean',gap:0,ordered:i===2,current:i>0,...(i===3?{oceanBiomes:['wreck','ruins','trench','jelly','cavern','abyss'],boss:{...oldBoss,name:'심해왕 루모',questions:words.slice(0,5).map((w,j)=>[`${w} 찾기`,w,words[(j+3)%12],words[(j+6)%12]])}}:{})}));
  H.worldStages.splice(first,4,...defs);
- H.isWorldStageUnlocked=(progress,id)=>{const index=H.worldStages.findIndex(s=>s.id===id),stage=H.worldStages[index];if(!stage)return false;return index===0||!!progress.stages[id]||!!progress.stages[H.worldStages[index-1]?.id]||(stage.number===1&&(!!progress.worldRewards?.[stage.worldId-1]||(stage.worldId===3&&!!progress.stages['2-4']?.boss)));};
+ H.isWorldStageUnlocked=(progress,id)=>{const index=H.worldStages.findIndex(s=>s.id===id),stage=H.worldStages[index];if(!stage)return false;const previousWorld=stage.worldId-1,legacyBoss=progress.stages?.[`${previousWorld}-4`]?.boss;return index===0||!!progress.stages[id]||!!progress.stages[H.worldStages[index-1]?.id]||(stage.number===1&&(!!progress.worldRewards?.[previousWorld]||!!legacyBoss));};
  const decorate=H.decorateWorldStage;
  H.decorateWorldStage=s=>{decorate(s);if(s.worldId!==2)return;
-  s.killY=660;s.checkpoints[0].y=310;s.oceanDepth=(s.number-1)/8;s.oceanShells=[];
+  s.killY=660;s.checkpoints[0].y=310;s.oceanDepth=(s.number-1)/3;s.oceanShells=[];
   // Broad terraces leave at least 150 logical pixels beneath the reward rows.
   const base=s.platforms.filter(p=>p.kind==='ground');s.platforms=s.platforms.filter(p=>p.kind!=='ground');
   for(const [i,p] of base.entries()){const heights=s.number>=6?[500,440,510]:[500,470,510],third=p.w/3;for(let j=0;j<3;j++)s.platforms.push({...p,x:p.x+j*third,w:third+1,y:heights[(i+j+s.number)%3],kind:'ground'});}
@@ -33,11 +28,11 @@
   });
   s.enemies.forEach((e,i)=>{if(e.x<330){e.x+=260;e.left+=260;e.right+=260;}const kind=e.originalKind;e.homeY=Math.min(420,e.homeY);if(kind==='reef-crab'){e.homeY=464;e.y=464;e.behavior='pinch';}
    if(s.number>=4&&i%7===3){e.behavior='ink';e.marineKind='octopus';}
-   if(s.number>=5&&i%9===4){e.behavior='shark';e.marineKind='shark';e.w=e.baseW=70;e.h=e.baseH=42;}
-   if(s.number>=6&&i%11===5){e.behavior='eel';e.marineKind='eel';e.w=e.baseW=76;e.h=e.baseH=32;}
+   if(s.number>=4&&i%9===4){e.behavior='shark';e.marineKind='shark';e.w=e.baseW=70;e.h=e.baseH=42;}
+   if(s.number>=4&&i%11===5){e.behavior='eel';e.marineKind='eel';e.w=e.baseW=76;e.h=e.baseH=32;}
    if(kind==='ink-sprite'&&!e.marineKind)e.behavior='jelly';
    if(e.marineKind==='shark'||e.marineKind==='eel'){e.left=Math.max(i?80:360,e.left);e.right=e.left+260;}
-   e.oceanSchool=true;e.hp=s.number>=7&&i%4===0?2:1;e.speed=Math.min(70,e.speed);e.attackTimer=2.5+i%4;
+   e.oceanSchool=true;e.hp=s.number>=4&&i%4===0?2:1;e.speed=Math.min(70,e.speed);e.attackTimer=2.5+i%4;
   });
   for(const letter of s.items.filter(i=>i.kind==='letter')){const floor=Math.min(...s.platforms.filter(p=>p.kind==='ground'&&letter.x+letter.w>p.x&&letter.x<p.x+p.w).map(p=>p.y));letter.y=Math.min(letter.y,floor-letter.h-22);}
   // Keep rewards outside the new wider learning tiles and the reef collision geometry.

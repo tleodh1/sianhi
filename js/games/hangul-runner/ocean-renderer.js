@@ -10,7 +10,7 @@
 
  const P=H.Renderer.prototype;
  P.oceanProp=function(index,x,bottom,width,alpha=1){const s=this.art.ocean?.[index];if(!s)return;const height=width*s.h/s.w;this.g.save();this.g.globalAlpha=alpha;this.g.drawImage(s.image,s.x,s.y,s.w,s.h,x,bottom-height,width,height);this.g.restore();};
- P.oceanBackground=function(e){const g=this.g,w=this.width,h=this.height,t=e.elapsed,c=e.cameraX,biome=e.stage.oceanBiome||'reef',pal=palettes[biome],depth=e.stage.oceanDepth||0;
+ P.oceanBackground=function(e){const g=this.g,w=this.width,h=this.height,t=e.elapsed,c=e.cameraX,zones=e.stage.oceanBiomes||[e.stage.oceanBiome||'reef'],zone=Math.min(zones.length-1,Math.floor(Math.max(0,Math.min(.999,(c+w*.5)/e.stage.length))*zones.length)),biome=zones[zone],pal=palettes[biome],depth=e.stage.oceanDepth||0;
   const bg=g.createLinearGradient(0,0,0,h);bg.addColorStop(0,pal[0]);bg.addColorStop(.5,pal[1]);bg.addColorStop(1,pal[2]);g.fillStyle=bg;g.fillRect(0,0,w,h);
   // Far cliffs .09, living reef .32, collidable terrain 1, foreground 1.18.
   for(let i=-1;i<7;i++){const x=i*240-(c*.09)%240;rock(g,x,470,280,170+(i%3)*62,pal[1]);g.fillStyle=pal[2]+'33';g.fillRect(x+120,100,8,230);}
