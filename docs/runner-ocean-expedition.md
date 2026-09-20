@@ -48,3 +48,11 @@
 - `tests/runner-review.html`: 배포된 실제 UI adapter/controls/renderer/engine을 실행하는 검증 진입점. 정상 저장을 비활성화하고 Stage/컨테이너 너비를 선택한다. 모바일 컨테이너 검증이며 iPhone 실기기 또는 Safari 에뮬레이션이 아니다.
 
 Production 결과는 배포 후 별도 기록한다. 실제 iPhone Safari 프레임 드롭/멀티터치는 아직 미검증이다.
+
+## Production 1차 확인 및 수정
+
+구현 커밋 `821b52a64d896dfe2926cce29187e55c3cce04f3`: GitHub Vercel status success 및 운영 도메인 검증 페이지 정상 표시 확인. 390px에서 한글/산호/광선/해초/생물/버튼 표시, 위·오른쪽 입력으로 x 62→88, y 356→331 이동을 DOM 상태로 확인했다.
+
+320px 2-7 검증에서 시작 근처 적 접촉 위험을 발견하여 첫 적 안전거리와 수중 시작 높이를 보정했다. 9개 Stage 각각 5초 무입력 상태에서 HP3/3 유지 테스트를 추가했다. 세 글자 단어의 타일 폭도 넓혔다.
+
+검증 환경은 Cloud Chrome의 320/390/430px 게임 컨테이너이며, 실제 모바일 viewport/Safari/실기기가 아니다. 브라우저 확장 자체의 metadata 전송 오류는 페이지 게임 오류와 분리했다. Vercel 연결 도구의 해당 팀 조회 권한은 없으므로 배포 증거는 GitHub Vercel 성공 status와 실제 운영 페이지 표시를 사용한다.

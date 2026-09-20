@@ -6,6 +6,7 @@ const before=JSON.stringify({stages:{'2-4':{boss:true,rating:3}},worldRewards:{2
 a(H.isWorldStageUnlocked(saved,'3-1'));a(H.isWorldStageUnlocked(saved,'2-5'));a(!H.isWorldStageUnlocked(saved,'2-9'));a.equal(JSON.stringify(saved),before);a(!H.isWorldStageUnlocked({stages:{},worldRewards:{}},'3-1'));
 let biome=new Set(),patterns=new Set();
 for(let n=1;n<=9;n++){
+ const idle=new H.WorldEngine(H.buildWorldStage(`2-${n}`));step(idle,600);a.equal(idle.status,'playing',`2-${n} safe idle start`);a.equal(idle.player.hp,3,`2-${n} no spawn damage`);
  const s=H.buildWorldStage(`2-${n}`);biome.add(s.oceanBiome);s.enemies.forEach(e=>patterns.add(e.behavior));a(s.length/285>40);a(new Set(s.platforms.filter(p=>p.kind==='ground').map(p=>p.y)).size>=3);
  for(const item of s.items.filter(i=>i.kind==='letter')){a(item.y>=32&&item.y+item.h<470);for(const p of s.platforms)a(!H.overlaps(item,p),`${s.id} ${item.id} outside terrain`);for(const b of s.blocks)a(!H.overlaps(item,b),`${s.id} ${item.id} outside blocks`);}
  // Input-driven navigability: immune to enemies only, with all terrain/blocks/currents live.

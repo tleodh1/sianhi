@@ -1,7 +1,7 @@
 /* Reuses the proven runner simulation, collisions, checkpoints and damage immunity. */
 (function(H){
  H.WorldEngine=class extends H.Engine{
-  constructor(stage,options){super(stage,options);this.setForm('small');this.sequence=0;this.flowTime=0;this.mode=stage.mode;this.freeMotion=false;this.projectiles=[];this.bossAttacks=[];this.answerCooldown=0;this.sceneState='RUN_STAGE';this.sceneTimer=0;}
+  constructor(stage,options){super(stage,options);this.setForm('small');if(stage.worldId===2&&stage.oceanBiome){this.player.y=stage.checkpoints[0].y-this.player.h;this.player.isGrounded=false;}this.sequence=0;this.flowTime=0;this.mode=stage.mode;this.freeMotion=false;this.projectiles=[];this.bossAttacks=[];this.answerCooldown=0;this.sceneState='RUN_STAGE';this.sceneTimer=0;}
   damage(){super.damage(true);}
   beforePhysics(dt){const p=this.player;if(p.flightTime>0){p.flightTime=Math.max(0,p.flightTime-dt);if(!p.flightTime){p.flight=false;this.emit('flightEnd');}}this.flowTime+=dt;this.mode=this.stage.mode;
    if(this.stage.runZones&&this.stage.runZones.some(z=>this.player.x>=z.x&&this.player.x<z.x+z.w))this.mode='run';

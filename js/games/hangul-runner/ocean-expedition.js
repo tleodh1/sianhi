@@ -17,12 +17,12 @@
  H.isWorldStageUnlocked=(progress,id)=>{const index=H.worldStages.findIndex(s=>s.id===id),stage=H.worldStages[index];if(!stage)return false;return index===0||!!progress.stages[id]||!!progress.stages[H.worldStages[index-1]?.id]||(stage.number===1&&(!!progress.worldRewards?.[stage.worldId-1]||(stage.worldId===3&&!!progress.stages['2-4']?.boss)));};
  const decorate=H.decorateWorldStage;
  H.decorateWorldStage=s=>{decorate(s);if(s.worldId!==2)return;
-  s.killY=660;s.oceanDepth=(s.number-1)/8;s.oceanShells=[];
+  s.killY=660;s.checkpoints[0].y=310;s.oceanDepth=(s.number-1)/8;s.oceanShells=[];
   // Broad terraces leave at least 150 logical pixels beneath the reward rows.
   const base=s.platforms.filter(p=>p.kind==='ground');s.platforms=s.platforms.filter(p=>p.kind!=='ground');
   for(const [i,p] of base.entries()){const heights=s.number>=6?[500,440,510]:[500,470,510],third=p.w/3;for(let j=0;j<3;j++)s.platforms.push({...p,x:p.x+j*third,w:third+1,y:heights[(i+j+s.number)%3],kind:'ground'});}
   for(const b of s.blocks){const floor=s.platforms.find(p=>p.kind==='ground'&&b.x>=p.x&&b.x<p.x+p.w)?.y||510;b.y=floor-H.PLAYER_FORMS.big.h-38-b.h;b.oceanSkin=b.kind==='reward'?'pearl':b.kind==='breakable'?'coral':'relic';}
-  s.words.forEach((word,i)=>{const x=i*s.span,letter=s.items.find(t=>t.id===`letter-${i}`);letter.x=x+245;letter.w=word.length>3?152:98;letter.h=word.length>6?112:82;letter.y=[135,240,335][(i+s.number-1)%3];
+  s.words.forEach((word,i)=>{const x=i*s.span,letter=s.items.find(t=>t.id===`letter-${i}`);letter.x=x+245;letter.w=word.length>3?152:word.length===3?118:98;letter.h=word.length>6?112:82;letter.y=[135,240,335][(i+s.number-1)%3];
    if(i%3===1){s.oceanShells.push({id:`clam-${i}`,x:x+680,y:404,w:82,h:55,opened:false,rewardId:`pearl-${i}`});s.items.push({id:`pearl-${i}`,kind:'coin',x:x+704,y:355,w:30,h:36,contained:true});}
    if(i%3===2){s.currents.push({x:x+730,w:100,y:140,h:345,vx:0,vy:-280,kind:'bubble-column'});s.items.push({id:`cave-star-${i}`,kind:'star',x:x+765,y:95,w:32,h:36});}
    if(['wreck','ruins','cavern','abyss'].includes(s.oceanBiome)&&i%2===1){s.platforms.push({x:x+40,y:70,w:135,h:32,oneWay:false,kind:'reef-ceiling'});}
@@ -31,7 +31,7 @@
    s.chapters[i].text=`${s.name} · ${['산호 길을 살펴봐요','조개의 보물을 찾아요','기포를 타고 올라가요'][i%3]}`;
 
   });
-  s.enemies.forEach((e,i)=>{const kind=e.originalKind;e.homeY=Math.min(420,e.homeY);if(kind==='reef-crab'){e.homeY=464;e.y=464;e.behavior='pinch';}
+  s.enemies.forEach((e,i)=>{if(e.x<330){e.x+=260;e.left+=260;e.right+=260;}const kind=e.originalKind;e.homeY=Math.min(420,e.homeY);if(kind==='reef-crab'){e.homeY=464;e.y=464;e.behavior='pinch';}
    if(s.number>=4&&i%7===3){e.behavior='ink';e.marineKind='octopus';}
    if(s.number>=5&&i%9===4){e.behavior='shark';e.marineKind='shark';e.w=e.baseW=70;e.h=e.baseH=42;}
    if(s.number>=6&&i%11===5){e.behavior='eel';e.marineKind='eel';e.w=e.baseW=76;e.h=e.baseH=32;}
