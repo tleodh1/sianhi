@@ -47,6 +47,28 @@ function play(){
     x.strokeStyle='#d7ffb877';x.lineWidth=1.5;x.beginPath();x.moveTo(0,13);x.quadraticCurveTo(2,1,5,-9);x.stroke();x.restore();};
    leaf(-17,-15,-.78);leaf(17,-15,.78);leaf(-17,17,-2.35);leaf(17,17,2.35);
    x.shadowBlur=0;const core=x.createRadialGradient(-3,-4,1,0,0,14);core.addColorStop(0,'#caff8d');core.addColorStop(.45,'#4ed45a');core.addColorStop(1,'#147d38');x.fillStyle=core;x.beginPath();x.arc(0,1,13,0,Math.PI*2);x.fill();x.strokeStyle='#d8ffae';x.lineWidth=2;x.stroke();sprites[3]=c;}
+  // Orange slice — native cached 3D sprite.
+  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#8f4d0088';x.shadowBlur=8;x.shadowOffsetY=6;
+   const g=x.createRadialGradient(-14,-18,3,0,0,43);g.addColorStop(0,'#fff59c');g.addColorStop(.18,'#ffca3a');g.addColorStop(.62,'#ff8a16');g.addColorStop(1,'#d65300');x.fillStyle=g;x.strokeStyle='#ffd26e';x.lineWidth=3;x.beginPath();x.arc(0,0,40,0,Math.PI*2);x.fill();x.stroke();x.shadowBlur=0;
+   x.strokeStyle='#fff3b0';x.lineWidth=3;for(let n=0;n<8;n++){const a=n*Math.PI/4;x.beginPath();x.moveTo(0,0);x.lineTo(Math.cos(a)*34,Math.sin(a)*34);x.stroke();}x.fillStyle='#fff7cb';x.beginPath();x.arc(0,0,6,0,Math.PI*2);x.fill();
+   x.fillStyle='#ffffff99';x.beginPath();x.ellipse(-14,-18,13,7,-.45,0,Math.PI*2);x.fill();sprites[1]=c;}
+  // Star — rounded golden 3D candy.
+  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#9a6a0088';x.shadowBlur=9;x.shadowOffsetY=6;const g=x.createLinearGradient(-28,-35,28,38);g.addColorStop(0,'#fff59a');g.addColorStop(.32,'#ffd92d');g.addColorStop(.72,'#ffb515');g.addColorStop(1,'#e28b00');x.fillStyle=g;x.strokeStyle='#fff0a5';x.lineWidth=3;
+   x.beginPath();for(let n=0;n<10;n++){const r=n%2?19:42,a=-Math.PI/2+n*Math.PI/5;n?x.lineTo(Math.cos(a)*r,Math.sin(a)*r):x.moveTo(Math.cos(a)*r,Math.sin(a)*r);}x.closePath();x.fill();x.stroke();x.shadowBlur=0;
+   const h=x.createRadialGradient(-10,-17,2,-6,-12,17);h.addColorStop(0,'#ffffffee');h.addColorStop(.35,'#ffffff77');h.addColorStop(1,'#ffffff00');x.fillStyle=h;x.beginPath();x.ellipse(-9,-14,12,7,-.4,0,Math.PI*2);x.fill();sprites[2]=c;}
+  // Blue orb — native cached 3D hard candy, no JPEG flattening.
+  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#0d4f9a88';x.shadowBlur=9;x.shadowOffsetY=6;const g=x.createRadialGradient(-14,-19,3,0,0,43);g.addColorStop(0,'#c8f6ff');g.addColorStop(.2,'#58d6ff');g.addColorStop(.58,'#1598ee');g.addColorStop(1,'#1558c6');x.fillStyle=g;x.strokeStyle='#a8ecff';x.lineWidth=3;x.beginPath();x.arc(0,0,40,0,Math.PI*2);x.fill();x.stroke();x.shadowBlur=0;
+   x.save();x.rotate(-.35);x.strokeStyle='#a8ecff';x.lineWidth=11;x.beginPath();x.arc(0,0,27,.15,Math.PI-.1);x.stroke();x.strokeStyle='#3d7fe6';x.lineWidth=4;x.beginPath();x.arc(0,0,27,.15,Math.PI-.1);x.stroke();x.restore();
+   x.fillStyle='#ffffffaa';x.beginPath();x.ellipse(-14,-18,14,7,-.5,0,Math.PI*2);x.fill();sprites[4]=c;}
+  // Grapes — clustered glossy beads.
+  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#4f1c7c88';x.shadowBlur=8;x.shadowOffsetY=6;const pts=[[0,-26],[-18,-12],[0,-10],[18,-12],[-25,7],[-8,7],[9,7],[26,7],[-15,25],[3,25],[18,25],[3,39]];
+   for(const [px,py] of pts){const g=x.createRadialGradient(px-6,py-7,1,px,py,14);g.addColorStop(0,'#f3c3ff');g.addColorStop(.22,'#c662ff');g.addColorStop(.65,'#8a32d2');g.addColorStop(1,'#57208c');x.fillStyle=g;x.strokeStyle='#e4adff';x.lineWidth=1.5;x.beginPath();x.arc(px,py,12,0,Math.PI*2);x.fill();x.stroke();}x.shadowBlur=0;x.fillStyle='#66c75a';x.beginPath();x.ellipse(-3,-38,15,7,-.3,0,Math.PI*2);x.fill();sprites[5]=c;}
+  // Flower — dimensional purple petals.
+  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#53217c88';x.shadowBlur=8;x.shadowOffsetY=6;
+   for(let n=0;n<6;n++){const a=n*Math.PI/3,px=Math.cos(a)*24,py=Math.sin(a)*24;const g=x.createRadialGradient(px-6,py-8,2,px,py,24);g.addColorStop(0,'#f2b4ff');g.addColorStop(.25,'#c35cf2');g.addColorStop(.68,'#8e39c7');g.addColorStop(1,'#5f258f');x.fillStyle=g;x.strokeStyle='#e6a7ff';x.lineWidth=2;x.beginPath();x.ellipse(px,py,18,24,a,0,Math.PI*2);x.fill();x.stroke();}x.shadowBlur=0;
+   const core=x.createRadialGradient(-4,-5,1,0,0,16);core.addColorStop(0,'#ffd98f');core.addColorStop(.4,'#e991ff');core.addColorStop(1,'#7d2ba8');x.fillStyle=core;x.beginPath();x.arc(0,0,15,0,Math.PI*2);x.fill();sprites[6]=c;}
+  // Mint drop — translucent aqua jelly drop.
+  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#147f7c77';x.shadowBlur=9;x.shadowOffsetY=6;const g=x.createLinearGradient(-20,-38,22,38);g.addColorStop(0,'#d4fff9');g.addColorStop(.24,'#79f0de');g.addColorStop(.62,'#35c7bd');g.addColorStop(1,'#168f91');x.fillStyle=g;x.strokeStyle='#c4fff6';x.lineWidth=3;x.beginPath();x.moveTo(0,-43);x.bezierCurveTo(18,-23,36,-3,34,16);x.bezierCurveTo(32,38,17,43,0,43);x.bezierCurveTo(-17,43,-32,38,-34,16);x.bezierCurveTo(-36,-3,-18,-23,0,-43);x.closePath();x.fill();x.stroke();x.shadowBlur=0;x.fillStyle='#ffffffa8';x.beginPath();x.ellipse(-12,-17,11,6,-.6,0,Math.PI*2);x.fill();sprites[7]=c;}
   sprites.row=orb('row');sprites.column=orb('column');}
  // Special badges are stroked paths over the cached sprite: no per-frame canvas or image allocation.
  function mark(c){
