@@ -12,6 +12,16 @@
   function retry(word,b){b?.classList.add('spaceShake');Session.timeout(()=>b?.classList.remove('spaceShake'),350);feedback.textContent='이 친구는 '+word.toUpperCase()+'. 다시 찾아볼까?';V.speak([en(word),ko('다시 찾아볼까?'),...q.parts.filter(p=>p.lang==='en-US')],{button:b,status:audio});}
   function hero(word){return `<button class="englishHero" aria-label="${word.toUpperCase()} 발음 듣기">${A.draw(word)}${caption(word)}</button>`;}
   function bindHero(){area.querySelector('.englishHero')?.addEventListener('click',e=>pronounce(q.word,e.currentTarget));}
+  if(['writeLetter','writeWord'].includes(q.mode)&&global.EnglishTrace){
+   area.innerHTML='<div class="englishTraceIntro"><b>'+(q.mode==='writeLetter'?'ALPHABET WRITING':'WORD WRITING')+'</b><p>'+S.esc(q.prompt)+'</p></div><div class="englishTraceHost"></div>';
+   const host=area.querySelector('.englishTraceHost');
+   const cleanup=EnglishTrace.mount(host,q,()=>{
+    if(solved)return;solved=true;
+    V.speak([en(String(q.writeText||q.word).toLowerCase()),ko('잘 썼어!'),...(global.VoiceDirector?[VoiceDirector.respond('success',q.stage)]:[])],{status:audio});
+    S.complete(root,'영어',q.stage,q.explanation);
+   });
+   Session.cleanup(cleanup);feedback.textContent='손가락으로 시작점부터 천천히 써 봐.';return;
+  }
   const optionText=id=>q.mode==='phrase'?id+' '+q.word+(q.phraseKind===3&&id!=='one'?'s':''):q.mode==='sentenceMeaning'?'The '+q.animal+' is '+id+(q.stage%2===0?' the box.':'.'):id;
   function optionArt(id){if(q.mode==='phrase'){if(q.phraseKind===0||q.phraseKind===2)return A.draw(q.word,{color:id});if(q.phraseKind===1)return '<span class="sizeExample '+id+'">'+A.draw(q.word)+'</span>';return '<span class="wordCount">'+Array.from({length:{one:1,two:2,three:3}[id]},()=>A.draw(q.word)).join('')+'</span>';}
    if(q.mode==='sentenceMeaning')return ['on','under','in'].includes(id)?A.position(q.animal,'box',id):'<span class="animalAction '+id+'">'+A.draw(q.animal)+'</span>';return A.draw(id);}
