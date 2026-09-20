@@ -57,7 +57,7 @@ var SianClaw = globalThis.SianClaw || {};
     const heroes=['dragon','robot','whale','dino','electric-monster','shark','panda','star-monster','bunny','puppy','phoenix','astronaut','dragon'];
     const ids=[...C.catalog.map(d=>d.id),...heroes];
     const tilts=[-1.18,.18,-.42,.08,.72,-.14,.31,-.86,.12,.48,-.2,1.35,-.1,.25,-.68,.05,.92,-.3,.16,-1.42,.38,-.08,.65,-.24,.1,-.74,.22,1.18,-.17,.44,-.55,.84,-1.25,.29,.63,-.36];
-    return ids.map((id,i)=>{const layer=Math.floor(i/9),column=i%9,z=[.89,.64,.38,.12][layer]+((i%3)-1)*.014,x=-208+column*52+(layer%2?22:0),toy={instanceId:`toy-${i}`,id,x,z,height:0,vy:0,tilt:tilts[i],scale:layer===3?[.94,1.06,1.18][i%3]:[.94,1.06,1.18,1.34,1.55,1.82][(i*5+layer)%6],pose:i%6===0?'side':i%9===0?'upside-down':i%5===0?'lean':'upright',won:false};return C.constrainToy(toy);});
+    return ids.map((id,i)=>{const layer=Math.floor(i/9),column=i%9,z=[.89,.64,.38,.12][layer]+((i%3)-1)*.014,x=-208+column*52+(layer%2?22:0),toy={instanceId:`toy-${i}`,id,x,z,height:0,vy:0,tilt:tilts[i],scale:layer===3?[.94,1.06,1.18][i%3]:[.94,1.06,1.18,1.34,1.55,1.82][(i*5+layer)%6],pose:i%6===0?'side':i%9===0?'upside-down':i%5===0?'lean':'upright',won:false};if(toy.z<.2&&toy.x<-70)toy.z=.34;return C.constrainToy(toy);});
   };
   C.clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 })(SianClaw);

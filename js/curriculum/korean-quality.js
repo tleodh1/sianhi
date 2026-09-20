@@ -11,4 +11,5 @@
  else if(ch>=8){const actors=['시안','민수','지수','유나','하나','준우','서아'],things=['책','공','우유','사과','연필','모자'],a=choose(actors,n),b=choose(actors,n+2),item=choose(things,Math.floor(n/7));q=mc(a+'이는 '+item+'을 가지고 있어요. '+b+'이는 꽃을 가지고 있어요.\n'+item+'을 가진 사람은?',a,[a,...actors.filter(x=>x!==a).slice(0,3)],'readingOwner',{questionType:'reading'});}
  else q=old(stage,attempt);q.category||=q.templateId;q.difficulty=ch+1;return q;
  };
+for(const s of window.SianCurriculum.curricula.한글){if(s.stage%4===0&&s.stage<90)s.questionType='HANGUL_TRACING';}
 })(LearningBank);
