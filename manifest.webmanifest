@@ -1,0 +1,20 @@
+{
+  "name": "시안Hi",
+  "short_name": "시안Hi",
+  "description": "배움이 모험이 되는 어린이 학습 게임",
+  "lang": "ko-KR",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f5fbff",
+  "theme_color": "#8cd5f9",
+  "icons": [
+    {
+      "src": "/assets/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
