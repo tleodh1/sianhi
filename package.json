@@ -1,1 +1,24 @@
-{"name":"sianhi","version":"2.1.0","private":true,"scripts":{"dev":"node scripts/dev.mjs","test":"node scripts/test.mjs"}}
+{
+  "name": "sianhi",
+  "version": "2.1.0",
+  "private": true,
+  "description": "시안Hi learning adventure web and native app",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "test": "node scripts/test.mjs",
+    "mobile:build": "node scripts/build-mobile.mjs",
+    "cap:add:ios": "npm run mobile:build && npx cap add ios",
+    "cap:add:android": "npm run mobile:build && npx cap add android",
+    "cap:sync": "npm run mobile:build && npx cap sync",
+    "cap:open:ios": "npx cap open ios",
+    "cap:open:android": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/core": "8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/cli": "8.5.2",
+    "@capacitor/ios": "8.5.2"
+  }
+}
