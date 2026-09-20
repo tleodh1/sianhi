@@ -160,6 +160,8 @@
           true,
         );
       this.drawClaw(e);
+      this.canvas.dataset.toyCount=String(sorted.length);this.canvas.dataset.depth=c.z.toFixed(2);this.canvas.dataset.phase=e.phase;
+      g.save();g.strokeStyle='#fff2bb';g.lineWidth=2;g.globalAlpha=.72;g.beginPath();g.ellipse(target.x,target.y-3,26*target.scale,9*target.scale,0,0,Math.PI*2);g.moveTo(target.x-9,target.y-3);g.lineTo(target.x+9,target.y-3);g.moveTo(target.x,target.y-10);g.lineTo(target.x,target.y+4);g.stroke();g.restore();
       g.save();g.fillStyle='#173b4de6';g.beginPath();g.roundRect(305,410,190,24,10);g.fill();g.fillStyle='#fff';g.font='700 13px Pretendard,sans-serif';g.textAlign='center';g.fillText(c.z>.66?'뒤쪽 · BACK':c.z>.34?'가운데 · MIDDLE':'앞쪽 · FRONT',400,427);g.restore();
       // Gentle glass highlights stay at the sides, leaving aiming unobstructed.
       g.save();
