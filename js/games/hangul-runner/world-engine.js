@@ -2,9 +2,13 @@
 (function(H){
  H.WorldEngine=class extends H.Engine{
   constructor(stage,options){super(stage,options);this.sequence=0;this.flowTime=0;this.mode=stage.mode;this.freeMotion=false;this.projectiles=[];this.bossAttacks=[];this.answerCooldown=0;this.sceneState='RUN_STAGE';this.sceneTimer=0;}
+  damage(){super.damage(true);}
   beforePhysics(dt){this.flowTime+=dt;this.mode=this.stage.mode;
    if(this.stage.runZones&&this.stage.runZones.some(z=>this.player.x>=z.x&&this.player.x<z.x+z.w))this.mode='run';
    if(this.stage.waterZones){const p=this.player;this.mode=this.stage.waterZones.some(z=>p.x>=z.x&&p.x<z.x+z.w&&p.y+p.h>z.surface+Math.sin(this.elapsed*.6)*25)?'swim':'run';}
+   if(this.stage.flightPickup&&this.mode==='fly'&&!this.player.flight)this.mode='run';
+   if(this.player.flight&&this.sceneState==='RUN_STAGE')this.mode='fly';
+   if(this.sceneState!=='RUN_STAGE')this.mode='run';
    this.freeMotion=this.mode==='swim'||this.mode==='fly';this.player.gravity=this.freeMotion?0:1500;
    for(const a of this.stage.platforms){if(!a.motion)continue;const oldX=a.x,oldY=a.y;a.x=a.originX+Math.sin(this.elapsed*a.motion.speed)*a.motion.x;a.y=a.originY+Math.sin(this.elapsed*a.motion.speed)*a.motion.y;
     const p=this.player;if(p.isGrounded&&p.x+p.w>oldX&&p.x<oldX+a.w&&Math.abs(p.y+p.h-oldY)<3){p.x+=a.x-oldX;p.y+=a.y-oldY;}}

@@ -6,8 +6,8 @@
   {number:4,name:'지하도시의 심장',words:['하','시','쇠','구'],story:'배운 낱말을 완성해 빛 에너지로 최종 보스를 물리쳐요.',boss:{name:'철갑왕 그롬',style:'underground',attacks:['gear','steam','slam'],questions:[['지○','하','수','고'],['도○','시','로','기'],['열○','쇠','매','차'],['출○','구','문','발']]}}
  ]);
  const previous=H.decorateWorldStage;H.decorateWorldStage=s=>{previous?.(s);if(s.worldId!==4)return;
-  if(s.water)s.waterZones=s.words.map((_,i)=>({x:i*650+260,w:300,surface:245}));
-  s.words.forEach((_,i)=>{const x=i*650;
+  if(s.water)s.waterZones=s.words.map((_,i)=>({x:i*s.span+260,w:300,surface:245}));
+  s.words.forEach((_,i)=>{const x=i*s.span;
    s.hazards.push({kind:i%2?'steam':'gear',x:x+455,y:370,w:48,h:50});
    const level=s.number,kind=['tunnel-bat','gear-shell','fire-imp','pipe-snapper'][(i+level-1)%4];s.enemies.push({x:x+350,y:376,w:50,h:48,left:x+300,right:x+500,dir:i%2?1:-1,speed:40+level*9,kind,baseY:kind==='tunnel-bat'?270:kind==='pipe-snapper'?405:372,phase:i,level,hp:level>=3?2:1,flying:kind==='tunnel-bat',armored:kind==='gear-shell',rollSpeed:350+level*18});
    if(level>=2&&i%2===1)s.enemies.push({x:x+525,y:372,w:48,h:48,left:x+485,right:x+610,dir:-1,speed:45+level*8,kind:level>=3?'fire-imp':'gear-shell',baseY:372,phase:i+3,level,hp:level>=4?2:1,armored:level<3,rollSpeed:370});
