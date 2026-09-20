@@ -18,6 +18,21 @@
   if(ch===8){q.phraseKind=k%4;q.word=['apple','dog','car','cat'][q.phraseKind];q.correct=['red','big','blue','two'][q.phraseKind];q.options=[['red','blue','yellow'],['big','small'],['red','blue','yellow'],['one','two','three']][q.phraseKind];q.expression=q.correct+' '+q.word+(q.phraseKind===3?'s':'');q.parts=[ko('그림과 영어 표현을 연결해 봐.'),eng('Find '+q.expression+'.')];}
   if(ch===9){q.animal=k%2?'dog':'cat';q.word=q.animal;q.correct=k%2?'under':'running';q.options=k%2?['on','under','in']:['running','walking','sleeping'];q.expression='The '+q.animal+' is '+q.correct+(k%2?' the box.':'.');q.parts=[ko('문장을 듣고 같은 장면을 찾아 줘.'),eng(q.expression)];}
   q.lexeme={image:q.word,spelling:q.word.toUpperCase(),pronunciation:{text:q.word,lang:'en-US'}};
+  // Interleave handwriting missions through the English curriculum.
+  // Early stages write single alphabet letters; later stages write short words.
+  const handwritingStage=stage%3===0;
+  if(handwritingStage){
+   if(stage<=30){
+    const alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ',letter=alphabet[(stage/3-1)%26|0];
+    q.mode='writeLetter';q.writeText=letter;q.word=letter.toLowerCase();q.title='알파벳 손글씨';q.prompt=letter+'를 보고, 따라 쓰고, 기억해서 써 보자.';
+    q.parts=[eng(letter),ko('손가락으로 알파벳 '+letter+'를 따라 써 보자.')];q.tracePhases=['A','B','C','D'];
+   }else{
+    const writingWords=['cat','dog','sun','map','pig','hat','bed','fox','cup','fish','ball','milk','car','bear','apple'];
+    const word=writingWords[((stage/3|0)-11)%writingWords.length];
+    q.mode='writeWord';q.writeText=word.toUpperCase();q.word=word;q.title=stage<=60?'짧은 단어 쓰기':'기억해서 단어 쓰기';q.prompt=word.toUpperCase()+'를 한 글자씩 손으로 써 보자.';
+    q.parts=[eng(word),ko('단어 '+word.toUpperCase()+'를 손가락으로 써 보자.')];q.tracePhases=stage<=60?['B','C']:['C','D'];
+   }
+  }
   q.explanation='그림, 영어 글자, 소리를 함께 기억했어!';
 
  }else{
