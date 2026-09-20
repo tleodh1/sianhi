@@ -40,6 +40,13 @@ function play(){
    x.beginPath();x.moveTo(0,39);x.bezierCurveTo(-8,30,-42,10,-42,-15);x.bezierCurveTo(-42,-35,-18,-45,-3,-28);x.bezierCurveTo(-1,-26,0,-23,0,-20);x.bezierCurveTo(0,-23,1,-26,3,-28);x.bezierCurveTo(18,-45,42,-35,42,-15);x.bezierCurveTo(42,10,8,30,0,39);x.closePath();x.fill();x.stroke();
    x.shadowBlur=0;const shine=x.createRadialGradient(-17,-22,2,-13,-17,20);shine.addColorStop(0,'#ffffffee');shine.addColorStop(.28,'#ffffff88');shine.addColorStop(1,'#ffffff00');x.fillStyle=shine;x.beginPath();x.ellipse(-14,-18,15,10,-.55,0,Math.PI*2);x.fill();
    x.strokeStyle='#ffced8aa';x.lineWidth=2;x.beginPath();x.moveTo(-27,7);x.quadraticCurveTo(-12,27,0,33);x.stroke();sprites[0]=c;}
+  // Clover also uses a native cached 3D vector sprite to avoid a flat cut-out look.
+  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#165d2f88';x.shadowBlur=9;x.shadowOffsetY=6;
+   const leaf=(cx,cy,rot)=>{x.save();x.translate(cx,cy);x.rotate(rot);const g=x.createRadialGradient(-8,-10,2,0,0,28);g.addColorStop(0,'#d8ff9a');g.addColorStop(.24,'#75f05a');g.addColorStop(.62,'#28b84a');g.addColorStop(1,'#0a6f2f');x.fillStyle=g;x.strokeStyle='#b8ff92';x.lineWidth=2.4;x.beginPath();x.moveTo(0,18);x.bezierCurveTo(-20,10,-24,-10,-9,-18);x.bezierCurveTo(-1,-23,0,-13,0,-7);x.bezierCurveTo(0,-13,1,-23,9,-18);x.bezierCurveTo(24,-10,20,10,0,18);x.closePath();x.fill();x.stroke();x.shadowBlur=0;
+    const h=x.createRadialGradient(-7,-11,1,-5,-8,12);h.addColorStop(0,'#ffffffdd');h.addColorStop(.35,'#ffffff66');h.addColorStop(1,'#ffffff00');x.fillStyle=h;x.beginPath();x.ellipse(-5,-7,9,5,-.4,0,Math.PI*2);x.fill();
+    x.strokeStyle='#d7ffb877';x.lineWidth=1.5;x.beginPath();x.moveTo(0,13);x.quadraticCurveTo(2,1,5,-9);x.stroke();x.restore();};
+   leaf(-17,-15,-.78);leaf(17,-15,.78);leaf(-17,17,-2.35);leaf(17,17,2.35);
+   x.shadowBlur=0;const core=x.createRadialGradient(-3,-4,1,0,0,14);core.addColorStop(0,'#caff8d');core.addColorStop(.45,'#4ed45a');core.addColorStop(1,'#147d38');x.fillStyle=core;x.beginPath();x.arc(0,1,13,0,Math.PI*2);x.fill();x.strokeStyle='#d8ffae';x.lineWidth=2;x.stroke();sprites[3]=c;}
   sprites.row=orb('row');sprites.column=orb('column');}
  // Special badges are stroked paths over the cached sprite: no per-frame canvas or image allocation.
  function mark(c){
