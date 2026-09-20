@@ -31,9 +31,11 @@ class Engine{
  tick(dt){if(this.paused||this.phase==='result')return;dt=Math.max(0,Math.min(dt,2));this.idle+=dt;this.comboLife=Math.max(0,this.comboLife-dt);this.fever=Math.max(0,this.fever-dt);if(!this.last)this.time=Math.max(0,this.time-dt);else{this.lastElapsed+=dt;if(this.lastElapsed>=3.6){const remaining=this.board.flatMap((c,i)=>c?.special?[i]:[]);if(remaining.length)this.resolve([],remaining);this.finish();return;}}
  if(this.animation){this.animation.elapsed+=dt;if(this.animation.elapsed<this.animation.duration)return;const kind=this.animation.kind;this.animation=null;if(kind==='swap'){this.resolveSwap();return;}if(kind==='pop'){this.fall();return;}if(kind==='fall'){if(this.last){this.phase='last';this.lastWait=.08;return;}const m=groups(this.board);if(m.length){this.resolve(m);return;}}this.phase='ready';}
  if(this.last){this.lastWait-=dt;if(this.lastWait<=0){const i=this.board.findIndex(c=>c?.special);if(i>=0)this.resolve([],[i]);else if(this.lastElapsed>=2)this.finish();}return;}
- if(this.phase==='ready'){if(this.time<=0||this.usedMoves>=this.config.moves){this.beginLast();return;}if(!moves(this.board).length)this.shuffle();}}
+ if(this.phase==='ready'){if(this.time<=0||this.usedMoves>=this.config.moves){this.beginLast();return;}if(!this.playable().length)this.shuffle();}}
  result(){const c=this.config,mission=c.mission==='score'||c.mission==='color'&&this.removed[c.n%c.colors]>=15||c.mission==='special'&&this.created>=2||c.mission==='combo'&&this.bestCombo>=3||c.mission==='ice'&&this.iceRemoved>=c.ice;const stars=mission&&this.score>=c.target?(this.score>=c.target*1.7?3:this.score>=c.target*1.3?2:1):0;return {level:c.n,score:this.score,stars,combo:this.bestCombo,matches:this.matches};}
- hint(){return moves(this.board)[0]||[];}
+ // Legal-move search is O(cells x swaps); cache it until the board's layout or special pieces change.
+ playable(){let h=0,k=0;for(let i=0;i<49;i++){const c=this.board[i],v=c?c.type+1+(c.special==='row'?16:c.special==='column'?32:c.special==='area'?48:c.special==='color'?64:0):0;h=(h*31+v)|0;k=(k*17+v*(i+1))|0;}if(!this._mv||h!==this._mh||k!==this._mk){this._mh=h;this._mk=k;this._mv=moves(this.board);}return this._mv;}
+ hint(){return this.playable()[0]||[];}
 }
 function record(previous,r){const s={unlocked:1,levels:{},bestCombo:0,totalMatches:0,...previous};s.levels={...s.levels};const old=s.levels[r.level]||{score:0,stars:0};s.levels[r.level]={score:Math.max(old.score,r.score),stars:Math.max(old.stars,r.stars)};s.unlocked=Math.max(s.unlocked,r.stars?r.level+1:1);s.bestCombo=Math.max(s.bestCombo,r.combo);s.totalMatches+=r.matches;return s;}
 Object.assign(P,{Engine,level,runs,groups,moves,adjacent,record});
