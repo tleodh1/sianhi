@@ -84,7 +84,8 @@
         if(theme==='ocean'&&this.oceanTerrain){this.oceanTerrain(a,x,e);}else if(a.kind==='drain'){g.fillStyle=theme==='forest'?'#79634d':theme==='underground'?'#706581':'#4d8292';g.strokeStyle='#c5e3d6';g.lineWidth=3;g.beginPath();g.roundRect(x,a.y,a.w,a.h+12,6);g.fill();g.stroke();g.fillStyle='#22373d';g.fillRect(x+6,a.y+2,a.w-12,5);}else if(theme!=='forest'){const ground={ocean:'#a2bfa5',sky:'#e7e7ff',underground:'#786c99',dinosaur:'#8aaa58',ice:'#d6f7ff',fire:'#914940',lightning:'#868ba7',space:'#6b6193'}[theme]||'#8aaa58';g.fillStyle=ground;g.fillRect(x,a.y,a.w,Math.min(a.h,120));g.fillStyle='#ffffff66';g.fillRect(x,a.y,a.w,7);g.fillStyle='#00000022';for(let j=0;j<a.w;j+=50)g.fillRect(x+j,a.y+12,3,Math.min(a.h,90));}else if(a.kind==='ground'){
           // Texture tiles meet exactly at collider tops; split terrain leaves real holes.
           const n=Math.ceil(a.w/260);for(let j=0;j<n;j++){const tw=a.w/n;this.surfaceSprite(0,x+j*tw-1,a.y,tw+2,a.h,45);}
-          g.fillStyle='#82b43d';g.fillRect(x,a.y,a.w,5);g.fillStyle='#abd765';for(let blade=0;blade<a.w;blade+=13){g.beginPath();g.moveTo(x+blade,a.y);g.lineTo(x+blade+3,a.y-3);g.lineTo(x+blade+5,a.y);g.fill();}
+          // Keep the illustrated grass edge only; do not overlay a flat green stripe across the terrain.
+          g.fillStyle='#abd765';for(let blade=0;blade<a.w;blade+=13){g.beginPath();g.moveTo(x+blade,a.y);g.lineTo(x+blade+3,a.y-3);g.lineTo(x+blade+5,a.y);g.fill();}
           if(Math.floor(a.x/620)%2===0){this.sprite(3,x+25,a.y-182,148,192);this.sprite(14,x+165,a.y-35,73,44);}
         }else if(a.kind==='bridge'){this.surfaceSprite(2,x-5,a.y,a.w+10,73,155);}
         else this.surfaceSprite(1,x-3,a.y,a.w+6,66,55);
