@@ -242,3 +242,4 @@ footer{background:linear-gradient(#244f7f,#173b79)!important;border-top:6px soli
 @media(max-width:650px){.tetrisGame .tetrisBoard{--cell:clamp(11px,3.8vw,18px);--grid-gap:1px}.tetrisGame .tetrisMain{gap:7px}.tetrisGame .arcadeControls{display:grid;grid-template-columns:repeat(3,1fr)}#game:has(.tetrisGame){padding:10px;max-height:94dvh;overflow:auto}.tetrisGame .tStats{gap:5px}.tetrisGame .tStats>div{padding:5px}}
 body:has(#game[open]){overflow:hidden;overscroll-behavior:none}
 #game:has(.traceHost){width:min(560px,96vw)!important;padding:10px!important;border-width:4px!important}#game:has(.traceHost) .storyStage{padding:0!important}#game:has(.traceHost) .questCard{padding:12px 8px!important;margin:8px 0!important}#game:has(.traceHost) .stageTop{padding:8px!important}#game:has(.traceHost) .storyPanel{margin:8px 0!important}
+#game:has(.traceHost){padding:6px!important}#game:has(.traceHost) .questCard{padding-left:6px!important;padding-right:6px!important}
