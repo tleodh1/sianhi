@@ -249,3 +249,15 @@ html.appStandalone body{padding-bottom:env(safe-area-inset-bottom)}
 html.appStandalone header{height:calc(78px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}
 html.appStandalone dialog{max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 12px)}
 @media(max-width:650px){html.appStandalone header{height:calc(65px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}}
+
+/* Coding curriculum: varied concept missions, not one repeated maze. */
+.codingQuizCard{max-width:620px;margin:0 auto;padding:22px;border-radius:24px;background:linear-gradient(145deg,#f8fcff,#eef8f1);box-shadow:0 8px 0 #bfd7d4,0 15px 24px #426c8520;border:2px solid #fff}
+.codingQuizCard>small{font-size:12px;font-weight:900;letter-spacing:1px;color:#5b7d8d}
+.codingQuizCard h3{margin:7px 0 5px;font-size:24px;color:#173b67}
+.codingQuestion{font-size:20px;line-height:1.45;font-weight:850;margin:14px 0 18px;padding:14px;border-radius:17px;background:#fff8d8;text-align:center}
+.codingQuizChoices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.codingChoice{min-height:58px;padding:11px;border-radius:15px;background:#fff;border:2px solid #cfe0e4;color:#183b58;font-weight:900;font-size:17px;box-shadow:0 4px 0 #c7d8db}
+.codingChoice:disabled{opacity:.68}.codingChoice.correctChoice{background:#dff4df;border-color:#66b982;box-shadow:0 4px 0 #86bf92}
+.codingHint{padding:10px 14px;border-radius:12px;background:#fff0c9;color:#6b5120;font-weight:850}
+.codingQuiz .codingFeedback{margin:16px 0 4px;min-height:46px}
+@media(max-width:600px){.codingQuizCard{padding:16px}.codingQuizCard h3{font-size:21px}.codingQuestion{font-size:17px}.codingQuizChoices{grid-template-columns:1fr}.codingChoice{min-height:52px;font-size:15px}}
