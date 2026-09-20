@@ -99,9 +99,9 @@
       g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
       g.globalAlpha=1;g.globalCompositeOperation='source-over';g.shadowBlur=0;
       g.drawImage(this.art.cabinet, 0, 0, 800, 533);
-      // Opaque interior removes decorative, ungrabbable plush printed in cabinet art.
+      // Extend the floor plane while preserving the original cabinet walls.
       g.save();g.beginPath();g.rect(88,92,624,315);g.clip();
-      const wall=g.createLinearGradient(0,92,0,230);wall.addColorStop(0,'#537c81');wall.addColorStop(1,'#b4d6cd');g.fillStyle=wall;g.fillRect(88,92,624,315);
+      
       const floor=g.createLinearGradient(0,200,0,410);floor.addColorStop(0,'#85aaa9');floor.addColorStop(.5,'#c9ddd0');floor.addColorStop(1,'#f0e6c7');g.fillStyle=floor;g.beginPath();g.moveTo(165,205);g.lineTo(635,205);g.lineTo(714,408);g.lineTo(86,408);g.closePath();g.fill();
       g.strokeStyle='#426d7060';g.lineWidth=1.5;
       for(let x=-300;x<=300;x+=75){const back=C.project(x,1),front=C.project(x,0);g.beginPath();g.moveTo(back.x,back.y);g.lineTo(front.x,front.y);g.stroke();}
