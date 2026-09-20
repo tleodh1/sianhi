@@ -243,3 +243,9 @@ footer{background:linear-gradient(#244f7f,#173b79)!important;border-top:6px soli
 body:has(#game[open]){overflow:hidden;overscroll-behavior:none}
 #game:has(.traceHost){width:min(560px,96vw)!important;padding:10px!important;border-width:4px!important}#game:has(.traceHost) .storyStage{padding:0!important}#game:has(.traceHost) .questCard{padding:12px 8px!important;margin:8px 0!important}#game:has(.traceHost) .stageTop{padding:8px!important}#game:has(.traceHost) .storyPanel{margin:8px 0!important}
 #game:has(.traceHost){padding:6px!important}#game:has(.traceHost) .questCard{padding-left:6px!important;padding-right:6px!important}
+
+/* Installed app / native shell safe-area support. */
+html.appStandalone body{padding-bottom:env(safe-area-inset-bottom)}
+html.appStandalone header{height:calc(78px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}
+html.appStandalone dialog{max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 12px)}
+@media(max-width:650px){html.appStandalone header{height:calc(65px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top)}}
