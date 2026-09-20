@@ -1,0 +1,14 @@
+{
+  "appId": "com.sianhi.app",
+  "appName": "시안Hi",
+  "webDir": "www",
+  "backgroundColor": "#f5fbff",
+  "ios": {
+    "contentInset": "automatic",
+    "scrollEnabled": true
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#f5fbff"
+  }
+}
