@@ -11,7 +11,7 @@
  function speak(parts,options={}){
   if(options.automatic&&!state.sound)return false;
   stop();const token=serial,queue=(typeof parts==='string'?segments(parts):parts).filter(p=>p.text?.trim());
-  const ctx=current={button:options.button,status:options.status,utterance:null,started:false};
+  const ctx=current={button:options.button,status:options.status,utterance:null,started:false};if(ctx.status)delete ctx.status.dataset.speechError;
   if(!synth||!global.SpeechSynthesisUtterance){mark(ctx,'error','이 기기는 음성 읽기를 지원하지 않아요.');return false;}
   refresh();if(synth.paused)synth.resume();mark(ctx,'loading','소리를 준비하고 있어요.');
   function next(){if(token!==serial)return;const part=queue.shift();if(!part){mark(ctx,'ended','다시 들으려면 스피커를 눌러 줘.');current=null;return;}
