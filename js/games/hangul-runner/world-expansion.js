@@ -48,7 +48,7 @@
    }
   });
   // Headroom is derived from the BIG collision body; SMALL still reaches the underside.
-  const floor=s.mode==='swim'?510:420,headroom=H.PLAYER_FORMS.big.h+32;
+  s.killY=600;const floor=s.mode==='swim'?510:420,headroom=H.PLAYER_FORMS.big.h+32;
   for(const b of s.blocks){b.fragile=false;if(b.id?.startsWith('rolling-wall')){b.y=floor-b.h;continue;}
    const support=b.hidden?s.platforms.filter(a=>a.oneWay&&a.x<b.x+b.w&&a.x+a.w>b.x&&a.y>b.y).sort((a,c)=>a.y-c.y)[0]:null;
    b.y=(support?.y??floor)-headroom-b.h;
@@ -59,14 +59,14 @@
    e.artIndex=s.worldId>=5?({5:9,6:10,7:3,8:11,9:6})[s.worldId]:undefined;
    const behaviors={1:['walk','roll','emerge'],2:['swim','pinch','inflate'],3:['swoop','wind'],4:['dive','fall'],5:['chase','charge','hop'],6:['slide','ice'],7:['fire','lava'],8:['blink-dash','electric'],9:['float','teleport','energy']};
    e.behavior=behaviors[s.worldId][i%behaviors[s.worldId].length];
-   if(e.kind==='pipe-snapper'){e.kind='cactus';e.behavior='emerge';e.speed=0;e.left=e.right=e.x;e.drainY=420;e.y=420;e.baseY=420;e.retracted=true;e.artIndex=2;}
+   if(e.kind==='pipe-snapper'){e.kind='cactus';e.behavior='emerge';e.speed=0;e.left=e.right=e.x;e.drainY=floor;e.y=floor;e.baseY=floor;e.retracted=true;e.artIndex=2;e.stompable=false;s.platforms.push({x:e.x-8,y:floor-12,w:e.w+16,h:12,kind:'drain',oneWay:false});}
    else if(s.worldId>=2){e.originalKind=e.kind;e.kind='world-creature';e.artIndex??=({'bubble-puffer':4,'reef-crab':5,'ink-sprite':6,'cloud-rascal':7,'storm-bat':7,'spark-drake':7,'tunnel-bat':8,'gear-shell':1})[e.originalKind]??0;}
   }
  };
  const before=H.WorldEngine.prototype.beforePhysics;
  H.WorldEngine.prototype.beforePhysics=function(dt){before.call(this,dt);const p=this.player;
   if(this.sceneState==='RUN_STAGE'&&!this.freeMotion&&this.stage.worldId===9)p.gravity=1100;
-  for(const h of this.stage.hazards)if(h.kind==='lava'||h.kind==='electric')h.inactive=(this.elapsed+(h.phase||0))%4<2;
+  for(const h of this.stage.hazards)if(h.kind==='electric')h.inactive=(this.elapsed+(h.phase||0))%4<2;
   for(const e of this.stage.enemies){if(e.defeated)continue;e.behaviorTime+=dt;e.attackTimer-=dt;e.hitTime=Math.max(0,(e.hitTime||0)-dt);
    if(e.kind!=='cactus'){
     if(e.state==='shell'||e.state==='rolling')continue;
