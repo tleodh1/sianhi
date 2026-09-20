@@ -22,19 +22,27 @@
   const bonusShift=Math.floor(Math.random()*3)*12;
   for(let i=0;i<18;i++)s.items.push({id:`route-coin-${i}`,kind:'coin',x:400+i*(end-900)/18,y:swim?340:350,w:26,h:30});
   for(let i=0;i<3;i++)s.items.push({id:`star-${i}`,kind:'star',x:end*[.23,.55,.8][i]+bonusShift,y:swim?160:sky?(i?120:260):260,w:32,h:36,requiresFlight:sky&&i>0});
-  s.items.push({id:'route-growth',kind:'power',x:490,y:swim?285:365,w:40,h:45},{id:'route-power-star',kind:'powerStar',x:end*.4,y:swim?250:365,w:40,h:42});
-  const rowFractions=n===2?[.18,.47,.7]:[.2,.67];
+  if(s.worldId!==1)s.items.push({id:'route-growth',kind:'power',x:490,y:swim?285:365,w:40,h:45},{id:'route-power-star',kind:'powerStar',x:end*.4,y:swim?250:365,w:40,h:42});
+  const rowFractions=s.worldId===1?(n===1?[.14,.32,.52,.72]:n===2?[.12,.3,.5,.7,.84]:[.14,.28,.45,.62,.78]):n===2?[.18,.47,.7]:[.2,.67];
   rowFractions.forEach((fraction,i)=>{const x=end*fraction,y=floor-H.PLAYER_FORMS.big.h-38-48;
    for(let j=0;j<3;j++)s.blocks.push({id:`route-block-${i}-${j}`,x:x+j*54,y,w:48,h:48,kind:['breakable','reward','hard'][j],revealed:true,rewardId:j===1?`route-reward-${i}`:null,oceanSkin:j===1?'pearl':j===0?'coral':'relic'});
-   s.items.push({id:`route-reward-${i}`,kind:i===0?'power':'star',x:0,y:0,w:40,h:42,contained:true});
+   const rewardKind=s.worldId===1?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):(i===0?'power':'star');s.items.push({id:`route-reward-${i}`,kind:rewardKind,x:0,y:0,w:40,h:rewardKind==='power'?45:42,contained:true});
   });
   for(const fraction of (n===2?[.35,.77]:n===3?[.28,.63,.83]:[.56])){const x=end*fraction;s.platforms.push({x,y:swim?400:310,w:150,h:24,kind:'floating',oneWay:true,...(n===2?{originX:x,originY:swim?400:310,motion:{x:40,y:25,speed:.7}}:{})});}
-  const total=s.boss?(swim?6:4):n===1?(s.worldId===1?1:2):3,used=new Set();
+  const total=s.worldId===1?(s.boss?6:n===1?5:n===2?6:7):(s.boss?(swim?6:4):n===1?2:3),used=new Set();
   const preferred=swim?(s.boss?['inflate','ink','shark','eel','pinch','jelly']:n===1?['inflate','jelly']:n===2?['pinch','jelly','inflate']:['jelly','pinch','inflate']):null;
   for(let i=0;i<total;i++){let e=candidates.find(a=>!used.has(a)&&preferred?.[i]===a.behavior)||candidates.find(a=>!used.has(a)&&a.behavior!==s.enemies.at(-1)?.behavior&&(a.originalKind||a.kind)!==(s.enemies.at(-1)?.originalKind||s.enemies.at(-1)?.kind))||candidates.find(a=>!used.has(a));if(!e)continue;used.add(e);
    const x=end*(total===1?.48:.26+i*.56/Math.max(1,total-1));Object.assign(e,{x,left:x-65,right:x+95,speed:Math.min(65,e.speed),hp:s.worldId>=7?2:1,level:Math.min(3,e.level||1),phase:i,behaviorTime:i*.7});
    if(!swim){e.y=e.baseY=e.homeY=sky?190:420-e.h;}else{e.y=e.baseY=e.homeY=[360,130,390,145,430,170][i];}
    if(e.kind==='cactus'){e.left=e.right=x;e.drainY=floor;e.y=e.baseY=floor;s.platforms.push({x:x-8,y:floor-12,w:e.w+16,h:12,kind:'drain'});}s.enemies.push(e);
+  }
+  if(s.worldId===1){
+   const forestExtra=n===1?[.22,.41,.61,.82]:[.18,.36,.57,.76,.88];
+   forestExtra.forEach((fraction,i)=>{const x=end*fraction;
+    if(i%2===0)s.platforms.push({x:x-80,y:300-(i%3)*28,w:145,h:24,kind:i%3===0?'bridge':'floating',oneWay:true});
+    if(n>=2&&i%2===1)s.platforms.push({x:x-70,y:275,w:140,h:24,kind:'floating',oneWay:true,originX:x-70,originY:275,motion:{x:34,y:24,speed:.72+i*.04}});
+   });
+   if(n>=2)s.hazards.push({kind:'log',x:end*.44,y:395,w:38,h:25},{kind:'thorn',x:end*.74,y:392,w:40,h:28});
   }
   if(swim){s.oceanShells=[{id:'route-clam',x:end*.58,y:435,w:82,h:55,opened:false,rewardId:'route-pearl'}];s.items.push({id:'route-pearl',kind:'coin',x:end*.58+24,y:390,w:30,h:36,contained:true});s.currents.push({x:end*.73,w:100,y:160,h:310,vx:0,vy:-180,kind:'bubble-column'});if(n>=2)s.currents.push({x:end*.32,w:220,y:150,h:220,vx:n===2?25:-20,vy:0});if(s.boss)s.platforms.push({x:end*.63,y:60,w:190,h:32,kind:'reef-ceiling'});}
   if(sky){for(let i=0;i<4;i++)s.items.push({id:i?`flight-backup-${i}`:'flight-wings',kind:'flight',x:i?end*i/4:112,y:351,w:48,h:48});}
