@@ -45,6 +45,7 @@ require("../tests/arithmetic-options.test.cjs");
 require("../tests/learning-bank.test.cjs");
 require("../tests/learning-responsive.test.cjs");
 require("../tests/pang-engine.test.cjs");
+require("../tests/pang-input.test.cjs");
 require("../tests/brick-stage.test.cjs");
 require("../tests/brick-touch.test.cjs");
 require("../tests/art-engine.test.cjs");
