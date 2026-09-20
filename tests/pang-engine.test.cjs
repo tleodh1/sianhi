@@ -11,5 +11,5 @@ for(const [cells,special] of [[[0,1,2,3],'column'],[[0,7,14,21],'row'],[[0,1,2,3
 assert.ok(!P.adjacent(6,7));assert.ok(!P.adjacent(0,8));console.log('PASS Pang: 130 levels, specials, chains, input lock, timer, ice, shuffle, saved bests/unlimited retry');
 {const e=fixture();e.heat=99;[0,1,2].forEach(i=>e.board[i].type=7);e.resolve(P.groups(e.board));assert.equal(e.fever,7);assert.ok(e.events.some(v=>v.type==='fever'));}
 {const e=fixture();e.board[0].special='color';const color=e.board[1].type;assert.ok(e.swap(0,1));e.tick(.1);e.tick(.1);assert.ok(e.removed[color]>=1);assert.equal(e.phase,'pop');}
-{const e=fixture();let pair;for(let i=0;i<48;i++)if(P.adjacent(i,i+1)&&!P.moves(e.board).some(([a,b])=>a===i&&b===i+1)){pair=[i,i+1];break;}const ids=e.board.map(c=>c.id);e.swap(...pair);for(let i=0;i<10;i++)e.tick(.05);assert.deepEqual(e.board.map(c=>c.id),ids);assert.equal(e.score,0);}
+{const e=new P.Engine(1,rng);let pair;for(let i=0;i<48;i++)if(P.adjacent(i,i+1)&&!P.moves(e.board).some(([a,b])=>a===i&&b===i+1)){pair=[i,i+1];break;}const ids=e.board.map(c=>c.id);e.swap(...pair);for(let i=0;i<10;i++)e.tick(.05);assert.deepEqual(e.board.map(c=>c.id),ids);assert.equal(e.score,0);}
 console.log('PASS Pang fever duration, color-bomb swap and invalid-swap restoration');
