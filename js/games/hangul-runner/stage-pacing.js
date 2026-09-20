@@ -14,8 +14,11 @@
   const swim=s.mode==='swim',sky=s.worldId===3,floor=swim?510:420,end=s.length,n=s.number;
   const candidates=s.enemies.slice();s.enemies=[];s.blocks=[];s.hazards=[];s.currents=[];s.gates=[];if(swim)delete s.waterZones;s.runZones=[];s.oceanShells=[];
   s.platforms=[];const beat=end/7;
-  for(let i=0;i<7;i++){const x=i*beat,gap=!swim&&!sky&&n===3&&[2,4].includes(i)?85:0;s.platforms.push({x,y:swim?[510,480,500][i%3]:420,w:beat-gap+1,h:300,kind:'ground'});
-   if(gap){s.platforms.push({x:x+beat-180,y:340,w:110,h:24,kind:'bridge',oneWay:true});}
+  // Real terrain gaps: WORLD 1 now has jumpable pits that are fatal on a miss.
+  const forestPitBeats=s.worldId===1?(n===1?[4]:n===2?[2,5]:n===3?[2,4,6]:[3,5]):[];
+  for(let i=0;i<7;i++){const x=i*beat,isForestPit=forestPitBeats.includes(i),gap=isForestPit?(n===1?76:n===2?92:108):(!swim&&!sky&&n===3&&[2,4].includes(i)?85:0);s.platforms.push({x,y:swim?[510,480,500][i%3]:420,w:Math.max(120,beat-gap)+1,h:300,kind:'ground'});
+   if(gap&&!isForestPit){s.platforms.push({x:x+beat-180,y:340,w:110,h:24,kind:'bridge',oneWay:true});}
+   if(isForestPit){const pitStart=x+Math.max(120,beat-gap),pitWidth=gap;s.hazards.push({kind:'pit',x:pitStart,y:420,w:pitWidth,h:180,fatal:true});}
   }
   s.items=s.words.map((text,i)=>({id:`letter-${i}`,index:i,kind:'letter',text,x:300+(end-1000)*i/(s.words.length-1),y:swim?[270,215,310,250,300,210][i]:sky?329:368,...H.learningTile(text)}));
   // Coins lead the eye between learning stops; a modest replay-only bonus shift never moves answers.
@@ -29,7 +32,7 @@
    const rewardKind=s.worldId===1?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):(i===0?'power':'star');s.items.push({id:`route-reward-${i}`,kind:rewardKind,x:0,y:0,w:40,h:rewardKind==='power'?45:42,contained:true});
   });
   for(const fraction of (n===2?[.35,.77]:n===3?[.28,.63,.83]:[.56])){const x=end*fraction;s.platforms.push({x,y:swim?400:310,w:150,h:24,kind:'floating',oneWay:true,...(n===2?{originX:x,originY:swim?400:310,motion:{x:40,y:25,speed:.7}}:{})});}
-  const total=s.worldId===1?(s.boss?6:n===1?5:n===2?6:7):(s.boss?(swim?6:4):n===1?2:3),used=new Set();
+  const total=s.worldId===1?(s.boss?8:n===1?6:n===2?8:9):(s.boss?(swim?6:4):n===1?2:3),used=new Set();
   const preferred=swim?(s.boss?['inflate','ink','shark','eel','pinch','jelly']:n===1?['inflate','jelly']:n===2?['pinch','jelly','inflate']:['jelly','pinch','inflate']):null;
   for(let i=0;i<total;i++){let e=candidates.find(a=>!used.has(a)&&preferred?.[i]===a.behavior)||candidates.find(a=>!used.has(a)&&a.behavior!==s.enemies.at(-1)?.behavior&&(a.originalKind||a.kind)!==(s.enemies.at(-1)?.originalKind||s.enemies.at(-1)?.kind))||candidates.find(a=>!used.has(a));if(!e)continue;used.add(e);
    const x=end*(total===1?.48:.26+i*.56/Math.max(1,total-1));Object.assign(e,{x,left:x-65,right:x+95,speed:Math.min(65,e.speed),hp:s.worldId>=7?2:1,level:Math.min(3,e.level||1),phase:i,behaviorTime:i*.7});
@@ -43,6 +46,8 @@
     if(n>=2&&i%2===1)s.platforms.push({x:x-70,y:275,w:140,h:24,kind:'floating',oneWay:true,originX:x-70,originY:275,motion:{x:34,y:24,speed:.72+i*.04}});
    });
    if(n>=2)s.hazards.push({kind:'log',x:end*.44,y:395,w:38,h:25},{kind:'thorn',x:end*.74,y:392,w:40,h:28});
+   // Keep enemies away from pit centers so deaths feel fair rather than unavoidable.
+   for(const e of s.enemies){for(const h of s.hazards.filter(a=>a.kind==='pit')){const center=h.x+h.w/2;if(Math.abs(e.x-center)<120){const shift=e.x<center?-150:150;e.x+=shift;e.left+=shift;e.right+=shift;}}}
   }
   if(swim){s.oceanShells=[{id:'route-clam',x:end*.58,y:435,w:82,h:55,opened:false,rewardId:'route-pearl'}];s.items.push({id:'route-pearl',kind:'coin',x:end*.58+24,y:390,w:30,h:36,contained:true});s.currents.push({x:end*.73,w:100,y:160,h:310,vx:0,vy:-180,kind:'bubble-column'});if(n>=2)s.currents.push({x:end*.32,w:220,y:150,h:220,vx:n===2?25:-20,vy:0});if(s.boss)s.platforms.push({x:end*.63,y:60,w:190,h:32,kind:'reef-ceiling'});}
   if(sky){for(let i=0;i<4;i++)s.items.push({id:i?`flight-backup-${i}`:'flight-wings',kind:'flight',x:i?end*i/4:112,y:351,w:48,h:48});}
