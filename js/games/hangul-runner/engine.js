@@ -2,6 +2,9 @@
 (function(HR){
   const hit=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
   HR.overlaps=hit;
+  HR.PLAYER_FORMS={small:{w:34,h:64},big:{w:46,h:96}};
+  // Both simulation and renderer use the same sole, never the atlas cell bottom.
+  HR.playerRenderBounds=(p,s,height=p.h)=>{const sole=s.sole??s.h,scale=height/sole;return {x:p.x+p.w/2-s.w*scale/2,y:p.y+p.h-height,w:s.w*scale,h:s.h*scale,feet:p.y+p.h};};
   HR.Engine=class {
     constructor(stage,options={}) {
       this.stage=stage; this.onEvent=options.onEvent||(()=>{}); this.viewport=options.viewport||960;
@@ -10,6 +13,7 @@
       this.status='playing';this.jumpHeld=false;this.coyote=.1;this.jumpBuffer=0;this.poseTime=0;this.particles=[];this.goalHint=0;this.deathTimer=0;this.events={};
     }
     emit(type,data={}) {this.events[type]=(this.events[type]||0)+1;this.onEvent({type,...data});}
+    setForm(form){const p=this.player,shape=HR.PLAYER_FORMS[form],feet=p.y+p.h,center=p.x+p.w/2;p.powerState=form;p.w=shape.w;p.h=shape.h;p.x=center-p.w/2;p.y=feet-p.h;}
     setPose(p,time=0){this.player.pose=p;this.poseTime=time;}
     respawn(){const p=this.player;p.x=this.checkpoint.x;p.y=this.checkpoint.y-p.h;p.velocityX=p.velocityY=0;p.hp=Math.max(1,p.hp);p.isGrounded=true;p.invincible=2;p.powerState='small';this.status='playing';this.jumpBuffer=0;this.setPose('idle');this.emit('respawn');}
     die(){if(this.status!=='playing')return;this.deaths++;this.status='dead';this.deathTimer=.85;this.setPose('dead');this.emit('death');}
