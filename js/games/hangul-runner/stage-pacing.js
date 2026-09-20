@@ -29,7 +29,7 @@
   for(let i=0;i<3;i++)s.items.push({id:`star-${i}`,kind:'star',x:end*[.23,.55,.8][i]+bonusShift,y:swim?160:sky?(i?120:260):260,w:32,h:36,requiresFlight:sky&&i>0});
   if(![1,2,3,4].includes(s.worldId))s.items.push({id:'route-growth',kind:'power',x:490,y:swim?285:365,w:40,h:45},{id:'route-power-star',kind:'powerStar',x:end*.4,y:swim?250:365,w:40,h:42});
   const rowFractions=s.worldId===1?(n===1?[.14,.32,.52,.72]:n===2?[.12,.3,.5,.7,.84]:[.14,.28,.45,.62,.78]):s.worldId===2?(n===1?[.13,.31,.52,.74]:n===2?[.1,.26,.44,.62,.8]:n===3?[.08,.21,.36,.52,.68,.83]:[.1,.24,.4,.56,.72,.86]):s.worldId===3?(n===1?[.12,.28,.46,.65,.82]:n===2?[.1,.24,.39,.55,.7,.84]:n===3?[.09,.21,.34,.48,.62,.76,.88]:[.1,.24,.4,.57,.73,.86]):s.worldId===4?(n===1?[.11,.27,.46,.66,.83]:n===2?[.09,.23,.39,.56,.72,.87]:n===3?[.08,.2,.34,.49,.64,.78,.9]:[.1,.24,.4,.57,.73,.87]):n===2?[.18,.47,.7]:[.2,.67];
-  rowFractions.forEach((fraction,i)=>{const x=end*fraction,y=floor-H.PLAYER_FORMS.big.h-38-48;
+  rowFractions.forEach((fraction,i)=>{const x=end*fraction,y=(s.worldId===4&&s.boss)?305:floor-H.PLAYER_FORMS.big.h-38-48;
    for(let j=0;j<3;j++)s.blocks.push({id:`route-block-${i}-${j}`,x:x+j*54,y,w:48,h:48,kind:['breakable','reward','hard'][j],revealed:true,rewardId:j===1?`route-reward-${i}`:null,oceanSkin:j===1?'pearl':j===0?'coral':'relic'});
    const rewardKind=s.worldId===1?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):s.worldId===2?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'star':'coin'):s.worldId===3?(i%3===0?'power':i%3===1?'powerStar':'star'):s.worldId===4?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):(i===0?'power':'star');s.items.push({id:`route-reward-${i}`,kind:rewardKind,x:0,y:0,w:40,h:rewardKind==='power'?45:42,contained:true});
   });
@@ -80,6 +80,11 @@
    hiddenLetters.forEach((letter,i)=>{const block=rewardBlocks[Math.min(rewardBlocks.length-1,1+i*2)]||rewardBlocks[i];if(!block)return;const old=block.rewardId;block.rewardId=letter.id;letter.contained=true;s.items=s.items.filter(a=>a.id!==old);});
    // 4-3 remains ordered: visible/hidden targets still progress left-to-right.
    if(s.ordered){letters.forEach((letter,i)=>{letter.index=i;letter.x=300+(end-1050)*i/Math.max(1,letters.length-1);});rewardBlocks.forEach((b,i)=>{const letter=hiddenLetters[i];if(letter&&b.rewardId===letter.id)b.x=Math.max(b.x,letter.x-40);});}
+   // 4-4 SMALL form must always have a reachable escape route before a fatal pit.
+   if(s.boss){
+    const bossVoids=s.hazards.filter(a=>a.kind==='void');
+    bossVoids.forEach((h,i)=>{const px=Math.max(80,h.x-125);s.platforms.push({x:px,y:350,w:92,h:20,kind:'pipe',oneWay:true});});
+   }
    // Growth and power star must be earned from blocks.
    const occupied=new Set(rewardBlocks.filter(b=>hiddenLetters.some(l=>b.rewardId===l.id)));
    const available=rewardBlocks.filter(b=>!occupied.has(b));
@@ -95,7 +100,7 @@
     else s.enemies.push({id:`sewer-shell-${n}-${i}`,kind:'gear-shell',x:x-30,y:372,w:50,h:48,left:x-110,right:x+110,dir:i%3?1:-1,speed:52+n*5,baseY:372,homeY:372,phase:i+24,level:n,hp:n>=3?2:1,flying:false,armored:true,behavior:'patrol',behaviorTime:i*.6,rollSpeed:360+n*12});
    });
    for(const f of (n===1?[.3,.76]:n===2?[.2,.55,.78]:[.17,.33,.58,.77,.91])){const x=end*f;s.hazards.push({kind:'open-drain',x:x-22,y:402,w:44,h:28,fatal:true});}
-   for(const e of s.enemies)for(const h of pits){const center=h.x+h.w/2;if(Math.abs(e.x-center)<105){const shift=e.x<center?-135:135;e.x+=shift;e.left+=shift;e.right+=shift;}}
+   for(const e of s.enemies)for(const h of pits){const center=h.x+h.w/2,margin=s.boss?180:105;if(Math.abs(e.x-center)<margin){const shift=e.x<center?-(margin+45):(margin+45);e.x+=shift;e.left+=shift;e.right+=shift;}}
   }
   if(s.worldId===2){
    const rewardBlocks=s.blocks.filter(b=>b.kind==='reward');
