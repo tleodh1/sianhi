@@ -13,7 +13,7 @@
    if(s.number>=2){const moving={x:x+545,y:285-(i%2)*45,w:170,h:30,kind:'bridge',oneWay:true};if(s.moving)Object.assign(moving,{originX:moving.x,originY:moving.y,motion:{x:i%2?48:24,y:i%2?20:42,speed:.72+i*.05}});s.platforms.push(moving);}
    const letterReward=i===1&&s.number>1,rewardId=letterReward?`letter-${i}`:`block-reward-${i}`;const rowY=265-(i%2)*44;for(let j=0;j<3;j++)s.blocks.push({id:`block-${i}-${j}`,x:x+315+j*58,y:rowY,w:54,h:50,kind:j===0?'breakable':j===1?'reward':'hard',fragile:s.number===1&&i===0,rewardId:j===1?rewardId:null,revealed:true});
    if(s.number>=2&&i%2===1)s.blocks.push({id:`rolling-wall-${i}`,x:x+820,y:370,w:54,h:50,kind:'breakable',fragile:false,revealed:true});
-   if(letterReward)letter.contained=true;else s.items.push({id:rewardId,kind:'coin',x:0,y:0,w:30,h:36,contained:true});
+   if(letterReward)letter.contained=true;else s.items.push({id:rewardId,kind:i===2?'powerStar':'coin',x:0,y:0,w:i===2?40:30,h:i===2?42:36,contained:true});
    const level=s.number,mainKind=level===1?'berry-bandit':level===2?'seed-shell':level===3?(i%2?'pipe-snapper':'seed-shell'):(i%3===0?'fire-imp':i%3===1?'pipe-snapper':'seed-shell');
    if(i===0||level>=2)s.enemies.push({id:`walker-${i}`,x:x+480,y:376,w:48,h:48,left:x+420,right:x+650,dir:1,speed:42+level*7,kind:level===1?'berry-bandit':i%2?'berry-bandit':mainKind,baseY:376,phase:i,state:'walk',level,hp:level>=4?2:1,flying:level===1&&i%2===1});
    if(i>0)s.enemies.push({id:`enemy-${i}`,x:x+690,y:376,w:52,h:48,left:x+610,right:x+span-70,dir:-1,speed:38+level*6,kind:mainKind,baseY:376,phase:i,state:'walk',armored:mainKind==='seed-shell',rollSpeed:330+level*18,level,hp:level>=3&&mainKind!=='seed-shell'?2:1});

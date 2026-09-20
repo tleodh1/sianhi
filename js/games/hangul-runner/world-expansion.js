@@ -37,7 +37,7 @@
   if(s.worldId!==1)s.words.forEach((_,i)=>{const x=i*s.span;
    const y=s.mode==='swim'?350:265;
    for(let j=0;j<3;j++)s.blocks.push({id:`extra-block-${i}-${j}`,x:x+500+j*60,y,w:52,h:48,kind:j===1?'reward':j===0?'breakable':'hard',fragile:true,revealed:true,rewardId:`extra-reward-${i}`});
-   s.items.push({id:`extra-reward-${i}`,kind:i%3===0?'power':'coin',x:0,y:0,w:36,h:40,contained:true});
+   s.items.push({id:`extra-reward-${i}`,kind:i%4===2?'powerStar':i%3===0?'power':'coin',x:0,y:0,w:i%4===2?40:36,h:i%4===2?42:40,contained:true});
    if(s.worldId===3&&i%3===1)s.enemies.push({id:`sky-cactus-${i}`,kind:'pipe-snapper',x:x+760,y:420,baseY:420,w:48,h:52,left:x+760,right:x+760,dir:-1,speed:0,phase:i,hp:1});
    if(s.worldId>=5){const ledge={x:x+200,y:320,w:165,h:28,oneWay:true,kind:'floating'};if(i%3===1)Object.assign(ledge,{originX:ledge.x,originY:ledge.y,motion:{x:38,y:28,speed:.7}});s.platforms.push(ledge);
     if(s.worldId===5)s.hazards.push({kind:'rock',x:x+890,y:395,w:32,h:25});

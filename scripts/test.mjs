@@ -54,3 +54,4 @@ require("../tests/art-collection.test.cjs");
 require("../tests/runner-expansion.test.cjs");
 require("../tests/runner-physics.test.cjs");
 require("../tests/runner-ocean.test.cjs");
+require("../tests/runner-star-power.test.cjs");
