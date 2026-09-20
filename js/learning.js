@@ -592,25 +592,203 @@ function playStage100(subject, stage) {
 function playCoding100(stage) {
   Session.begin();
 
-  const size = stage < 31 ? 5 : stage < 71 ? 6 : 7,
+  const chapter = Math.floor((stage - 1) / 10),
+    step = (stage - 1) % 10,
+    info = build100("코딩")[stage - 1],
+    chapterNames = [
+      "명령 숲",
+      "순서 다리",
+      "반복 동굴",
+      "조건 마을",
+      "디버그 연구소",
+      "좌표 섬",
+      "패턴 공장",
+      "알고리즘 성",
+      "미션 로봇",
+      "코딩 챌린지",
+    ];
+
+  const finish = (message) => {
+    const fb = gameBody.querySelector(".codingFeedback");
+    if (fb) fb.innerHTML = "⭐ " + message;
+    state.stage100["코딩"] = Math.max(
+      state.stage100["코딩"] || 1,
+      Math.min(100, stage + 1),
+    );
+    award("learn:코딩:" + stage);
+    const actions = gameBody.querySelector(".codingActions") || fb;
+    const next = document.createElement("button");
+    next.className = "nextBtn codingNext";
+    next.textContent = stage < 100 ? "다음 미션 →" : "지도로 돌아가기";
+    next.onclick = () =>
+      stage < 100 ? playCoding100(stage + 1) : openStageMap("코딩");
+    actions?.append(next);
+  };
+
+  const quizBank = () => {
+    if (chapter === 2) {
+      const n = 2 + (step % 4);
+      return {
+        title: "반복 명령 압축",
+        q: "↑ 명령을 " + n + "번 반복하려면 어떤 표현이 가장 알맞을까?",
+        opts: ["↑ × " + n, "→ × " + n, "↑ × " + (n + 1), "↓ × " + n],
+        ans: "↑ × " + n,
+        help: "같은 명령이 이어지면 반복 횟수로 묶을 수 있어.",
+      };
+    }
+    if (chapter === 3) {
+      const cases = [
+        ["앞에 나무가 있으면?", "오른쪽으로 돌아간다", "계속 앞으로 간다", "멈추지 않고 점프한다", "뒤로만 간다"],
+        ["별이 보이면?", "별 쪽으로 이동한다", "반대쪽으로 간다", "명령을 모두 지운다", "제자리에만 있는다"],
+        ["길이 막히지 않았다면?", "앞으로 한 칸 간다", "무조건 뒤로 간다", "별을 버린다", "게임을 끝낸다"],
+        ["배터리가 부족하면?", "충전소로 간다", "더 빠르게 달린다", "벽으로 간다", "명령을 거꾸로 한다"],
+      ];
+      const c = cases[step % cases.length];
+      return { title: "만약 ~라면", q: c[0], opts: c.slice(1), ans: c[1], help: "조건이 참일 때 실행할 행동을 고르는 게 조건문이야." };
+    }
+    if (chapter === 4) {
+      const sets = [
+        ["목표: 위 2칸, 오른쪽 1칸", "↑ ↑ ←", "↑ ↑ →", "↑ → ↑", "→ ↑ ↑"],
+        ["목표: 오른쪽 2칸, 위 1칸", "→ ← ↑", "→ → ↑", "↑ → →", "→ ↑ →"],
+        ["목표: 아래 1칸, 오른쪽 2칸", "↓ → →", "↑ → →", "→ ↓ →", "→ → ↓"],
+      ];
+      const c = sets[step % sets.length];
+      return {
+        title: "버그 찾기",
+        q: c[0] + "인데 잘못된 명령 묶음은?",
+        opts: c.slice(1),
+        ans: c[1],
+        help: "목표와 반대 방향이 섞였는지 하나씩 실행해 봐.",
+      };
+    }
+    if (chapter === 5) {
+      const row = 1 + (step % 4), col = 1 + ((step * 2) % 4);
+      return {
+        title: "좌표 섬",
+        q: "별이 " + row + "행 " + col + "열에 있어. 좌표를 고르면?",
+        opts: [row + "행 " + col + "열", col + "행 " + row + "열", (row + 1) + "행 " + col + "열", row + "행 " + (col + 1) + "열"],
+        ans: row + "행 " + col + "열",
+        help: "행은 위에서 아래, 열은 왼쪽에서 오른쪽으로 세어.",
+      };
+    }
+    if (chapter === 6) {
+      const patterns = [
+        ["↑ → ↑ → ?", "↑", "→", "↓", "←"],
+        ["→ → ↑ → → ↑ ?", "→", "↑", "↓", "←"],
+        ["↑ ↑ → ↑ ↑ → ?", "↑", "→", "↓", "←"],
+        ["← ↑ ← ↑ ?", "←", "↑", "→", "↓"],
+      ];
+      const c = patterns[step % patterns.length];
+      return { title: "명령 패턴", q: c[0], opts: c.slice(1), ans: c[1], help: "반복되는 묶음을 찾아 다음 명령을 예상해 봐." };
+    }
+    if (chapter === 7) {
+      const routes = [
+        ["별까지 가장 짧은 명령은?", "↑ ↑ → →", "↑ ↑ ↑ → →", "→ → → ↑ ↑", "↑ → ↑ → →"],
+        ["오른쪽 3칸 가는 가장 짧은 방법은?", "→ → →", "→ ↑ → ↓ →", "→ → → →", "↑ → → → ↓"],
+        ["위 2칸 가는 가장 짧은 방법은?", "↑ ↑", "↑ → ↑ ←", "↑ ↑ ↑", "→ ↑ ↑ ←"],
+      ];
+      const c = routes[step % routes.length];
+      return { title: "알고리즘 비교", q: c[0], opts: c.slice(1), ans: c[1], help: "같은 결과라면 더 적은 명령으로 해결하는 방법을 찾아." };
+    }
+    return null;
+  };
+
+  const quiz = quizBank();
+  if (quiz) {
+    gameBody.innerHTML =
+      '<div class="codingGame codingQuiz"><div class="stageTop"><button class="backMap">← 지도</button><b>코딩 ' +
+      stage +
+      '/100</b></div><div class="codingStory"><b>🤖 ' +
+      chapterNames[chapter] +
+      "</b><span>" +
+      info.story +
+      '</span></div><div class="codingQuizCard"><small>MISSION ' +
+      (step + 1) +
+      '</small><h3>' +
+      quiz.title +
+      '</h3><p class="codingQuestion">' +
+      quiz.q +
+      '</p><div class="codingQuizChoices">' +
+      quiz.opts.map((x) => '<button class="codingChoice">' + x + '</button>').join("") +
+      '</div><div class="codingFeedback">생각한 답을 골라 봐.</div><div class="codingActions"><button class="codingHint">💡 힌트</button></div></div></div>';
+
+    gameBody.querySelector(".backMap").onclick = () => openStageMap("코딩");
+    const fb = gameBody.querySelector(".codingFeedback");
+    gameBody.querySelector(".codingHint").onclick = () => {
+      fb.textContent = quiz.help;
+    };
+    gameBody.querySelectorAll(".codingChoice").forEach((b) => {
+      b.onclick = () => {
+        if (b.textContent === quiz.ans) {
+          gameBody.querySelectorAll(".codingChoice").forEach((x) => (x.disabled = true));
+          b.classList.add("correctChoice");
+          finish("정답! " + quiz.help);
+        } else {
+          b.classList.add("wrongBrick");
+          fb.textContent = "다시 생각해 보자. " + quiz.help;
+          Session.timeout(() => b.classList.remove("wrongBrick"), 300);
+        }
+      };
+    });
+    game.showModal();
+    return;
+  }
+
+  const size = chapter < 2 ? 5 : chapter < 9 ? 6 : 7,
     start = [size - 1, 0],
     goal = [0, size - 1],
+    collectMode = chapter === 8 || chapter === 9,
+    checkpoint = collectMode ? [Math.floor(size / 2), Math.floor(size / 2)] : null,
     walls = [];
-  for (let i = 1; i < size - 1; i++)
-    if ((i + stage) % 3 === 0)
-      walls.push([size - 1 - i, Math.min(size - 2, i)]);
+
+  // Keep a guaranteed route open: first column -> checkpoint corridor -> top row.
+  for (let r = 1; r < size - 1; r++) {
+    for (let c = 1; c < size - 1; c++) {
+      if (checkpoint && ((c === 0) || (r === checkpoint[0] && c <= checkpoint[1]) || (c === checkpoint[1] && r <= checkpoint[0]))) continue;
+      if ((r * 3 + c * 5 + stage) % (chapter >= 9 ? 5 : 7) === 0) walls.push([r, c]);
+    }
+  }
+  if (checkpoint) {
+    for (let r = checkpoint[0]; r < size; r++) walls.splice(0,0); // route marker; no mutation needed
+    // Clear a reliable L-shaped corridor from start to checkpoint and checkpoint to goal.
+    for (let r = checkpoint[0]; r < size; r++) {
+      const i = walls.findIndex(w => w[0] === r && w[1] === 0); if (i >= 0) walls.splice(i,1);
+    }
+    for (let c = 0; c <= checkpoint[1]; c++) {
+      const i = walls.findIndex(w => w[0] === checkpoint[0] && w[1] === c); if (i >= 0) walls.splice(i,1);
+    }
+    for (let r = 0; r <= checkpoint[0]; r++) {
+      const i = walls.findIndex(w => w[0] === r && w[1] === checkpoint[1]); if (i >= 0) walls.splice(i,1);
+    }
+    for (let c = checkpoint[1]; c < size; c++) {
+      const i = walls.findIndex(w => w[0] === 0 && w[1] === c); if (i >= 0) walls.splice(i,1);
+    }
+  } else {
+    // Simple guaranteed route for the first two chapters.
+    for (let r = 0; r < size; r++) {
+      const i = walls.findIndex(w => w[0] === r && w[1] === 0); if (i >= 0) walls.splice(i,1);
+    }
+    for (let c = 0; c < size; c++) {
+      const i = walls.findIndex(w => w[0] === 0 && w[1] === c); if (i >= 0) walls.splice(i,1);
+    }
+  }
+
   const L = {
     size,
     start,
     goal,
+    checkpoint,
     walls,
-    max: size * 3,
-    name: "별길 " + stage,
-    story: build100("코딩")[stage - 1].story,
+    max: chapter >= 9 ? size * 3 - 2 : size * 3,
+    name: chapterNames[chapter],
+    story: info.story,
   };
+
   let pos = [...start],
     queue = [],
-    running = false;
+    running = false,
+    gotCheckpoint = !checkpoint;
+
   gameBody.innerHTML =
     '<div class="codingGame"><div class="stageTop"><button class="backMap">← 지도</button><b>코딩 ' +
     stage +
@@ -620,49 +798,64 @@ function playCoding100(stage) {
     L.story +
     '</span></div><div class="codingStage"><div class="codingBoard" style="--n:' +
     size +
-    '"></div></div><div class="codingPanel"><div class="commandQueue"><span class="emptyQueue">명령을 차례대로 넣어 줘</span></div><div class="codingControls"><button data-cmd="U">↑<small>위</small></button><button data-cmd="R">→<small>오른쪽</small></button><button data-cmd="D">↓<small>아래</small></button><button data-cmd="L">←<small>왼쪽</small></button><button class="undoCmd">↶<small>취소</small></button></div><div class="codingActions"><button class="resetCode">다시</button><button class="runCode">▶ 출발!</button></div><div class="codingFeedback">별까지 가는 길을 만들어 봐.</div></div></div>';
+    '"></div></div><div class="codingPanel"><div class="missionLine"><b>' +
+    (checkpoint ? "💎 보석을 먼저 모은 뒤 별까지!" : chapter === 1 ? "명령 순서를 생각해서 별까지!" : "화살표 명령으로 별까지!") +
+    '</b><span>최대 ' +
+    L.max +
+    '개</span></div><div class="commandQueue"><span class="emptyQueue">명령을 차례대로 넣어 줘</span></div><div class="codingControls"><button data-cmd="U">↑<small>위</small></button><button data-cmd="R">→<small>오른쪽</small></button><button data-cmd="D">↓<small>아래</small></button><button data-cmd="L">←<small>왼쪽</small></button><button class="undoCmd">↶<small>취소</small></button></div><div class="codingActions"><button class="resetCode">다시</button><button class="runCode">▶ 출발!</button></div><div class="codingFeedback">' +
+    (checkpoint ? "보석을 지나 별까지 가는 길을 만들어 봐." : "별까지 가는 길을 만들어 봐.") +
+    "</div></div></div>";
+
   const board = gameBody.querySelector(".codingBoard"),
     qb = gameBody.querySelector(".commandQueue"),
     fb = gameBody.querySelector(".codingFeedback");
+
   function draw() {
     board.innerHTML = "";
     for (let r = 0; r < size; r++)
       for (let c = 0; c < size; c++) {
-        let e = document.createElement("div");
+        const e = document.createElement("div");
         e.className = "codeCell";
+        if ((r + c) % 2) e.classList.add("alt");
         if (walls.some((w) => w[0] === r && w[1] === c)) {
           e.classList.add("wall");
-          e.textContent = "🌳";
+          e.textContent = chapter >= 8 ? "🪨" : "🌳";
         }
+        if (checkpoint && checkpoint[0] === r && checkpoint[1] === c && !gotCheckpoint)
+          e.innerHTML = '<span class="goalStar">💎</span>';
         if (goal[0] === r && goal[1] === c)
           e.innerHTML = '<span class="goalStar">⭐</span>';
-        if (pos[0] === r && pos[1] === c)
+        if (pos[0] === r && pos[1] === c) {
+          e.classList.add("robotCell");
           e.innerHTML = '<span class="robot">🤖</span>';
+        }
         board.appendChild(e);
       }
   }
+
   function rq() {
     qb.innerHTML = queue.length
-      ? queue
-          .map(
-            (x) =>
-              '<span class="cmdChip">' +
-              { U: "↑", R: "→", D: "↓", L: "←" }[x] +
-              "</span>",
-          )
-          .join("")
+      ? queue.map((x, i) =>
+          '<span class="cmdChip">' +
+          { U: "↑", R: "→", D: "↓", L: "←" }[x] +
+          "<i>" + (i + 1) + "</i></span>",
+        ).join("")
       : '<span class="emptyQueue">명령을 차례대로 넣어 줘</span>';
   }
+
   gameBody.querySelector(".backMap").onclick = () => openStageMap("코딩");
-  gameBody.querySelectorAll("[data-cmd]").forEach(
-    (b) =>
-      (b.onclick = () => {
-        if (!running && queue.length < L.max) {
-          queue.push(b.dataset.cmd);
-          rq();
-        }
-      }),
+  gameBody.querySelectorAll("[data-cmd]").forEach((b) =>
+    (b.onclick = () => {
+      if (running) return;
+      if (queue.length >= L.max) {
+        fb.textContent = "명령은 " + L.max + "개까지 넣을 수 있어. 필요 없는 명령을 줄여 보자.";
+        return;
+      }
+      queue.push(b.dataset.cmd);
+      rq();
+    }),
   );
+
   gameBody.querySelector(".undoCmd").onclick = () => {
     if (running) return;
     queue.pop();
@@ -672,19 +865,26 @@ function playCoding100(stage) {
     if (running) return;
     queue = [];
     pos = [...start];
+    gotCheckpoint = !checkpoint;
     rq();
     draw();
+    fb.textContent = checkpoint ? "보석을 지나 별까지 가는 길을 만들어 봐." : "별까지 가는 길을 만들어 봐.";
   };
+
   gameBody.querySelector(".runCode").onclick = async () => {
     if (!queue.length || running) return;
     running = true;
     pos = [...start];
+    gotCheckpoint = !checkpoint;
     draw();
     const d = { U: [-1, 0], R: [0, 1], D: [1, 0], L: [0, -1] };
-    for (const cmd of queue) {
+
+    for (let i = 0; i < queue.length; i++) {
       await new Promise((r) => Session.timeout(r, 220));
-      let nr = pos[0] + d[cmd][0],
+      const cmd = queue[i],
+        nr = pos[0] + d[cmd][0],
         nc = pos[1] + d[cmd][1];
+
       if (
         nr < 0 ||
         nc < 0 ||
@@ -692,30 +892,34 @@ function playCoding100(stage) {
         nc >= size ||
         walls.some((w) => w[0] === nr && w[1] === nc)
       ) {
-        fb.textContent = "🌳 길이 막혔어. 명령을 고쳐 보자!";
+        fb.textContent = "🪨 " + (i + 1) + "번째 명령에서 길이 막혔어. 순서를 고쳐 보자!";
         running = false;
         return;
       }
+
       pos = [nr, nc];
+      if (checkpoint && nr === checkpoint[0] && nc === checkpoint[1]) {
+        gotCheckpoint = true;
+        fb.textContent = "💎 보석 획득! 이제 별까지 가자.";
+      }
       draw();
+
       if (nr === goal[0] && nc === goal[1]) {
-        fb.textContent = "⭐ 성공! 다음 별길이 열렸어!";
-        state.stage100["코딩"] = Math.max(
-          state.stage100["코딩"] || 1,
-          Math.min(100, stage + 1),
-        );
-        award("learn:코딩:" + stage);
         running = false;
-        Session.timeout(
-          () => (stage < 100 ? playCoding100(stage + 1) : openStageMap("코딩")),
-          600,
-        );
+        if (!gotCheckpoint) {
+          fb.textContent = "별에는 왔지만 보석을 놓쳤어. 보석을 먼저 지나가 보자!";
+          return;
+        }
+        gameBody.querySelectorAll("[data-cmd], .undoCmd, .runCode").forEach((x) => (x.disabled = true));
+        finish(chapter >= 9 ? "코딩 챌린지 성공!" : checkpoint ? "보석과 별을 모두 찾았어!" : "로봇이 별에 도착했어!");
         return;
       }
     }
-    fb.textContent = "조금 더 가야 해. 명령을 추가해 봐!";
+
+    fb.textContent = gotCheckpoint && checkpoint ? "보석은 찾았어! 별까지 갈 명령을 더 추가해 봐." : "조금 더 가야 해. 명령을 이어서 생각해 보자.";
     running = false;
   };
+
   draw();
   rq();
   game.showModal();
