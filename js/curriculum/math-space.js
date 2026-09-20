@@ -4,7 +4,7 @@
   const q=M.make(subject,stage);if(!M.validate(q))throw new Error('Invalid mission '+q.id);
   const root=S.shell(subject,stage,q.title,q.prompt,q.theme),area=root.querySelector('.spaceGameplay'),feedback=root.querySelector('.spaceFeedback');root.dataset.mode=q.mode;
   let solved=false;const finish=()=>{if(solved)return;solved=true;S.complete(root,subject,stage,q.explanation);};
-  const wrong=(el,text='여기가 아니구나. 그림을 다시 살펴봐.')=>{if(solved)return;feedback.textContent=text;el?.classList.add('spaceShake');Session.timeout(()=>el?.classList.remove('spaceShake'),350);};
+  const wrong=(el,text='여기가 아니구나. 그림을 다시 살펴봐.')=>{if(solved)return;feedback.textContent=text;if(global.VoiceDirector)LearningSpeech.speak([VoiceDirector.respond('retry'),{text,lang:'ko-KR'}]);el?.classList.add('spaceShake');Session.timeout(()=>el?.classList.remove('spaceShake'),350);};
   const piece=i=>`<button type="button" class="missionPiece" data-piece="${S.esc(i.id)}" aria-label="${S.esc(S.label(i))}">${S.object(i)}</button>`;
   const target=t=>`<button type="button" class="missionTarget" data-target="${S.esc(t.id)}" aria-label="${S.esc(t.sample?S.label(t.sample)+' 자리':t.label)}">${t.sample?'<span class="targetSample">'+S.object(t.sample)+'</span>':'<span class="targetSocket">＋</span>'}<span class="targetCaption">${S.esc(t.sample?(q.mode==='venn'?t.label:''):t.label)}</span><span class="targetContents"></span></button>`;
   const fruits=(n,side)=>`<div class="fruitPlate" aria-label="과일 ${n}개">${Array.from({length:n},(_,i)=>`<button class="countFruit" data-count="${side}-${i}" aria-label="${i+1}번째 과일">${S.object({kind:'fruit',color:side==='b'?'green':'red',shape:'circle',scale:.92+i%3*.035})}<span></span></button>`).join('')}</div>`;

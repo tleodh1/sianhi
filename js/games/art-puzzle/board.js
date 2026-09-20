@@ -50,7 +50,7 @@
     };
     const complete = () => {
       if (!e.complete || finished) return;
-      finished = true;
+      finished = true;window.SianAudio?.stopMusic();window.SianAudio?.effect("clear");
       scope.stopLoop();
       root.querySelectorAll("[data-hint]").forEach((b) => (b.disabled = true));
       board.classList.add("art-complete");
@@ -69,7 +69,7 @@
     };
     const place = (index) => {
       if (e.selected === null) return;
-      if (e.place(index)) {
+      if (e.place(index)) {window.SianAudio?.effect("snap");
         sync();
         const slot=q(`[data-slot="${index}"]`); slot.classList.add("art-snapped"); scope.later(()=>slot.classList.remove("art-snapped"),700);
         q(".art-message").textContent = "딱 맞아요! 그림이 조금 더 보이네요.";

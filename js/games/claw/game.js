@@ -30,6 +30,7 @@
         q = (s) => root.querySelector(s),
         canvas = q("canvas"),
         renderer = new C.Renderer(canvas, art);
+      window.SianAudio?.start("claw");
       const on = (el, type, fn) =>
         el.addEventListener(type, fn, { signal: abort.signal });
       const hud = () => {
@@ -39,25 +40,7 @@
           `도감 ${Object.keys(r.inventory).filter(id=>C.catalog.some(d=>d.id===id)).length} / ${C.catalog.length}`;
         q("[data-best]").textContent = `최고 연속 ${r.best}`;
       };
-      const sound = (rarity) => {
-        if (!state.sound) return;
-        try {
-          audio ||= new (window.AudioContext || window.webkitAudioContext)();
-          audio.resume();
-          for (let i = 0; i < 3 + rarity; i++) {
-            const o = audio.createOscillator(),
-              g = audio.createGain(),
-              t = audio.currentTime + i * 0.12;
-            o.type = "sine";
-            o.frequency.value = 440 * Math.pow(1.25, i);
-            g.gain.setValueAtTime(0.08, t);
-            g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
-            o.connect(g).connect(audio.destination);
-            o.start(t);
-            o.stop(t + 0.31);
-          }
-        } catch {}
-      };
+      const sound = () => window.SianAudio?.effect('worldClear');
       const e = new C.Engine({
         attempts: r.coins,
         onEvent: ({ type }) => {
@@ -106,7 +89,7 @@
           q(".claw-status").textContent = "놀이 코인 10개를 무료로 충전했어요!";
           return;
         }
-        if (e.drop()) q(".claw-drop").disabled = true;
+        if (e.drop()) {window.SianAudio?.effect("clawDrop");q(".claw-drop").disabled = true;}
       };
       controls = new C.Controls(root, canvas, e, renderer, drop);
       on(q(".claw-drop"), "click", drop);

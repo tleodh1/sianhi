@@ -6,6 +6,7 @@
     let build=R.normalize(loaded?.parts?loaded:R.store.active()||R.defaultBuild());
     let selected='head',yaw=0,zoom=1;
     gameBody.innerHTML=`<div class="robotApp"><header class="robotHeader"><h2>🤖 로봇 메이커</h2><button data-back>← 게임월드</button></header><main class="robotMaker"><section class="robotStage"><canvas aria-label="3D 로봇 미리보기"></canvas><div class="robotZoom"><button data-turn>90° 회전</button><button data-zoom="-1" aria-label="축소">−</button><button data-zoom="1" aria-label="확대">＋</button></div><p class="robotAngle" role="status"></p></section><section class="robotWorkshop"><label class="robotName">이름 <input maxlength="14"></label><div class="robotSlots">${R.slots.map(s=>`<button data-slot="${s}">${R.labels[s]}</button>`).join('')}</div><div class="robotOptions"></div><div class="robotPaint"></div><div class="robotStats"></div><button class="robotSave">격납고에 저장</button><button data-new>새 로봇 만들기</button><div class="robotBattleChoice"><select aria-label="AI 난이도"><option value="easy">EASY</option><option value="normal" selected>NORMAL</option><option value="hard">HARD</option></select><button class="robotBattleStart">저장하고 배틀 시작</button></div><div class="robotHangar"></div><p class="robotMessage" role="status"></p></section></main></div>`;
+    window.SianAudio?.start('robot');
     const root=gameBody,canvas=root.querySelector('canvas');
     root.querySelector('[data-back]').onclick=openGameWorld;
     let view;

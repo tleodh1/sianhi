@@ -5,7 +5,8 @@
     const canvas=root.querySelector('canvas');let view,audio;const heard={};
     root.querySelector('[data-exit]').onclick=()=>R.start(build);
     try{view=R.createArenaView(canvas,engine);}catch(e){root.querySelector('.battleEnergy').textContent='3D 화면을 열 수 없어요. 메이커로 돌아가 다시 시도해 주세요.';return;}
-    const sound=kind=>{if(!state.sound)return;try{audio||=new(window.AudioContext||window.webkitAudioContext)();audio.resume();const o=audio.createOscillator(),g=audio.createGain(),now=audio.currentTime;o.type=kind==='hit'?'square':kind==='skillCharge'?'sine':'triangle';o.frequency.setValueAtTime(kind==='skillCharge'?180:kind==='launch'?520:kind==='hit'?120:300,now);o.frequency.exponentialRampToValueAtTime(kind==='skillCharge'?760:kind==='hit'?70:240,now+.18);g.gain.setValueAtTime(.045,now);g.gain.exponentialRampToValueAtTime(.001,now+.22);o.connect(g).connect(audio.destination);o.start();o.stop(now+.23);}catch{}};
+    window.SianAudio?.start('robot');
+    const sound=kind=>window.SianAudio?.effect(({hit:'enemyStarHit',skillCharge:'starPower',launch:'starShot',attack:'bossAttack',guard:'blockHit'})[kind]||'blockHit');
     const disposeControls=R.bindBattleControls(root,engine);let last=performance.now(),ended=false;
     Session.cleanups.push(()=>{ended=true;disposeControls();view.dispose();audio?.close();});
     function loop(now){if(ended)return;const dt=(now-last)/1000;last=now;if(!document.hidden)engine.tick(dt);for(const kind of ['attack','skillCharge','launch','hit','guardHit','guard'])if((engine.events[kind]||0)>(heard[kind]||0)){heard[kind]=engine.events[kind];sound(kind==='guardHit'?'hit':kind);}view.render();
@@ -13,7 +14,7 @@
       root.querySelector('[data-ehp]').style.setProperty('--hp',`${engine.enemy.hp/engine.enemy.stats.hp*100}%`);
       root.querySelector('[data-state]').textContent=engine.player.attackState?.skill?`CHARGE · ${engine.player.attackState.skillType}`:engine.player.guard?'ENERGY SHIELD':difficulty.toUpperCase();
       root.querySelector('.battleEnergy').textContent=`HP ${Math.ceil(engine.player.hp)} · 에너지 ${Math.floor(engine.player.energy)} · 공격 대기 ${engine.player.cooldown.toFixed(1)}초`;
-      if(engine.over){const win=engine.result==='win',reward=R.recordBattle(build,difficulty,win),result=root.querySelector('.battleResult');result.hidden=false;result.innerHTML=`<h2>${win?'아레나 승리!':'멋진 도전이었어요!'}</h2><p>${reward?`별 ${reward}개를 얻었어요!`:'배틀 기록을 저장했어요.'}</p><button data-again>다시 배틀</button><button data-maker>메이커로</button>`;disposeControls();result.querySelector('[data-again]').onclick=()=>R.startBattle(root,build,difficulty);result.querySelector('[data-maker]').onclick=()=>R.start(build);return;}
+      if(engine.over){window.SianAudio?.stopMusic();window.SianAudio?.effect(engine.result==='win'?'worldClear':'fail');const win=engine.result==='win',reward=R.recordBattle(build,difficulty,win),result=root.querySelector('.battleResult');result.hidden=false;result.innerHTML=`<h2>${win?'아레나 승리!':'멋진 도전이었어요!'}</h2><p>${reward?`별 ${reward}개를 얻었어요!`:'배틀 기록을 저장했어요.'}</p><button data-again>다시 배틀</button><button data-maker>메이커로</button>`;disposeControls();result.querySelector('[data-again]').onclick=()=>R.startBattle(root,build,difficulty);result.querySelector('[data-maker]').onclick=()=>R.start(build);return;}
       Session.frame(loop);
     }Session.frame(loop);
   };

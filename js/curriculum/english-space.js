@@ -8,7 +8,7 @@
   const spelling=w=>`<strong class="englishSpelling">${S.esc(w.toUpperCase())}</strong>`;
   const caption=w=>spelling(w)+`<span class="wordPronunciation">${V.icon}</span><small class="wordMeaning">${S.esc(A.labels[w]||'')}</small>`;
   function pronounce(w,b){V.speak([en(w)],{button:b,status:audio});b?.classList.remove('wordBounce');if(b){void b.offsetWidth;b.classList.add('wordBounce');}}
-  function celebrate(word=q.word){if(solved)return;solved=true;const panel=document.createElement('div');panel.className='englishCompletion';panel.innerHTML=A.draw(q.word)+spelling(word);area.append(panel);S.burst(panel);V.speak([en(word),ko(A.labels[q.word]||'잘했어!')],{button:panel,status:audio});Session.timeout(()=>S.complete(root,'영어',q.stage,q.explanation),1400);}
+  function celebrate(word=q.word){if(solved)return;solved=true;const panel=document.createElement('div');panel.className='englishCompletion';panel.innerHTML=A.draw(q.word)+spelling(word);area.append(panel);S.burst(panel);V.speak([en(word),ko(A.labels[q.word]||'잘했어!'),...(global.VoiceDirector?[VoiceDirector.respond('success',q.stage)]:[])],{button:panel,status:audio});Session.timeout(()=>S.complete(root,'영어',q.stage,q.explanation),1400);}
   function retry(word,b){b?.classList.add('spaceShake');Session.timeout(()=>b?.classList.remove('spaceShake'),350);feedback.textContent='이 친구는 '+word.toUpperCase()+'. 다시 찾아볼까?';V.speak([en(word),ko('다시 찾아볼까?'),...q.parts.filter(p=>p.lang==='en-US')],{button:b,status:audio});}
   function hero(word){return `<button class="englishHero" aria-label="${word.toUpperCase()} 발음 듣기">${A.draw(word)}${caption(word)}</button>`;}
   function bindHero(){area.querySelector('.englishHero')?.addEventListener('click',e=>pronounce(q.word,e.currentTarget));}

@@ -40,7 +40,7 @@
       open(card); say(card.querySelector(".cardFront b").textContent,"en-US");
       if(!first){first=card;return;}
       moves++;
-      if(first.dataset.key===card.dataset.key){const a=first;first=null;a.classList.add("matched","friendPop");card.classList.add("matched","friendPop");matched+=2;status.textContent="반짝! 영어 친구를 찾았어요 ✦";const m=cards[Number(card.dataset.i)].m;if(A.isNew(m.id))newFriend(m);if(matched===cards.length){A.finish(levelId,moves,Math.round((Date.now()-startAt)/1000));status.textContent=`STAGE CLEAR · ${moves}번 만에 모두 찾았어요!`;}}
+      if(first.dataset.key===card.dataset.key){const a=first;first=null;a.classList.add("matched","friendPop");card.classList.add("matched","friendPop");matched+=2;window.SianAudio?.effect("match");status.textContent="반짝! 영어 친구를 찾았어요 ✦";const m=cards[Number(card.dataset.i)].m;if(A.isNew(m.id))newFriend(m);if(matched===cards.length){window.SianAudio?.stopMusic();window.SianAudio?.effect("clear");A.finish(levelId,moves,Math.round((Date.now()-startAt)/1000));status.textContent=`STAGE CLEAR · ${moves}번 만에 모두 찾았어요!`;}}
       else{lock=true;const a=first;first=null;Session.timeout(()=>{close(a);close(card);lock=false;},720);}
     });
   }

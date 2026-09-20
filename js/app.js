@@ -214,7 +214,8 @@ document
 $("#parentButton").onclick = () => go("parent");
 $("#profileButton").onclick = () => go("records");
 $("#soundToggle").onclick = () => {
-  state.sound = !state.sound;
+  window.SianAudio?.unlock();
+  if(window.SianAudio)SianAudio.configure("master",!SianAudio.settings().master);else state.sound = !state.sound;
   save();
   $("#soundToggle").setAttribute(
     "aria-label",

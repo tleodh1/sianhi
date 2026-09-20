@@ -65,3 +65,5 @@ require("../tests/claw-chute.test.cjs");
 require("../tests/learning-space.test.cjs");
 
 require("../tests/discovery-space.test.cjs");
+
+require("../tests/audio.test.cjs");

@@ -5,6 +5,7 @@
     gameBody.innerHTML = '<section class="art-app"></section>';
     if (!game.open) game.showModal();
     const root = gameBody.querySelector(".art-app");
+    window.SianAudio?.start("shape");
     let scope;
     const screen = () => {
       scope?.destroy();
@@ -27,7 +28,7 @@
       sc.on(root.querySelector("[data-back]"), "click", gallery);
       root.querySelectorAll("[data-level]").forEach((b) =>
         sc.on(b, "click", () => {
-          const playScope = screen();
+          const playScope = screen();window.SianAudio?.music("shape");
           A.play(
             root,
             art,

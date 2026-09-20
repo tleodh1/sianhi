@@ -25,8 +25,8 @@
     get playerState(){return this.status==='dead'?'DEAD':this.player.invincible>0?'INVINCIBLE_TEMP':this.player.powerState.toUpperCase();}
     setPose(p,time=0){this.player.pose=p;this.poseTime=time;}
     respawn(){const p=this.player;this.setForm('small');p.pendingGrowth=false;p.flight=false;p.flightTime=0;p.x=this.checkpoint.x;p.y=this.checkpoint.y-p.h;p.velocityX=p.velocityY=0;p.hp=Math.max(1,p.hp);p.isGrounded=true;p.invincible=2;p.powerState='small';this.projectiles=[];this.fireCooldown=0;this.status='playing';this.jumpBuffer=0;this.setPose('idle');this.emit('respawn');}
-    die(){if(this.status!=='playing')return;this.deaths++;this.status='dead';this.deathTimer=.85;this.player.velocityX=0;this.player.velocityY=-210;this.player.flight=false;this.player.flightTime=0;this.player.pendingGrowth=false;this.setPose('dead');this.emit('death');}
-    fatalFall(){if(this.status!=='playing')return;this.player.hp=Math.max(0,this.player.hp-1);this.die();}
+    die(reason='enemy'){if(this.status!=='playing')return;this.deaths++;this.status='dead';this.deathTimer=.85;this.player.velocityX=0;this.player.velocityY=-210;this.player.flight=false;this.player.flightTime=0;this.player.pendingGrowth=false;this.setPose('dead');this.emit('death',{reason});}
+    fatalFall(){if(this.status!=='playing')return;this.player.hp=Math.max(0,this.player.hp-1);this.die('fall');}
     damage(lethalSmall=false){const p=this.player;if(p.invincible>0||this.status!=='playing')return;
       if(p.powerState==='big'||p.powerState==='star_power'){const lost=p.powerState;this.setForm('small');this.projectiles=this.projectiles.filter(q=>q.kind!=='star-power');this.setPose('small',.4);if(lost==='star_power')this.emit('powerLost');this.emit('shrink',{from:lost});}
       else {p.hp=Math.max(0,p.hp-1);this.setPose('hurt',.4);this.emit('hurt');if(lethalSmall)this.die();}

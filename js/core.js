@@ -79,6 +79,7 @@ const Session = {
     this.generation++;
   },
   end() {
+    window.SianAudio?.stop();
     this.timers.forEach(clearTimeout);
     this.intervals.forEach(clearInterval);
     this.frames.forEach(cancelAnimationFrame);

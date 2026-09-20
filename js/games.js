@@ -6,6 +6,8 @@ function gameShell(title, body, controls = "") {
   Session.begin();
   gameBody.innerHTML = `<div class="arcade"><div class="arcadeTop gameHeader"><b class="gameHeaderTitle">${title}</b><button class="backWorld gameHeaderBack">← 게임월드</button></div>${body}<div class="arcadeControls">${controls}</div></div>`;
   gameBody.querySelector(".backWorld").onclick = openGameWorld;
+  const audioTrack=title.includes("블록")?"tetris":title.includes("카드")?"memory":"brick";
+  window.SianAudio?.start(audioTrack);
 }
 function playBrick() {
   SianBrick.start();
@@ -97,7 +99,7 @@ function playTetris() {
     preview("#nextPreview", nextPiece);
     preview("#holdPreview", holdPiece);
     if (hit(0, 0, piece)) {
-      over = true;
+      over = true;window.SianAudio?.stopMusic();window.SianAudio?.effect("death");
       clearInterval(timer);
       msg.textContent = "게임 종료! 점수 " + score + "점";
       const retry=document.createElement('button');retry.textContent='다시 시작';retry.onclick=playTetris;msg.append(retry);
@@ -138,7 +140,7 @@ function playTetris() {
     gameBody.querySelector("#tCombo").textContent =
       combo > 1 ? combo + " COMBO!" : "-";
   }
-  function lock() {
+  function lock() {window.SianAudio?.effect("lock");
     piece.forEach((r, yy) =>
       r.forEach((v, xx) => {
         if (v && board[y + yy]) board[y + yy][x + xx] = 1;
@@ -148,14 +150,14 @@ function playTetris() {
     for (let r = H - 1; r >= 0; r--)
       if (board[r].every(Boolean)) {
         board.splice(r, 1);
-        board.unshift(Array(W).fill(0));
+        board.unshift(Array(W).fill(0));window.SianAudio?.effect("line");
         cleared++;
         r++;
       }
     if (cleared) {
       lines += cleared;
       combo++;
-      level = 1 + Math.floor(lines / 10);
+      level = 1 + Math.floor(lines / 10);window.SianAudio?.intensity(Math.min(1,(level-1)/9));
       clearInterval(timer);Session.intervals.delete(timer);timer=Session.interval(drop,Math.max(120,650-(level-1)*45));
       score += cleared * 100 * level + (combo > 1 ? (combo - 1) * 50 : 0);
       msg.textContent =
@@ -195,7 +197,7 @@ function playTetris() {
     }
     canHold = false;
     if (hit(0, 0, piece)) {
-      over = true;
+      over = true;window.SianAudio?.stopMusic();window.SianAudio?.effect("death");
       clearInterval(timer);
       msg.textContent = "게임 종료! 점수 " + score + "점";
       const retry=document.createElement('button');retry.textContent='다시 시작';retry.onclick=playTetris;msg.append(retry);
