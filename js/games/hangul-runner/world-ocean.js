@@ -8,8 +8,9 @@
  const previous=H.decorateWorldStage;H.decorateWorldStage=s=>{previous?.(s);if(s.worldId!==2)return;
   s.words.forEach((_,i)=>{const x=i*s.span,level=s.number,kind=['bubble-puffer','reef-crab','ink-sprite'][(i+level-1)%3];s.enemies.push({x:x+440,y:160+(i%3)*90,w:48+(kind==='reef-crab'?6:0),h:46,left:x+340,right:x+550,dir:i%2?1:-1,speed:32+level*8,kind,baseY:160+(i%3)*90,phase:i,level,hp:level>=3&&i%3===2?2:1,flying:kind!=='reef-crab'});
    if(level>=3&&i%2===1)s.enemies.push({x:x+555,y:285,w:46,h:48,left:x+535,right:x+620,dir:-1,speed:46+level*6,kind:i%4===1?'ink-sprite':'bubble-puffer',baseY:285,phase:i+3,level,hp:level===4?2:1,flying:true});
+   for(let j=0;j<2;j++){const creature=['bubble-puffer','reef-crab','ink-sprite'][(i+j+level)%3],y=creature==='reef-crab'?464:j?260:90;s.enemies.push({id:`reef-school-${i}-${j}`,x:x+(j?735:125),y,w:creature==='reef-crab'?54:46,h:46,left:x+(j?660:80),right:x+(j?800:180),dir:j?1:-1,speed:24+level*7,kind:creature,baseY:y,phase:i+j+1,level,hp:1,flying:creature!=='reef-crab'});}
    if(s.current)s.currents.push({x:x+350,w:200,vx:i%2?55:-45,vy:18});
-   if(s.cave)s.hazards.push({kind:'coral',x:x+470,y:i%2?350:70,w:65,h:120});
+   if(s.cave)s.hazards.push({kind:'coral',x:x+700,y:i%2?390:60,w:55,h:110});
    if(s.ordered&&i%2===1)s.gates.push({x:x+500,required:i+1});
   });
  };

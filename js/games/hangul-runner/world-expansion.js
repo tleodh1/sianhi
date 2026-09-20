@@ -47,6 +47,15 @@
     const kind=['seed-shell','fire-imp','pipe-snapper','berry-bandit'][(i+s.number)%4];s.enemies.push({id:`world-enemy-${i}`,kind,x:x+735,y:374,baseY:374,w:54,h:46,left:x+670,right:x+850,dir:-1,speed:45+s.worldId*4,level:s.worldId,hp:s.worldId>=7?2:1,armored:kind==='seed-shell',state:'walk',phase:i});
    }
   });
+  // Six authored route motifs vary the optional challenge while the lower learning path stays open.
+  const motifs=['arrival','stepping-stones','reward-bridge','moving-lookout','secret-overlook','guardian-approach'];
+  s.chapters=s.words.map((word,i)=>({x:i*s.span,kind:motifs[(i+s.number-1)%motifs.length],text:`${s.world.name} · ${['첫 발걸음','징검다리 길','별빛 다리','움직이는 전망대','숨은 보물길','수호자의 길'][(i+s.number-1)%6]} · ${word}`}));
+  if(![2,3].includes(s.worldId))for(const [i,chapter] of s.chapters.entries()){const x=i*s.span;
+   if(chapter.kind==='stepping-stones')s.platforms.push({x:x+60,y:348,w:105,h:24,kind:'floating',oneWay:true},{x:x+170,y:285,w:110,h:24,kind:'floating',oneWay:true});
+   if(chapter.kind==='reward-bridge')s.platforms.push({x:x+645,y:330,w:155,h:24,kind:'bridge',oneWay:true});
+   if(chapter.kind==='moving-lookout')s.platforms.push({x:x+40,y:310,w:130,h:24,kind:'floating',oneWay:true,originX:x+40,originY:310,motion:{x:25,y:25,speed:.65}});
+   if(chapter.kind==='secret-overlook'){s.platforms.push({x:x+660,y:340,w:125,h:24,kind:'floating',oneWay:true},{x:x+775,y:270,w:125,h:24,kind:'floating',oneWay:true});s.items.push({id:`lookout-star-${i}`,kind:'star',x:x+820,y:225,w:32,h:36});}
+  }
   // Headroom is derived from the BIG collision body; SMALL still reaches the underside.
   s.killY=600;const floor=s.mode==='swim'?510:420,headroom=H.PLAYER_FORMS.big.h+32;
   for(const b of s.blocks){b.fragile=false;if(b.id?.startsWith('rolling-wall')){b.y=floor-b.h;continue;}
@@ -58,13 +67,14 @@
   for(const [i,e] of s.enemies.entries()){e.theme=s.theme;e.worldId=s.worldId;e.homeY=e.baseY;e.baseW=e.w;e.baseH=e.h;e.behaviorTime=i*.7;e.attackTimer=2+i%3;
    e.artIndex=s.worldId>=5?({5:9,6:10,7:3,8:11,9:6})[s.worldId]:undefined;
    const behaviors={1:['walk','roll','emerge'],2:['swim','pinch','inflate'],3:['swoop','wind'],4:['dive','fall'],5:['chase','charge','hop'],6:['slide','ice'],7:['fire','lava'],8:['blink-dash','electric'],9:['float','teleport','energy']};
-   e.behavior=behaviors[s.worldId][i%behaviors[s.worldId].length];
+   e.behavior=behaviors[s.worldId][i%behaviors[s.worldId].length];if(s.worldId===2)e.behavior=e.kind==='reef-crab'?'pinch':e.kind==='bubble-puffer'?'inflate':'swim';
    if(e.kind==='pipe-snapper'){e.kind='cactus';e.behavior='emerge';e.speed=0;e.left=e.right=e.x;e.drainY=floor;e.y=floor;e.baseY=floor;e.retracted=true;e.artIndex=2;e.stompable=false;s.platforms.push({x:e.x-8,y:floor-12,w:e.w+16,h:12,kind:'drain',oneWay:false});}
    else if(s.worldId>=2){e.originalKind=e.kind;e.kind='world-creature';e.artIndex??=({'bubble-puffer':4,'reef-crab':5,'ink-sprite':6,'cloud-rascal':7,'storm-bat':7,'spark-drake':7,'tunnel-bat':8,'gear-shell':1})[e.originalKind]??0;}
   }
  };
  const before=H.WorldEngine.prototype.beforePhysics;
  H.WorldEngine.prototype.beforePhysics=function(dt){before.call(this,dt);const p=this.player;
+  const chapter=this.stage.chapters?.findLast(c=>p.x>=c.x);if(this.sceneState==='RUN_STAGE'&&chapter&&chapter!==this.chapter){this.chapter=chapter;this.emit('chapter',{text:chapter.text});}
   if(this.sceneState==='RUN_STAGE'&&!this.freeMotion&&this.stage.worldId===9)p.gravity=1100;
   for(const h of this.stage.hazards)if(h.kind==='electric')h.inactive=(this.elapsed+(h.phase||0))%4<2;
   for(const e of this.stage.enemies){if(e.defeated)continue;e.behaviorTime+=dt;e.attackTimer-=dt;e.hitTime=Math.max(0,(e.hitTime||0)-dt);
