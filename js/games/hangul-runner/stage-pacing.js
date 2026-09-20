@@ -53,7 +53,7 @@
   if(s.worldId===3){
    // Required letters alternate between visible flight-route pickups and block rewards.
    const rewardBlocks=s.blocks.filter(b=>b.kind==='reward');
-   const hiddenLetterCount=n===3?3:2;
+   const hiddenLetterCount=s.boss?3:n===3?4:3;
    const letterCandidates=s.items.filter(a=>a.kind==='letter').slice(0,hiddenLetterCount);
    letterCandidates.forEach((letter,i)=>{const bi=Math.min(rewardBlocks.length-1,1+i*2),block=rewardBlocks[bi];if(!block)return;const orphan=block.rewardId;block.rewardId=letter.id;letter.contained=true;s.items=s.items.filter(a=>a.id!==orphan);});
    // Ensure both growth steps exist in remaining reward blocks.
