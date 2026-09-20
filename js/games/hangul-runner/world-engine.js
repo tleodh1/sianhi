@@ -3,7 +3,7 @@
  H.WorldEngine=class extends H.Engine{
   constructor(stage,options){super(stage,options);this.setForm('small');this.sequence=0;this.flowTime=0;this.mode=stage.mode;this.freeMotion=false;this.projectiles=[];this.bossAttacks=[];this.answerCooldown=0;this.sceneState='RUN_STAGE';this.sceneTimer=0;}
   damage(){super.damage(true);}
-  beforePhysics(dt){this.flowTime+=dt;this.mode=this.stage.mode;
+  beforePhysics(dt){const p=this.player;if(p.flightTime>0){p.flightTime=Math.max(0,p.flightTime-dt);if(!p.flightTime){p.flight=false;this.emit('flightEnd');}}this.flowTime+=dt;this.mode=this.stage.mode;
    if(this.stage.runZones&&this.stage.runZones.some(z=>this.player.x>=z.x&&this.player.x<z.x+z.w))this.mode='run';
    if(this.stage.waterZones){const p=this.player;this.mode=this.stage.waterZones.some(z=>p.x>=z.x&&p.x<z.x+z.w&&p.y+p.h>z.surface+Math.sin(this.elapsed*.6)*25)?'swim':'run';}
    if(this.stage.flightPickup&&this.mode==='fly'&&!this.player.flight)this.mode='run';

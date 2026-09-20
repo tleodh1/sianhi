@@ -25,6 +25,7 @@
     resize(width){this.width=width<620?640:960;this.height=540;this.dpr=Math.min(2,window.devicePixelRatio||1);this.canvas.width=this.width*this.dpr;this.canvas.height=this.height*this.dpr;}
     sprite(i,x,y,w,h,flip){draw(this.g,this.art.sprites[i],x,y,w,h,flip);}
     hero(e,camera=0){const g=this.g,p=e.player,t=e.elapsed;let frame={idle:8,jump:9,fall:10,land:11,hurt:12,'power-up':13,small:12,dead:14,celebrate:15}[p.pose];if(p.pose==='run')frame=Math.floor(t*12)%8;
+      if(p.flightTime>0){g.save();g.strokeStyle='#fff4b0';g.shadowColor='#7aeeff';g.shadowBlur=16;g.lineWidth=5;const cx=p.x-camera+p.w/2,cy=p.y+p.h*.45;for(const dir of [-1,1]){g.beginPath();g.moveTo(cx,cy+8);g.quadraticCurveTo(cx+dir*45,cy-30-Math.sin(t*12)*8,cx+dir*32,cy+15);g.stroke();}g.restore();}
       const s=this.art.frames[frame??8],growth=p.growthTime?(p.growthFrom+(p.h-p.growthFrom)*(1-Math.pow(p.growthTime/.45,2))):p.h,r=HR.playerRenderBounds(p,s,growth*(p.pose==='land'?.92:1));
       if(p.invincible<=0||Math.floor(t*13)%2===0||e.status==='dead'){g.save();if(p.powerState==='big'){g.shadowColor='#ffe26c';g.shadowBlur=16;}draw(g,s,r.x-camera,r.y,r.w,r.h,p.facing<0);g.restore();}}
     surfaceSprite(i,x,surface,w,h,anchor){const s=this.art.sprites[i],offset=(anchor*s.image.width/([387,251,305][i])-s.y)/s.h*h;this.sprite(i,x,surface-offset,w,h);}
