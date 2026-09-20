@@ -17,6 +17,7 @@
   if(ch===6){q.options=[];q.tiles=shuffle([...q.word.toUpperCase()].map((letter,i)=>({id:'letter-'+i,letter})),stage*61);q.prompt='알파벳을 차례로 눌러 줘. 빈칸으로 옮겨도 돼.';q.parts=[eng(q.word),ko(q.prompt)];}
   if(ch===8){q.phraseKind=k%4;q.word=['apple','dog','car','cat'][q.phraseKind];q.correct=['red','big','blue','two'][q.phraseKind];q.options=[['red','blue','yellow'],['big','small'],['red','blue','yellow'],['one','two','three']][q.phraseKind];q.expression=q.correct+' '+q.word+(q.phraseKind===3?'s':'');q.parts=[ko('그림과 영어 표현을 연결해 봐.'),eng('Find '+q.expression+'.')];}
   if(ch===9){q.animal=k%2?'dog':'cat';q.word=q.animal;q.correct=k%2?'under':'running';q.options=k%2?['on','under','in']:['running','walking','sleeping'];q.expression='The '+q.animal+' is '+q.correct+(k%2?' the box.':'.');q.parts=[ko('문장을 듣고 같은 장면을 찾아 줘.'),eng(q.expression)];}
+  q.lexeme={image:q.word,spelling:q.word.toUpperCase(),pronunciation:{text:q.word,lang:'en-US'}};
   q.explanation='그림, 영어 글자, 소리를 함께 기억했어!';
 
  }else{
