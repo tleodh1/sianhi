@@ -29,7 +29,7 @@
   for(let i=0;i<3;i++)s.items.push({id:`star-${i}`,kind:'star',x:end*[.23,.55,.8][i]+bonusShift,y:swim?160:sky?(i?120:260):260,w:32,h:36,requiresFlight:sky&&i>0});
   if(![1,2,3,4].includes(s.worldId))s.items.push({id:'route-growth',kind:'power',x:490,y:swim?285:365,w:40,h:45},{id:'route-power-star',kind:'powerStar',x:end*.4,y:swim?250:365,w:40,h:42});
   const rowFractions=s.worldId===1?(n===1?[.14,.32,.52,.72]:n===2?[.12,.3,.5,.7,.84]:[.14,.28,.45,.62,.78]):s.worldId===2?(n===1?[.13,.31,.52,.74]:n===2?[.1,.26,.44,.62,.8]:n===3?[.08,.21,.36,.52,.68,.83]:[.1,.24,.4,.56,.72,.86]):s.worldId===3?(n===1?[.12,.28,.46,.65,.82]:n===2?[.1,.24,.39,.55,.7,.84]:n===3?[.09,.21,.34,.48,.62,.76,.88]:[.1,.24,.4,.57,.73,.86]):s.worldId===4?(n===1?[.11,.27,.46,.66,.83]:n===2?[.09,.23,.39,.56,.72,.87]:n===3?[.08,.2,.34,.49,.64,.78,.9]:[.1,.24,.4,.57,.73,.87]):n===2?[.18,.47,.7]:[.2,.67];
-  rowFractions.forEach((fraction,i)=>{const x=end*fraction,y=(s.worldId===4&&s.boss)?330:floor-H.PLAYER_FORMS.big.h-38-48;
+  rowFractions.forEach((fraction,i)=>{const x=end*fraction,y=floor-H.PLAYER_FORMS.big.h-38-48;
    for(let j=0;j<3;j++)s.blocks.push({id:`route-block-${i}-${j}`,x:x+j*54,y,w:48,h:48,kind:['breakable','reward','hard'][j],revealed:true,rewardId:j===1?`route-reward-${i}`:null,oceanSkin:j===1?'pearl':j===0?'coral':'relic'});
    const rewardKind=s.worldId===1?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):s.worldId===2?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'star':'coin'):s.worldId===3?(i%3===0?'power':i%3===1?'powerStar':'star'):s.worldId===4?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):(i===0?'power':'star');s.items.push({id:`route-reward-${i}`,kind:rewardKind,x:0,y:0,w:40,h:rewardKind==='power'?45:42,contained:true});
   });
@@ -80,10 +80,6 @@
    hiddenLetters.forEach((letter,i)=>{const block=rewardBlocks[Math.min(rewardBlocks.length-1,1+i*2)]||rewardBlocks[i];if(!block)return;const old=block.rewardId;block.rewardId=letter.id;letter.contained=true;s.items=s.items.filter(a=>a.id!==old);});
    // 4-3 remains ordered: visible/hidden targets still progress left-to-right.
    if(s.ordered){letters.forEach((letter,i)=>{letter.index=i;letter.x=300+(end-1050)*i/Math.max(1,letters.length-1);});rewardBlocks.forEach((b,i)=>{const letter=hiddenLetters[i];if(letter&&b.rewardId===letter.id)b.x=Math.max(b.x,letter.x-40);});}
-   // 4-4 block rows need a real step-up path so SMALL form can stand on the bricks and collect popped letters.
-   if(s.boss){
-    for(const b of rewardBlocks){s.platforms.push({x:b.x-74,y:372,w:62,h:16,kind:'pipe',oneWay:true});}
-   }
    // 4-4 SMALL form must always have a reachable escape route before a fatal pit.
    if(s.boss){
     const bossVoids=s.hazards.filter(a=>a.kind==='void');
