@@ -1,6 +1,6 @@
 const a=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const ctx={window:{},state:{records:{},stage100:{'한자':17,'한글':28},completed:{'learn:한자:1':1},stars:9},Math,localStorage:{setItem(){}}};vm.createContext(ctx);
-for(const f of ['core','content','tracing','mission-model','learning-space','math-space','hanja-data','hanja-space','space-curriculum']){vm.runInContext(fs.readFileSync('js/curriculum/'+f+'.js','utf8'),ctx);if(f==='tracing')ctx.HangulTrace=ctx.window.HangulTrace;}
+for(const f of ['core','content','tracing','mission-model','learning-space','math-space','hanja-data','hanja-space','discovery-model','space-curriculum']){vm.runInContext(fs.readFileSync('js/curriculum/'+f+'.js','utf8'),ctx);if(f==='tracing')ctx.HangulTrace=ctx.window.HangulTrace;}
 const M=ctx.window.MissionModel,H=ctx.window.HanjaSpace,C=ctx.window.HanjaCharacters;
 const counts={};for(const subject of ['수학','사고력 수학','연산'])for(let s=1;s<=(subject==='연산'?30:100);s++)for(let v=0;v<5;v++){const q=M.make(subject,s,v);a.ok(M.validate(q),q.id);counts[q.mode]=(counts[q.mode]||0)+1;for(const it of q.items)if(q.expected[it.id]&&q.expected[it.id]!=='none')a.ok(q.targets.some(t=>M.accepts(q,it.id,t.id)),q.id+' reachable');}
 const venn=M.make('사고력 수학',42);a.equal(venn.mode,'venn');a.equal(venn.expected['1'],'both');a.equal(venn.expected['3'],'outside');a.equal(M.accepts(venn,'1','right'),false);

@@ -89,7 +89,8 @@ const Session = {
     this.frames.clear();
     this.keys = [];
     this.cleanups = [];
-    if ("speechSynthesis" in window) speechSynthesis.cancel();
+    if (window.LearningSpeech) window.LearningSpeech.stop();
+    else if ("speechSynthesis" in window) speechSynthesis.cancel();
   },
   timeout(fn, ms) {
     const token = this.generation;
@@ -133,6 +134,7 @@ game.addEventListener("close", () => Session.end());
 game.addEventListener("cancel", () => Session.end());
 function say(text, lang = "ko-KR") {
   if (!state.sound || !("speechSynthesis" in window)) return;
+  if (window.LearningSpeech) return window.LearningSpeech.speak([{text,lang}],{automatic:true});
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = lang;
