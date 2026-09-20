@@ -63,6 +63,7 @@
    b.y=(support?.y??floor)-headroom-b.h;
    const reward=s.items.find(i=>i.id===b.rewardId);if(reward?.contained&&reward.kind==='coin'&&b.kind==='reward'&&Number(b.id.match(/\d+/)?.[0]||0)%3===0){reward.kind='power';reward.w=40;reward.h=45;}
   }
+  for(const item of s.items){const match=item.id.match(/^coin-(\d+)-(\d+)$/);if(match){const row=s.blocks.find(b=>b.id===`block-${match[1]}-0`||b.id===`extra-block-${match[1]}-0`);if(row)item.x=row.x-155+Number(match[2])*45;}}
   for(const item of s.items){if(item.contained)continue;for(const b of s.blocks){if(b.hidden&&!b.revealed)continue;if(H.overlaps(item,b)){item.y=b.y-item.h-12;}}}
   for(const [i,e] of s.enemies.entries()){e.theme=s.theme;e.worldId=s.worldId;e.homeY=e.baseY;e.baseW=e.w;e.baseH=e.h;e.behaviorTime=i*.7;e.attackTimer=2+i%3;
    e.artIndex=s.worldId>=5?({5:9,6:10,7:3,8:11,9:6})[s.worldId]:undefined;
