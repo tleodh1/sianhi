@@ -38,7 +38,7 @@
   const preferred=swim?(s.boss?['inflate','ink','shark','eel','pinch','jelly']:n===1?['inflate','jelly']:n===2?['pinch','jelly','inflate']:['jelly','pinch','inflate']):null;
   for(let i=0;i<total;i++){let e=candidates.find(a=>!used.has(a)&&preferred?.[i]===a.behavior)||candidates.find(a=>!used.has(a)&&a.behavior!==s.enemies.at(-1)?.behavior&&(a.originalKind||a.kind)!==(s.enemies.at(-1)?.originalKind||s.enemies.at(-1)?.kind))||candidates.find(a=>!used.has(a));if(!e&&s.worldId===2&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`ocean-extra-${n}-${i}`,phase:i+11,behaviorTime:i*.47};}if(!e&&s.worldId===3&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`sky-extra-${n}-${i}`,phase:i+7,behaviorTime:i*.53};}if(!e&&s.worldId===4&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`underground-extra-${n}-${i}`,phase:i+13,behaviorTime:i*.49};}if(!e)continue;used.add(e);
    const x=end*(total===1?.48:.26+i*.56/Math.max(1,total-1));Object.assign(e,{x,left:x-65,right:x+95,speed:Math.min(65,e.speed),hp:s.worldId>=7?2:1,level:Math.min(3,e.level||1),phase:i,behaviorTime:i*.7});
-   if(!swim){e.y=e.baseY=e.homeY=sky?190:420-e.h;}else{e.y=e.baseY=e.homeY=[360,130,390,145,430,170][i];}
+   if(!swim){e.y=e.baseY=e.homeY=sky?190:420-e.h;if(s.worldId===4){e.flying=false;e.behavior=e.behavior==='dive'?'patrol':e.behavior;}}else{e.y=e.baseY=e.homeY=[360,130,390,145,430,170][i];}
    if(e.kind==='cactus'){e.left=e.right=x;e.drainY=floor;e.y=e.baseY=floor;s.platforms.push({x:x-8,y:floor-12,w:e.w+16,h:12,kind:'drain'});}s.enemies.push(e);
   }
   if(s.worldId===1){
@@ -92,7 +92,7 @@
    const drainFractions=n===1?[.18,.38,.68,.86]:n===2?[.12,.29,.47,.66,.84]:[.1,.24,.39,.54,.69,.84];
    drainFractions.forEach((fraction,i)=>{const x=end*fraction;s.platforms.push({x:x-30,y:408,w:60,h:12,kind:'drain',oneWay:false});
     if(i%2===0)s.enemies.push({id:`sewer-cactus-${n}-${i}`,kind:'cactus',x:x-18,y:420,w:48,h:52,left:x-18,right:x-18,dir:-1,speed:0,baseY:420,homeY:420,drainY:420,phase:i+20,level:n,hp:1,retracted:true,stompable:false,behavior:'emerge'});
-    else s.enemies.push({id:`sewer-bat-${n}-${i}`,kind:'world-creature',originalKind:'tunnel-bat',artIndex:8,x:x-30,y:190-(i%3)*35,w:50,h:44,left:x-110,right:x+110,dir:i%3?1:-1,speed:70+n*5,baseY:190-(i%3)*35,homeY:190-(i%3)*35,phase:i+24,level:n,hp:1,flying:true,behavior:'dive',behaviorTime:i*.6,attackTimer:2+i%2});
+    else s.enemies.push({id:`sewer-shell-${n}-${i}`,kind:'gear-shell',x:x-30,y:372,w:50,h:48,left:x-110,right:x+110,dir:i%3?1:-1,speed:52+n*5,baseY:372,homeY:372,phase:i+24,level:n,hp:n>=3?2:1,flying:false,armored:true,behavior:'patrol',behaviorTime:i*.6,rollSpeed:360+n*12});
    });
    for(const f of (n===1?[.3,.76]:n===2?[.2,.55,.78]:[.17,.33,.58,.77,.91])){const x=end*f;s.hazards.push({kind:'open-drain',x:x-22,y:402,w:44,h:28,fatal:true});}
    for(const e of s.enemies)for(const h of pits){const center=h.x+h.w/2;if(Math.abs(e.x-center)<105){const shift=e.x<center?-135:135;e.x+=shift;e.left+=shift;e.right+=shift;}}
