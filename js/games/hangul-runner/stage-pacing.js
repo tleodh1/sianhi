@@ -67,11 +67,11 @@
   }
   if(s.worldId===2){
    const rewardBlocks=s.blocks.filter(b=>b.kind==='reward');
-   const hideCount=s.boss?4:n===3?4:n===2?3:2;
+   const hideCount=s.boss?4:n===3?2:n===2?3:2;
    const letters=s.items.filter(a=>a.kind==='letter');
    // Visible letters no longer sit on one flat line: alternate upper/middle/lower swim lanes.
    const lanes=[155,245,335,205,300,120];
-   letters.forEach((letter,i)=>{letter.y=lanes[(i+n)%lanes.length];letter.x+=((i%3)-1)*70;});
+   letters.forEach((letter,i)=>{letter.y=lanes[(i+n)%lanes.length];letter.x+=((i%3)-1)*70;if(n===3&&i===2){letter.y=125;letter.x+=90;letter.contained=false;}});
    letters.slice(0,hideCount).forEach((letter,i)=>{const block=rewardBlocks[Math.min(rewardBlocks.length-1,i*2+1)]||rewardBlocks[i];if(!block)return;const old=block.rewardId;block.rewardId=letter.id;letter.contained=true;s.items=s.items.filter(a=>a.id!==old);});
    const occupied=new Set(letters.filter(l=>l.contained).map(l=>rewardBlocks.find(b=>b.rewardId===l.id)));
    const available=rewardBlocks.filter(b=>!occupied.has(b));
