@@ -47,6 +47,14 @@
     const kind=['seed-shell','fire-imp','pipe-snapper','berry-bandit'][(i+s.number)%4];s.enemies.push({id:`world-enemy-${i}`,kind,x:x+735,y:374,baseY:374,w:54,h:46,left:x+670,right:x+850,dir:-1,speed:45+s.worldId*4,level:s.worldId,hp:s.worldId>=7?2:1,armored:kind==='seed-shell',state:'walk',phase:i});
    }
   });
+  // Headroom is derived from the BIG collision body; SMALL still reaches the underside.
+  const floor=s.mode==='swim'?510:420,headroom=H.PLAYER_FORMS.big.h+32;
+  for(const b of s.blocks){b.fragile=false;if(b.id?.startsWith('rolling-wall')){b.y=floor-b.h;continue;}
+   const support=b.hidden?s.platforms.filter(a=>a.oneWay&&a.x<b.x+b.w&&a.x+a.w>b.x&&a.y>b.y).sort((a,c)=>a.y-c.y)[0]:null;
+   b.y=(support?.y??floor)-headroom-b.h;
+   const reward=s.items.find(i=>i.id===b.rewardId);if(reward?.contained&&reward.kind==='coin'&&b.kind==='reward'&&Number(b.id.match(/\d+/)?.[0]||0)%3===0){reward.kind='power';reward.w=40;reward.h=45;}
+  }
+  for(const item of s.items){if(item.contained)continue;for(const b of s.blocks){if(b.hidden&&!b.revealed)continue;if(H.overlaps(item,b)){item.y=b.y-item.h-12;}}}
   for(const [i,e] of s.enemies.entries()){e.theme=s.theme;e.worldId=s.worldId;e.homeY=e.baseY;e.baseW=e.w;e.baseH=e.h;e.behaviorTime=i*.7;e.attackTimer=2+i%3;
    e.artIndex=s.worldId>=5?({5:9,6:10,7:3,8:11,9:6})[s.worldId]:undefined;
    const behaviors={1:['walk','roll','emerge'],2:['swim','pinch','inflate'],3:['swoop','wind'],4:['dive','fall'],5:['chase','charge','hop'],6:['slide','ice'],7:['fire','lava'],8:['blink-dash','electric'],9:['float','teleport','energy']};

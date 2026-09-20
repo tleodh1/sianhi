@@ -17,7 +17,7 @@
    if(this.sceneState==='TRANSITION'||this.sceneState==='BOSS_INTRO'){p.velocityX=p.velocityY=0;return;}
    if(this.freeMotion){const speed=this.mode==='swim'?175:230;p.velocityX=((!!input.right)-(!!input.left))*speed;
     const wanted=((!!input.down)-(!!input.jump))*speed;p.velocityY+=(wanted-p.velocityY)*Math.min(1,dt*(this.mode==='swim'?3:5));
-    p.y=Math.max(32,Math.min(460-p.h,p.y));if(p.y<=32&&p.velocityY<0)p.velocityY=0;
+    p.y=Math.max(32,Math.min((this.mode==='swim'?510:540)-p.h,p.y));if(p.y<=32&&p.velocityY<0)p.velocityY=0;
    }
    for(const c of this.stage.currents||[])if(p.x>=c.x&&p.x<c.x+c.w){p.velocityX+=c.vx;p.velocityY+=c.vy*dt;}
    // Ordered learning remains a collection rule, never an invisible movement wall.
