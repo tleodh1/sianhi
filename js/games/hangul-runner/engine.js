@@ -81,7 +81,17 @@
         const stomp=e.stompable!==false&&p.velocityY>0&&oldY+p.h<=e.y+Math.min(12,e.h*.3);if(stomp){p.y=e.y-p.h;p.velocityY=-390;p.isGrounded=false;this.combo++;this.comboTime=2;this.burst(e.x+e.w/2,e.y+8);if((e.hp||1)>1){e.hp--;e.hitTime=.35;this.emit('enemyHit',{enemy:e,hp:e.hp});}else if(e.armored&&e.state!=='shell'){e.state='shell';e.speed=0;e.h=Math.max(28,e.h-12);e.y=e.baseY+12;this.emit('enemyShell',{enemy:e,combo:this.combo});}else if(e.state==='shell'){e.state='rolling';e.dir=p.x<e.x?1:-1;this.emit('enemyRoll',{enemy:e,combo:this.combo});}else{e.defeated=true;e.defeatTime=.45;this.coins++;this.emit('enemyStomp',{enemy:e,combo:this.combo});}continue;}
         if(e.state==='shell'){e.state='rolling';e.dir=p.x<e.x?1:-1;p.velocityX=-e.dir*110;this.emit('enemyRoll',{enemy:e,combo:this.combo});}else this.damage(e.kind==='cactus');}
       for(const roller of this.stage.enemies.filter(e=>!e.defeated&&e.state==='rolling')){for(const target of this.stage.enemies){if(target===roller||target.defeated||!hit(roller,target))continue;target.defeated=true;target.defeatTime=.45;roller.dir*=-1;this.combo++;this.comboTime=2;this.burst(target.x+target.w/2,target.y+target.h/2);this.emit('enemyCombo',{enemy:target,combo:this.combo});}for(const b of this.stage.blocks||[]){if(b.removed||b.kind!=='breakable'||!hit(roller,b))continue;b.removed=true;roller.dir*=-1;this.burst(b.x+b.w/2,b.y+b.h/2);this.emit('rollingBreak',{block:b});}}
-      for(const h of this.stage.hazards){if(h.kind==='crate')h.x=h.origin+Math.sin(this.elapsed*1.5)*h.range;if(!h.inactive&&hit(p,h)){if(['lava','void','open-drain'].includes(h.kind))this.fatalFall();else this.damage();}}
+      for(const h of this.stage.hazards){
+        if(h.kind==='crate')h.x=h.origin+Math.sin(this.elapsed*1.5)*h.range;
+        if(h.inactive||!hit(p,h))continue;
+        if(h.kind==='void'){
+          // A terrain gap should kill only after the player has actually started falling into it.
+          // Merely touching the pit's X range while still standing/jumping across must not be fatal.
+          const feet=p.y+p.h;
+          if(!p.isGrounded&&p.velocityY>=0&&feet>h.y+24)this.fatalFall();
+        }else if(h.kind==='lava'||h.kind==='open-drain')this.fatalFall();
+        else this.damage();
+      }
       for(const cp of this.stage.checkpoints)if(p.x>=cp.x&&cp.x>this.checkpoint.x){this.checkpoint=cp;this.emit('checkpoint',{checkpoint:cp});}
       if(p.y>(this.stage.killY||720))this.fatalFall();
       if(this.afterPhysics)this.afterPhysics(dt,input);
