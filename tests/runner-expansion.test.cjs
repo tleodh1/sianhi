@@ -1,8 +1,8 @@
 const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
 const ctx=vm.createContext({});
-for(const f of ['stage-data','engine','world-data','world-engine','world-forest','world-ocean','world-sky','world-underground','world-expansion','boss'])vm.runInContext(fs.readFileSync(`js/games/hangul-runner/${f}.js`,'utf8'),ctx);
+for(const f of ['stage-data','engine','world-data','world-engine','world-forest','world-ocean','world-sky','world-underground','world-expansion','ocean-expedition','boss'])vm.runInContext(fs.readFileSync(`js/games/hangul-runner/${f}.js`,'utf8'),ctx);
 const H=ctx.HangulRunner;
-assert.equal(H.worlds.length,9);assert.equal(H.worldStages.length,36);
+assert.equal(H.worlds.length,9);assert.equal(H.worldStages.length,41);
 for(const d of H.worldStages){const s=H.buildWorldStage(d.id);assert(s.words.length>=12,d.id);const maxSpeed=s.mode==='swim'?230:s.mode==='fly'?270:270;assert((s.goal.x-60)/maxSpeed>=40,d.id+' minimum travel');assert(s.blocks.length>=30,d.id+' content');assert(s.enemies.length>=10,d.id+' enemies');for(const i of s.items.filter(i=>!i.contained)){assert(i.x>=0&&i.x+i.w<s.length,d.id+' item bounds');assert(i.y>=32,d.id+' item height');}}
 const stage=H.buildWorldStage('3-1'),e=new H.WorldEngine(stage),wings=stage.items.find(i=>i.kind==='flight');
 assert(wings.x<stage.items.find(i=>i.requiresFlight).x);
@@ -24,8 +24,8 @@ for(let world=1;world<=9;world++){const sim=new H.WorldEngine(H.buildWorldStage(
  const kinds=new Set(sim.stage.enemies.map(x=>x.behavior));assert(kinds.size>=2,`world ${world} behavior variety`);
  for(let tick=0;tick<600;tick++)sim.step(.02,{right:true,jump:tick%90<12});
  for(const enemy of sim.stage.enemies)assert(Number.isFinite(enemy.x)&&Number.isFinite(enemy.y),`world ${world} finite enemy motion`);
- const boss=new H.WorldEngine(H.buildWorldStage(`${world}-4`));H.enterBossArena(boss);assert.equal(boss.stage.enemies.length,0);assert.equal(boss.canFinish(),false);assert(boss.boss.h>boss.player.h*2);assert(boss.boss.maxHp>=4);
+ const boss=new H.WorldEngine(H.buildWorldStage(`${world}-${world===2?9:4}`));H.enterBossArena(boss);assert.equal(boss.stage.enemies.length,0);assert.equal(boss.canFinish(),false);assert(boss.boss.h>boss.player.h*2);assert(boss.boss.maxHp>=4);
 }
 const state={stars:19,level:4,progress:{reading:7},records:{claw:{coins:5},hangulRunner:{version:1,stages:{1:{rating:3}},adventure:{stages:{'4-4':{rating:3}},worldRewards:{4:{earnedAt:1}}}}}};
 const before=JSON.stringify(state.records.claw);H.recordWorldClear(state,{stageId:'5-1',worldId:5,rating:2,seconds:55,boss:false});assert.equal(state.records.hangulRunner.adventure.stages['4-4'].rating,3);assert.equal(JSON.stringify(state.records.claw),before);assert.equal(state.progress.reading,7);assert.equal(state.level,4);
-console.log('PASS 36 stages, content bounds, flight input, cactus damage, immunity, additive saves');
+console.log('PASS 41 stages, content bounds, flight input, cactus damage, immunity, additive saves');

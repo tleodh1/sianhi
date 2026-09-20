@@ -50,3 +50,7 @@ require("../tests/brick-touch.test.cjs");
 require("../tests/art-engine.test.cjs");
 require("../tests/art-storage.test.cjs");
 require("../tests/art-collection.test.cjs");
+
+require("../tests/runner-expansion.test.cjs");
+require("../tests/runner-physics.test.cjs");
+require("../tests/runner-ocean.test.cjs");

@@ -54,6 +54,8 @@
           if(b.kind==='breakable'){if(p.powerState==='big'){b.removed=true;this.burst(b.x+b.w/2,b.y+b.h/2);this.emit('blockBreak',{block:b});}else{b.cracked=true;b.crack=.35;this.emit('blockCrack',{block:b});}}
           if(b.kind==='reward'&&!b.used){b.used=true;const reward=this.stage.items.find(i=>i.id===b.rewardId);if(reward){reward.contained=false;reward.x=b.x+(b.w-reward.w)/2;reward.y=b.y-reward.h-8;reward.pop=.4;reward.velocityY=-130;reward.dropReward=true;reward.originBlock=b;}this.emit('rewardPop',{block:b,reward});}
         }}
+      // Solid overhead reef edges stop upward swimming; one-way ledges stay passable.
+      for(const a of this.stage.platforms){if(!a.oneWay&&p.velocityY<0&&p.x+p.w>a.x+2&&p.x<a.x+a.w-2&&oldY>=a.y+a.h-1&&p.y<a.y+a.h){p.y=a.y+a.h;p.velocityY=0;}}
       for(const a of this.stage.platforms){if(p.x+p.w>a.x+2&&p.x<a.x+a.w-2&&p.velocityY>=0&&oldY+p.h<=a.y+1&&p.y+p.h>=a.y){p.y=a.y-p.h;p.velocityY=0;p.isGrounded=true;break;}}
       for(const b of this.stage.blocks||[]){if(b.removed||(!b.revealed&&b.hidden))continue;if(p.x+p.w>b.x+2&&p.x<b.x+b.w-2&&p.velocityY>=0&&oldY+p.h<=b.y+1&&p.y+p.h>=b.y){p.y=b.y-p.h;p.velocityY=0;p.isGrounded=true;break;}}
       if(!wasGrounded&&p.isGrounded){this.setPose('land',.1);this.emit('land');}

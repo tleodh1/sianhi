@@ -19,14 +19,14 @@
     const wanted=((!!input.down)-(!!input.jump))*speed;p.velocityY+=(wanted-p.velocityY)*Math.min(1,dt*(this.mode==='swim'?3:5));
     p.y=Math.max(32,Math.min((this.mode==='swim'?510:540)-p.h,p.y));if(p.y<=32&&p.velocityY<0)p.velocityY=0;
    }
-   for(const c of this.stage.currents||[])if(p.x>=c.x&&p.x<c.x+c.w){p.velocityX+=c.vx;p.velocityY+=c.vy*dt;}
+   for(const c of this.stage.currents||[])if(p.x>=c.x&&p.x<c.x+c.w&&(c.y===undefined||p.y+p.h>c.y&&p.y<c.y+c.h)){p.velocityX+=c.vx;p.velocityY+=c.vy*dt;}
    // Ordered learning remains a collection rule, never an invisible movement wall.
    for(const gate of this.stage.gates||[])if(this.sequence<gate.required&&p.x+p.w>gate.x&&!gate.warned){gate.warned=true;this.emit('orderGuide',{text:this.stage.words[this.sequence],x:gate.x});}
   }
   canCollect(item){if(item.kind!=='letter'||(!this.stage.ordered&&!this.stage.boss))return true;
    if(item.index!==this.sequence){if(this.goalHint<=0){this.goalHint=2;this.emit('order',{text:this.stage.words[this.sequence]});}return false;}this.sequence++;return true;
   }
-  afterPhysics(dt){if(this.freeMotion&&this.poseTime<=0)this.player.pose='run';if(H.tickBossScene&&this.stage.boss)H.tickBossScene(this,dt);}
+  afterPhysics(dt){if(this.freeMotion&&this.poseTime<=0){const p=this.player;p.pose=this.mode==='swim'?'swim':'run';p.swimPose=Math.abs(p.velocityY)>55?(p.velocityY<0?'up':'down'):Math.abs(p.velocityX)>80?'move':'idle';}if(H.tickBossScene&&this.stage.boss)H.tickBossScene(this,dt);}
   get letterCount(){return this._normalLetterCount??super.letterCount;}
   canFinish(){return !this.stage.boss||this.sceneState==='EXIT_OPEN';}
   result(){return {...super.result(),worldId:this.stage.worldId,boss:!!this.stage.boss};}
