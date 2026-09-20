@@ -58,9 +58,9 @@
     return { toys, cabinet };
   };
   C.project = (x, z, height = 0) => ({
-    x: 400 + x * (1 - 0.17 * z),
-    y: 389 - z * 124 - height,
-    scale: 1 - z * 0.18,
+    x: 400 + x * (1 - 0.25 * z),
+    y: 408 - z * 205 - height,
+    scale: 1.12 - z * 0.40,
   });
   C.Renderer = class {
     constructor(canvas, art) {
@@ -78,7 +78,7 @@
       const g = this.g,
         p = C.project(toy.x, toy.z, toy.height + extraHeight),
         s = this.art.toys[def.sprite],
-        h = def.radius * 2.9 * p.scale * (toy.scale || 1),
+        h = def.radius * 2.65 * p.scale * (toy.scale || 1),
         w = (h * s.w) / s.h;
       g.save();
       // Rotate around the plush centre. Rotating around the feet made upside-down
@@ -97,12 +97,21 @@
       const g = this.g,
         c = e.claw;
       g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      g.globalAlpha=1;g.globalCompositeOperation='source-over';g.shadowBlur=0;
       g.drawImage(this.art.cabinet, 0, 0, 800, 533);
+      // Opaque interior removes decorative, ungrabbable plush printed in cabinet art.
+      g.save();g.beginPath();g.rect(88,92,624,315);g.clip();
+      const wall=g.createLinearGradient(0,92,0,230);wall.addColorStop(0,'#537c81');wall.addColorStop(1,'#b4d6cd');g.fillStyle=wall;g.fillRect(88,92,624,315);
+      const floor=g.createLinearGradient(0,200,0,410);floor.addColorStop(0,'#85aaa9');floor.addColorStop(.5,'#c9ddd0');floor.addColorStop(1,'#f0e6c7');g.fillStyle=floor;g.beginPath();g.moveTo(165,205);g.lineTo(635,205);g.lineTo(714,408);g.lineTo(86,408);g.closePath();g.fill();
+      g.strokeStyle='#426d7060';g.lineWidth=1.5;
+      for(let x=-300;x<=300;x+=75){const back=C.project(x,1),front=C.project(x,0);g.beginPath();g.moveTo(back.x,back.y);g.lineTo(front.x,front.y);g.stroke();}
+      for(const z of [0,.25,.5,.75,1]){const l=C.project(-305,z),r=C.project(305,z);g.beginPath();g.moveTo(l.x,l.y);g.lineTo(r.x,r.y);g.stroke();}
+      g.restore();
       // Floor shadows are projected from true x/z, not arbitrary screen positions.
       for (const t of e.toys.filter((t) => !t.won && t !== e.held)) {
         const d = C.catalog.find((d) => d.id === t.id),
           p = C.project(t.x, t.z);
-        g.fillStyle = "#154b5530";
+        g.fillStyle = t.z<.35?"#173a5555":"#173a5535";
         g.beginPath();
         g.ellipse(
           p.x,
@@ -132,6 +141,8 @@
       );
       g.stroke();
       g.restore();
+      // A light plumb line marks the claw floor position, never a winning toy.
+      g.save();g.setLineDash([3,7]);g.strokeStyle='#fff7c477';g.lineWidth=1.5;g.beginPath();g.moveTo(target.x,target.y-c.height);g.lineTo(target.x,target.y);g.stroke();g.restore();
       const sorted = e.toys
         .filter((t) => !t.won && t !== e.held)
         .sort((a, b) => b.z - a.z);
@@ -149,6 +160,7 @@
           true,
         );
       this.drawClaw(e);
+      g.save();g.fillStyle='#173b4de6';g.beginPath();g.roundRect(305,410,190,24,10);g.fill();g.fillStyle='#fff';g.font='700 13px Pretendard,sans-serif';g.textAlign='center';g.fillText(c.z>.66?'뒤쪽 · BACK':c.z>.34?'가운데 · MIDDLE':'앞쪽 · FRONT',400,427);g.restore();
       // Gentle glass highlights stay at the sides, leaving aiming unobstructed.
       g.save();
       g.globalAlpha = 0.14;
@@ -352,8 +364,8 @@
           py <= b.y
         )
           return { x: b.toy.x, z: b.toy.z };
-      const z = C.clamp((389 - py) / 124, 0.08, 0.94);
-      return { x: C.clamp((px - 400) / (1 - 0.17 * z), -240, 240), z };
+      const z = C.clamp((408 - py) / 205, 0.08, 0.94);
+      return { x: C.clamp((px - 400) / (1 - 0.25 * z), -240, 240), z };
     }
     card(def, size = 280) {
       const s = this.art.toys[def.sprite],

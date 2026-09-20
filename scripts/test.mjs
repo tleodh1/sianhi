@@ -55,3 +55,5 @@ require("../tests/runner-expansion.test.cjs");
 require("../tests/runner-physics.test.cjs");
 require("../tests/runner-ocean.test.cjs");
 require("../tests/runner-star-power.test.cjs");
+
+require("../tests/visual-regression.test.cjs");
