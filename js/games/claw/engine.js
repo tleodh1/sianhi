@@ -108,7 +108,7 @@
       this.elapsed += dt;
       this.phaseTime += dt;
       for (const t of this.toys) {
-        if (t === this.held || t.won) continue;
+        if (t === this.held || t === this.fallingPrize || t.won) continue;
         if (t.height > 0 || t.vy !== 0) {
           t.vy -= 450 * dt;
           t.height += t.vy * dt;
@@ -193,11 +193,9 @@
         if (this.held && this.phaseTime > 0.3) {
           const toy = this.held;
           this.held = null;
-          toy.won = true;
-          this.result = { success: true, toyId: toy.id, round: this.round };
-          this.emit("delivery", { toyId: toy.id });
+          this.fallingPrize = toy; toy.vy = 0; this.emit("chuteDrop", {toyId:toy.id});
         }
-        if (this.phaseTime > 0.9) {
+        if (this.phaseTime > 0.9 && !this.fallingPrize) {
           if (!this.result) this.result = { success: false, round: this.round };
           this.enter("reveal");
         }
@@ -207,6 +205,7 @@
           this.emit("result", { result: this.result });
         }
       }
+      if(this.fallingPrize){const t=this.fallingPrize;t.vy-=380*dt;t.height+=t.vy*dt;if(t.height < -95){t.won=true;this.result={success:true,toyId:t.id,round:this.round};this.fallingPrize=null;this.emit("delivery",{toyId:t.id});}}
       if (this.held) {
         this.held.x = c.x;
         this.held.z = c.z;

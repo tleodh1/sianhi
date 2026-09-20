@@ -108,7 +108,7 @@
       for(const z of [0,.25,.5,.75,1]){const l=C.project(-305,z),r=C.project(305,z);g.beginPath();g.moveTo(l.x,l.y);g.lineTo(r.x,r.y);g.stroke();}
       g.restore();
       // Floor shadows are projected from true x/z, not arbitrary screen positions.
-      for (const t of e.toys.filter((t) => !t.won && t !== e.held)) {
+      for (const t of e.toys.filter((t) => !t.won && t !== e.held && t !== e.fallingPrize)) {
         const d = C.catalog.find((d) => d.id === t.id),
           p = C.project(t.x, t.z);
         g.fillStyle = t.z<.35?"#173a5555":"#173a5535";
@@ -144,7 +144,7 @@
       // A light plumb line marks the claw floor position, never a winning toy.
       g.save();g.setLineDash([3,7]);g.strokeStyle='#fff7c477';g.lineWidth=1.5;g.beginPath();g.moveTo(target.x,target.y-c.height);g.lineTo(target.x,target.y);g.stroke();g.restore();
       const sorted = e.toys
-        .filter((t) => !t.won && t !== e.held)
+        .filter((t) => !t.won && t !== e.held && t !== e.fallingPrize)
         .sort((a, b) => b.z - a.z);
       this.bounds = [];
       for (const t of sorted) {
@@ -159,6 +159,10 @@
           0,
           true,
         );
+      // The internal mouth shares the transport target (-199, .07).
+      const hole=C.project(-199,.07);g.save();g.shadowColor='#173e4866';g.shadowBlur=10;g.fillStyle='#bdad79';g.beginPath();g.moveTo(hole.x-100,hole.y-48);g.lineTo(hole.x+100,hole.y-48);g.lineTo(hole.x+119,hole.y+12);g.lineTo(hole.x-119,hole.y+12);g.closePath();g.fill();g.shadowBlur=0;g.fillStyle='#234d50';g.beginPath();g.moveTo(hole.x-86,hole.y-40);g.lineTo(hole.x+86,hole.y-40);g.lineTo(hole.x+102,hole.y+3);g.lineTo(hole.x-102,hole.y+3);g.closePath();g.fill();g.save();g.clip();g.fillStyle='#0d282f';g.fillRect(hole.x-100,hole.y-20,200,40);if(e.fallingPrize)this.toy(C.catalog.find(d=>d.id===e.fallingPrize.id),e.fallingPrize);g.restore();g.strokeStyle='#bcf6dd';g.lineWidth=3;g.beginPath();g.moveTo(hole.x-110,hole.y+8);g.lineTo(hole.x+110,hole.y+8);g.stroke();g.fillStyle='#284855';g.font='bold 12px Pretendard';g.textAlign='center';g.fillText('인형 투입구 ↓',hole.x,hole.y+25);g.restore();
+      if(e.fallingPrize&&e.fallingPrize.height>0)this.toy(C.catalog.find(d=>d.id===e.fallingPrize.id),e.fallingPrize);
+      if(e.phase==='reveal'&&e.result?.success){g.save();g.shadowBlur=15;g.shadowColor='#baf8d4';g.fillStyle='#baf8d4';g.font='bold 17px Pretendard';g.fillText('★ 친구 도착!',145,482);g.restore();}
       this.drawClaw(e);
       this.canvas.dataset.toyCount=String(sorted.length);this.canvas.dataset.depth=c.z.toFixed(2);this.canvas.dataset.phase=e.phase;
       g.save();g.strokeStyle='#fff2bb';g.lineWidth=2;g.globalAlpha=.72;g.beginPath();g.ellipse(target.x,target.y-3,26*target.scale,9*target.scale,0,0,Math.PI*2);g.moveTo(target.x-9,target.y-3);g.lineTo(target.x+9,target.y-3);g.moveTo(target.x,target.y-10);g.lineTo(target.x,target.y+4);g.stroke();g.restore();

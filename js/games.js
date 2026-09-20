@@ -63,7 +63,7 @@ function playTetris() {
     canHold = true,
     downHandler;
   gameShell(
-    "🎮 게임월드  ›  테트리스",
+    "블록 공장",
     '<div class="tetrisHud"><div class="tStats"><div>🏆<small>점수</small><strong id="tScore">0</strong></div><div>⭐<small>레벨</small><strong id="tLevel">1</strong></div><div>🚩<small>라인</small><strong id="tLines">0</strong></div><div class="comboBox">🔥<small>콤보</small><strong id="tCombo">-</strong></div></div><div class="tetrisMain"><div class="tetrisBoard"></div><div class="tetrisSide"><b>다음 블록</b><div id="nextPreview" class="piecePreview"></div><b>보관 블록</b><div id="holdPreview" class="piecePreview"></div><button data-t="H">교체 (C)</button><p>← → 이동<br>↑ 회전<br>↓ 빠르게<br>Space 즉시 내리기<br>C 블록 교체</p></div></div></div><p class="gameStatus">여러 줄을 연속으로 지우면 콤보 점수가 올라가요!</p>',
     '<button data-t="L">◀</button><button data-t="R">▶</button><button data-t="D">▼</button><button data-t="X">↻</button><button data-t="H">교체</button><button data-t="DROP">⤓</button>',
   );
@@ -100,6 +100,8 @@ function playTetris() {
       over = true;
       clearInterval(timer);
       msg.textContent = "게임 종료! 점수 " + score + "점";
+      const retry=document.createElement('button');retry.textContent='다시 시작';retry.onclick=playTetris;msg.append(retry);
+      state.records.tetris={...(state.records.tetris||{}),best:Math.max(state.records.tetris?.best||0,score),level,lines};save();
     }
   }
   function hit(dx, dy, p = piece) {
@@ -154,6 +156,7 @@ function playTetris() {
       lines += cleared;
       combo++;
       level = 1 + Math.floor(lines / 10);
+      clearInterval(timer);Session.intervals.delete(timer);timer=Session.interval(drop,Math.max(120,650-(level-1)*45));
       score += cleared * 100 * level + (combo > 1 ? (combo - 1) * 50 : 0);
       msg.textContent =
         combo > 1
@@ -195,6 +198,8 @@ function playTetris() {
       over = true;
       clearInterval(timer);
       msg.textContent = "게임 종료! 점수 " + score + "점";
+      const retry=document.createElement('button');retry.textContent='다시 시작';retry.onclick=playTetris;msg.append(retry);
+      state.records.tetris={...(state.records.tetris||{}),best:Math.max(state.records.tetris?.best||0,score),level,lines};save();
     }
     preview("#nextPreview", nextPiece);
     preview("#holdPreview", holdPiece);

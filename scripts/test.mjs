@@ -57,3 +57,6 @@ require("../tests/runner-ocean.test.cjs");
 require("../tests/runner-star-power.test.cjs");
 
 require("../tests/visual-regression.test.cjs");
+
+require("../tests/learning-quality.test.cjs");
+require("../tests/runner-aim.test.cjs");
