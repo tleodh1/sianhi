@@ -38,3 +38,5 @@ dialog#game.hangul-runner-dialog{padding:0!important;border-radius:22px!importan
 @container(max-width:620px){.hr-stage-path button{flex-basis:36px}.hr-stage-path{gap:5px;row-gap:12px}}
 
 .hr-shell[data-world="2"] .hr-letters{font-size:16px;font-weight:800;min-height:48px;align-items:center;color:#245967;white-space:normal}
+/* A compact header keeps the controls reachable on short 320px phones. */
+@container(max-width:360px){.hr-top{display:block;padding:8px 40px 8px 10px}.hr-top small{display:none}.hr-top h2{font-size:16px;white-space:nowrap}.hr-top-actions{max-width:none;margin-top:6px;justify-content:flex-start;flex-wrap:nowrap}.hr-hud{padding:6px 10px}.hr-bottom{padding:8px 10px}.hr-help{display:none}.hr-shell[data-world="2"] .hr-letters{min-height:42px;padding:8px 10px}}
