@@ -735,41 +735,65 @@ function playCoding100(stage) {
   }
 
   const size = chapter < 2 ? 5 : chapter < 9 ? 6 : 7,
-    start = [size - 1, 0],
-    goal = [0, size - 1],
-    collectMode = chapter === 8 || chapter === 9,
-    checkpoint = collectMode ? [Math.floor(size / 2), Math.floor(size / 2)] : null,
+    collectMode = chapter === 8 || chapter === 9;
+
+  // Each playable grid stage gets a genuinely different route, not the same
+  // bottom-left -> top-right path with a tree moved to another square.
+  const routeLayouts5 = [
+    { start:[4,0], path:"UUUURRRR" },
+    { start:[4,4], path:"UUUULLLL" },
+    { start:[0,0], path:"DDDDRRRR" },
+    { start:[0,4], path:"DDDDLLLL" },
+    { start:[4,0], path:"RRUURRUU" },
+    { start:[4,4], path:"LLUULLUU" },
+    { start:[0,0], path:"RRDDRRDD" },
+    { start:[0,4], path:"LLDDLLDD" },
+    { start:[4,0], path:"UURRRRUU" },
+    { start:[4,4], path:"UULLLLUU" },
+  ];
+
+  const routeLayoutsLarge = [
+    { start:[size-1,0], path:"UUURRUURR" },
+    { start:[size-1,size-1], path:"UUULLUULL" },
+    { start:[0,0], path:"DDDRRDDRR" },
+    { start:[0,size-1], path:"DDDLLDDLL" },
+    { start:[size-1,0], path:"RRRUUURR" },
+    { start:[size-1,size-1], path:"LLLUUULL" },
+    { start:[0,0], path:"RRRDDDRR" },
+    { start:[0,size-1], path:"LLLDDDLL" },
+    { start:[size-1,1], path:"UUURRRUU" },
+    { start:[1,size-1], path:"LLLDDDLL" },
+  ];
+
+  const layout = (size === 5 ? routeLayouts5 : routeLayoutsLarge)[step % 10],
+    start = [...layout.start],
+    deltaFor = {U:[-1,0],R:[0,1],D:[1,0],L:[0,-1]},
+    routeCells = [start.slice()];
+
+  for (const cmd of layout.path) {
+    const d = deltaFor[cmd],
+      last = routeCells[routeCells.length - 1],
+      next = [last[0] + d[0], last[1] + d[1]];
+    if (next[0] >= 0 && next[1] >= 0 && next[0] < size && next[1] < size)
+      routeCells.push(next);
+  }
+
+  const goal = routeCells[routeCells.length - 1].slice(),
+    checkpoint = collectMode ? routeCells[Math.max(1, Math.floor(routeCells.length / 2))].slice() : null,
+    routeKey = new Set(routeCells.map(([r,c]) => r + "-" + c)),
     walls = [];
 
-  // Keep a guaranteed route open: first column -> checkpoint corridor -> top row.
-  for (let r = 1; r < size - 1; r++) {
-    for (let c = 1; c < size - 1; c++) {
-      if (checkpoint && ((c === 0) || (r === checkpoint[0] && c <= checkpoint[1]) || (c === checkpoint[1] && r <= checkpoint[0]))) continue;
-      if ((r * 3 + c * 5 + stage) % (chapter >= 9 ? 5 : 7) === 0) walls.push([r, c]);
-    }
-  }
-  if (checkpoint) {
-    for (let r = checkpoint[0]; r < size; r++) walls.splice(0,0); // route marker; no mutation needed
-    // Clear a reliable L-shaped corridor from start to checkpoint and checkpoint to goal.
-    for (let r = checkpoint[0]; r < size; r++) {
-      const i = walls.findIndex(w => w[0] === r && w[1] === 0); if (i >= 0) walls.splice(i,1);
-    }
-    for (let c = 0; c <= checkpoint[1]; c++) {
-      const i = walls.findIndex(w => w[0] === checkpoint[0] && w[1] === c); if (i >= 0) walls.splice(i,1);
-    }
-    for (let r = 0; r <= checkpoint[0]; r++) {
-      const i = walls.findIndex(w => w[0] === r && w[1] === checkpoint[1]); if (i >= 0) walls.splice(i,1);
-    }
-    for (let c = checkpoint[1]; c < size; c++) {
-      const i = walls.findIndex(w => w[0] === 0 && w[1] === c); if (i >= 0) walls.splice(i,1);
-    }
-  } else {
-    // Simple guaranteed route for the first two chapters.
-    for (let r = 0; r < size; r++) {
-      const i = walls.findIndex(w => w[0] === r && w[1] === 0); if (i >= 0) walls.splice(i,1);
-    }
+  // Obstacles are placed around the authored route. Because the route itself
+  // changes by stage, both the robot/goal positions and the required command
+  // sequence change instead of only moving one tree.
+  for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
-      const i = walls.findIndex(w => w[0] === 0 && w[1] === c); if (i >= 0) walls.splice(i,1);
+      const key = r + "-" + c;
+      if (routeKey.has(key)) continue;
+      const edge = r===0 || c===0 || r===size-1 || c===size-1;
+      const density = chapter >= 9 ? 3 : chapter >= 8 ? 4 : 5;
+      if (!edge && ((r * 7 + c * 11 + stage * 3) % density === 0))
+        walls.push([r,c]);
     }
   }
 
