@@ -73,6 +73,26 @@
    else if(s.worldId>=2){e.originalKind=e.kind;e.kind='world-creature';e.artIndex??=({'bubble-puffer':4,'reef-crab':5,'ink-sprite':6,'cloud-rascal':7,'storm-bat':7,'spark-drake':7,'tunnel-bat':8,'gear-shell':1})[e.originalKind]??0;}
   }
  };
+ /* Late worlds get distinct terrain vocabulary and hazard rhythm. */
+ H.LATE_SCENES={
+  5:{silhouette:'ridge',hazard:'rock'},6:{silhouette:'peak',hazard:'icicle'},
+  7:{silhouette:'volcano',hazard:'lava'},8:{silhouette:'tower',hazard:'electric'},
+  9:{silhouette:'planet',hazard:'meteor'}
+ };
+ H.decorateLateWorld=(s,{floor,end,n,pits})=>{
+  const id=s.worldId;s.lateScene={...H.LATE_SCENES[id],stage:n};
+  for(const p of s.platforms)if(p.kind==='ground')p.lateKind=id;
+  const count=1+n+Math.floor((id-5)/2);
+  Array.from({length:count},(_,i)=>.16+(.72*i)/Math.max(1,count-1)).forEach((f,i)=>{
+   const x=end*f;if(pits.some(p=>x>p.x-140&&x<p.x+p.w+140))return;
+   if(id===5)s.hazards.push({kind:'rock',x,y:floor-25,w:36,h:25});
+   if(id===6){s.hazards.push({kind:'thorn',x,y:floor-30,w:38,h:30});if(i%2===0)s.platforms.push({x:x-90,y:floor-118,w:150,h:24,kind:'ice',oneWay:true,slippery:true});}
+   if(id===7)s.hazards.push({kind:'lava',x,y:floor-18,w:42,h:18,phase:i*.8});
+   if(id===8)s.hazards.push({kind:'electric',x,y:floor-60,w:30,h:60,phase:i*.9});
+   if(id===9){s.currents.push({x:x-80,w:160,y:130,h:floor-160,vx:0,vy:-46,kind:'wind'});s.platforms.push({x:x-70,y:floor-128-(i%2)*54,w:130,h:24,kind:'meteor',oneWay:true,originX:x-70,originY:floor-128-(i%2)*54,motion:{x:26,y:34,speed:.55+i*.06}});}
+  });
+  s.landmarks=Array.from({length:4},(_,i)=>({x:end*(.1+i*.27),kind:H.LATE_SCENES[id].silhouette,scale:.7+(i%3)*.22}));
+ };
  const before=H.WorldEngine.prototype.beforePhysics;
  H.WorldEngine.prototype.beforePhysics=function(dt){before.call(this,dt);const p=this.player;
   const chapter=this.stage.chapters?.findLast(c=>p.x>=c.x);if(this.sceneState==='RUN_STAGE'&&chapter&&chapter!==this.chapter){this.chapter=chapter;this.emit('chapter',{text:chapter.text});}
