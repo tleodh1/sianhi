@@ -64,3 +64,22 @@ dialog#game.hangul-runner-dialog{padding:0!important;border-radius:22px!importan
 .hr-world-copy h4{color:var(--ink,#294562)}.hr-world-copy>small{color:#526b82}.hr-world-copy>p{color:#526b82}.hr-landmark i{background:#fff;color:var(--accent)}
 .hr-stage-path button{background:#fff;color:var(--ink,#294562);border:1px solid #d8e5ed;box-shadow:0 4px 9px #2945620d}.hr-stage-path button.available{background:#fff0e5;border:2px solid #edb08b;outline:0}.hr-stage-path button.boss{background:#fff2d5;color:#76572f;border-color:#e6c991}.hr-stage-path button.boss i{background:#f9dfad;color:#6b4e2f}.hr-stage-path button.done:after{background:#b8e5ce;color:#285f4b;border:2px solid #fff}.hr-stage-path button:disabled{background:#edf2f6;color:#52687d;border-color:#d5e0e9;filter:none;opacity:1}.hr-stage-path button em{color:#957120;text-shadow:none}.hr-shell[data-view="map"] .hr-hud{background:#f6fbff;color:var(--ink,#294562);border-color:var(--line,#e2eaf3)}
 .hr-world-map>header{box-shadow:0 12px 40px #3764851a}.hr-stage-path button.available{border-color:#f5ac6e}.hr-world-map>header small{color:var(--blue,#509ed8)}
+
+/* ---- Stage preview cards: the map shows the place, not just a number ---- */
+.hr-shell .hr-stage-path{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0 2px}
+.hr-shell .hr-stage-path button.hr-stage-card{position:relative;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;place-items:stretch;gap:0;width:100%;max-width:none;height:auto;align-content:start;padding:0 0 6px;border-radius:18px;border:2px solid #ffffffcc;background:#fff;box-shadow:0 6px 16px #29456222;overflow:hidden;text-align:center}
+.hr-shell .hr-stage-card .hr-shot{display:block;width:100%;aspect-ratio:3/2;background-color:#dfe8f2;background-repeat:no-repeat;border-bottom:2px solid #ffffffcc}
+.hr-shell .hr-stage-card b{position:absolute;left:7px;top:6px;display:grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border-radius:9px;background:#ffffffe8;color:#1d465e;font-size:15px;line-height:1;box-shadow:0 2px 6px #12314522}
+.hr-shell .hr-stage-card .hr-shot-id{position:absolute;left:9px;top:34px;padding:1px 5px;border-radius:6px;background:#12314599;color:#fff;font-size:10px;font-weight:800;line-height:1.4}
+.hr-shell .hr-stage-card .hr-shot-name{display:block;margin:5px 6px 1px;font-size:12px;font-weight:800;line-height:1.25;color:#28495f;word-break:keep-all}
+.hr-shell .hr-stage-card em{position:static;display:block;font-size:13px;line-height:1.2;letter-spacing:1px;color:#e2a516;text-shadow:none}
+.hr-shell .hr-stage-card.boss{border-color:#f0c877;background:#fffaf0}
+.hr-shell .hr-stage-card.boss i{position:absolute;right:6px;top:6px;padding:2px 6px;border-radius:7px;background:#7a4a1d;color:#ffe9b0;font-size:9px;font-style:normal;font-weight:800;line-height:1.4;border:0;margin:0}
+.hr-shell .hr-stage-card.done:after{content:"✓";position:absolute;right:6px;bottom:44px;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#2c9a67;color:#fff;border:2px solid #fff;font-size:12px;top:auto}
+.hr-shell .hr-stage-card.boss.done:after{bottom:44px}
+.hr-shell .hr-stage-card.available{outline:0;border-color:#f3a862;box-shadow:0 6px 18px #d2782a33}
+.hr-shell .hr-stage-card:disabled{background:#eef3f7;border-color:#d5e0e9;opacity:1;filter:none}
+.hr-shell .hr-stage-card:disabled .hr-shot{filter:grayscale(.85) brightness(.92)}
+.hr-shell .hr-stage-card .hr-lock{position:absolute;right:8px;top:8px;background:#ffffffe8;border-radius:9px;padding:2px 5px;font-size:13px;line-height:1.2}
+@container (min-width:620px){.hr-shell .hr-stage-path{grid-template-columns:repeat(4,minmax(0,1fr))}.hr-shell .hr-stage-card .hr-shot-name{font-size:13px}}
+@container (max-width:360px){.hr-shell .hr-stage-path{gap:8px}.hr-shell .hr-stage-card{border-radius:15px}.hr-shell .hr-stage-card .hr-shot-name{font-size:11px;margin:4px 4px 0}.hr-shell .hr-stage-card em{font-size:12px}.hr-shell .hr-stage-card b{min-width:23px;height:23px;font-size:13px}}
