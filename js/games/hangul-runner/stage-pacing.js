@@ -13,34 +13,32 @@
  H.finishStagePacing=function(s){
   const swim=s.mode==='swim',sky=s.worldId===3,floor=swim?510:420,end=s.length,n=s.number;
   const candidates=s.enemies.slice();s.enemies=[];s.blocks=[];s.hazards=[];s.currents=[];s.gates=[];if(swim)delete s.waterZones;s.runZones=[];s.oceanShells=[];
-  s.platforms=[];const beat=end/7;
-  // Real terrain gaps: WORLD 1 now has jumpable pits that are fatal on a miss.
-  const forestPitBeats=s.worldId===1?(n===1?[4]:n===2?[2,5]:n===3?[2,4,6]:[3,5]):[];
-  const skyPitBeats=s.worldId===3?(n===1?[3]:n===2?[2,5]:n===3?[1,3,5]:[2,5]):[];
-  const undergroundPitBeats=s.worldId===4?(n===1?[4]:n===2?[2,5]:n===3?[1,3,5]:[1,2,4,6]):[];
-  for(let i=0;i<7;i++){const x=i*beat,isForestPit=forestPitBeats.includes(i),isSkyPit=skyPitBeats.includes(i),isUndergroundPit=undergroundPitBeats.includes(i),isFatalPit=isForestPit||isSkyPit||isUndergroundPit,gap=isForestPit?(n===1?76:n===2?92:108):isSkyPit?(n===1?90:n===2?110:125):isUndergroundPit?(n===1?95:n===2?112:132):(!swim&&!sky&&n===3&&[2,4].includes(i)?85:0);s.platforms.push({x,y:swim?[510,480,500][i%3]:420,w:Math.max(120,beat-gap)+1,h:300,kind:'ground'});
-   if(gap&&!isFatalPit){s.platforms.push({x:x+beat-180,y:340,w:110,h:24,kind:'bridge',oneWay:true});}
-   if(isFatalPit){const pitStart=x+Math.max(120,beat-gap),pitWidth=gap;s.hazards.push({kind:'void',x:pitStart,y:420,w:pitWidth,h:180,fatal:true});}
-  }
+  s.platforms=[];const beat=end/7,k=Math.min(3,n-1);
+  const pitTable={1:[[1],[2,5],[2,4,6],[2,4,6]],3:[[2,5],[1,4,6],[1,3,5,7],[1,3,5,7]],4:[[2,5],[1,3,6,8],[1,3,5,7,9],[1,2,4,6,8,10]],5:[[2,5,8],[1,3,6,9],[1,3,5,7,9],[1,2,4,6,8,10]],6:[[2,6],[1,3,6,9],[1,3,5,7,9],[1,3,5,7,10]],7:[[1,3,6,9],[1,3,5,7,10],[1,3,5,7,9,11],[1,2,4,6,8,10,12]],8:[[1,3,6,9],[1,3,5,7,9,11],[1,3,5,7,9,11,13],[1,2,4,6,8,10,12,14]],9:[[1,3,5,8,11],[1,3,5,7,9,11,13],[1,3,5,7,9,11,13,15],[1,3,5,7,9,11,13,15,17]]};
+  const pitSlots=!swim?(pitTable[s.worldId]?.[k]||[]):[],pitUnit=end/19;
+  const pits=pitSlots.map((slot,i)=>{const width=Math.min(150,76+s.worldId*5+n*7+(i%2)*8),x=Math.max(240,Math.min(end-520,slot*pitUnit));return {kind:'void',x,y:420,w:width,h:180,fatal:true};}).sort((a,b)=>a.x-b.x);
+  if(swim){for(let i=0;i<7;i++)s.platforms.push({x:i*beat,y:[510,480,500][i%3],w:beat+1,h:300,kind:'ground'});}
+  else{let cursor=0;for(const pit of pits){if(pit.x-cursor>150)s.platforms.push({x:cursor,y:420,w:pit.x-cursor,h:300,kind:'ground'});s.hazards.push(pit);cursor=pit.x+pit.w;}if(end-cursor>120)s.platforms.push({x:cursor,y:420,w:end-cursor+1,h:300,kind:'ground'});}
   s.items=s.words.map((text,i)=>({id:`letter-${i}`,index:i,kind:'letter',text,x:300+(end-1000)*i/(s.words.length-1),y:swim?[270,215,310,250,300,210][i]:sky?329:368,...H.learningTile(text)}));
   // Coins lead the eye between learning stops; a modest replay-only bonus shift never moves answers.
   const bonusShift=Math.floor(Math.random()*3)*12;
   for(let i=0;i<18;i++)s.items.push({id:`route-coin-${i}`,kind:'coin',x:400+i*(end-900)/18,y:swim?340:350,w:26,h:30});
   for(let i=0;i<3;i++)s.items.push({id:`star-${i}`,kind:'star',x:end*[.23,.55,.8][i]+bonusShift,y:swim?160:sky?(i?120:260):260,w:32,h:36,requiresFlight:sky&&i>0});
-  if(![1,2,3,4].includes(s.worldId))s.items.push({id:'route-growth',kind:'power',x:490,y:swim?285:365,w:40,h:45},{id:'route-power-star',kind:'powerStar',x:end*.4,y:swim?250:365,w:40,h:42});
-  const rowFractions=s.worldId===1?(n===1?[.14,.32,.52,.72]:n===2?[.12,.3,.5,.7,.84]:[.14,.28,.45,.62,.78]):s.worldId===2?(n===1?[.13,.31,.52,.74]:n===2?[.1,.26,.44,.62,.8]:n===3?[.08,.21,.36,.52,.68,.83]:[.1,.24,.4,.56,.72,.86]):s.worldId===3?(n===1?[.12,.28,.46,.65,.82]:n===2?[.1,.24,.39,.55,.7,.84]:n===3?[.09,.21,.34,.48,.62,.76,.88]:[.1,.24,.4,.57,.73,.86]):s.worldId===4?(n===1?[.11,.27,.46,.66,.83]:n===2?[.09,.23,.39,.56,.72,.87]:n===3?[.08,.2,.34,.49,.64,.78,.9]:[.1,.24,.4,.57,.73,.87]):n===2?[.18,.47,.7]:[.2,.67];
+  const rowFractions=s.worldId===1?(n===1?[.14,.32,.52,.72]:n===2?[.12,.3,.5,.7,.84]:[.14,.28,.45,.62,.78]):s.worldId===2?(n===1?[.13,.31,.52,.74]:n===2?[.1,.26,.44,.62,.8]:n===3?[.08,.21,.36,.52,.68,.83]:[.1,.24,.4,.56,.72,.86]):s.worldId===3?(n===1?[.12,.28,.46,.65,.82]:n===2?[.1,.24,.39,.55,.7,.84]:n===3?[.09,.21,.34,.48,.62,.76,.88]:[.1,.24,.4,.57,.73,.86]):s.worldId===4?(n===1?[.11,.27,.46,.66,.83]:n===2?[.09,.23,.39,.56,.72,.87]:n===3?[.08,.2,.34,.49,.64,.78,.9]:[.1,.24,.4,.57,.73,.87]):s.worldId>=5?(n===1?[.12,.3,.5,.7,.85]:n===2?[.1,.25,.42,.59,.76,.89]:[.09,.22,.36,.5,.64,.78,.9]):n===2?[.18,.47,.7]:[.2,.67];
   rowFractions.forEach((fraction,i)=>{const x=end*fraction,y=floor-H.PLAYER_FORMS.big.h-38-48;
    for(let j=0;j<3;j++){const blockY=(s.worldId===4&&s.boss&&(i===1||i===3))?y-48:y;s.blocks.push({id:`route-block-${i}-${j}`,x:x+j*54,y:blockY,w:48,h:48,kind:['breakable','reward','hard'][j],revealed:true,rewardId:j===1?`route-reward-${i}`:null,oceanSkin:j===1?'pearl':j===0?'coral':'relic'});}
-   const rewardKind=s.worldId===1?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):s.worldId===2?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'star':'coin'):s.worldId===3?(i%3===0?'power':i%3===1?'powerStar':'star'):s.worldId===4?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):(i===0?'power':'star');s.items.push({id:`route-reward-${i}`,kind:rewardKind,x:0,y:0,w:40,h:rewardKind==='power'?45:42,contained:true});
+   const rewardKind=s.worldId===1?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):s.worldId===2?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'star':'coin'):s.worldId===3?(i%3===0?'power':i%3===1?'powerStar':'star'):s.worldId===4?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):s.worldId>=5?(i%4===0?'power':i%4===1?'powerStar':i%4===2?'coin':'star'):(i===0?'power':'star');s.items.push({id:`route-reward-${i}`,kind:rewardKind,x:0,y:0,w:40,h:rewardKind==='power'?45:42,contained:true});
   });
   for(const fraction of (n===2?[.35,.77]:n===3?[.28,.63,.83]:[.56])){const x=end*fraction;s.platforms.push({x,y:swim?400:310,w:150,h:24,kind:'floating',oneWay:true,...(n===2?{originX:x,originY:swim?400:310,motion:{x:40,y:25,speed:.7}}:{})});}
-  const total=s.worldId===1?(s.boss?8:n===1?6:n===2?8:9):s.worldId===2?(s.boss?16:n===1?8:n===2?10:12):s.worldId===3?(s.boss?10:n===1?6:n===2?8:10):s.worldId===4?(s.boss?28:n===1?16:n===2?20:24):(s.boss?(swim?6:4):n===1?2:3),used=new Set();
+  const enemyTable={1:[5,8,10,10],2:[9,11,13,17],3:[8,10,12,13],4:[11,14,17,20],5:[12,15,18,21],6:[13,16,19,22],7:[14,17,20,24],8:[15,18,22,26],9:[17,20,24,28]},total=enemyTable[s.worldId]?.[k]||6,used=new Set();
   const preferred=swim?(s.boss?['inflate','ink','shark','eel','pinch','jelly']:n===1?['inflate','jelly']:n===2?['pinch','jelly','inflate']:['jelly','pinch','inflate']):null;
-  for(let i=0;i<total;i++){let e=candidates.find(a=>!used.has(a)&&preferred?.[i]===a.behavior)||candidates.find(a=>!used.has(a)&&a.behavior!==s.enemies.at(-1)?.behavior&&(a.originalKind||a.kind)!==(s.enemies.at(-1)?.originalKind||s.enemies.at(-1)?.kind))||candidates.find(a=>!used.has(a));if(!e&&s.worldId===2&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`ocean-extra-${n}-${i}`,phase:i+11,behaviorTime:i*.47};}if(!e&&s.worldId===3&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`sky-extra-${n}-${i}`,phase:i+7,behaviorTime:i*.53};}if(!e&&s.worldId===4&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`underground-extra-${n}-${i}`,phase:i+13,behaviorTime:i*.49};}if(!e)continue;used.add(e);
-   const x=end*(total===1?.48:.26+i*.56/Math.max(1,total-1));Object.assign(e,{x,left:x-65,right:x+95,speed:Math.min(65,e.speed),hp:s.worldId>=7?2:1,level:Math.min(3,e.level||1),phase:i,behaviorTime:i*.7});
+  for(let i=0;i<total;i++){let e=candidates.find(a=>!used.has(a)&&preferred?.[i]===a.behavior)||candidates.find(a=>!used.has(a)&&a.behavior!==s.enemies.at(-1)?.behavior&&(a.originalKind||a.kind)!==(s.enemies.at(-1)?.originalKind||s.enemies.at(-1)?.kind))||candidates.find(a=>!used.has(a));if(!e&&candidates.length){const src=candidates[i%candidates.length];e={...src,id:`${s.theme}-extra-${n}-${i}`,phase:i+11,behaviorTime:i*.47};}if(!e)continue;if(candidates.includes(e))used.add(e);
+   const x=end*(total===1?.48:.1+i*.82/Math.max(1,total-1));Object.assign(e,{x,left:x-65,right:x+95,speed:Math.min(65,e.speed),hp:s.worldId>=7?2:1,level:Math.min(3,e.level||1),phase:i,behaviorTime:i*.7});
    if(!swim){e.y=e.baseY=e.homeY=sky?190:420-e.h;if(s.worldId===4){e.flying=false;e.behavior=e.behavior==='dive'?'patrol':e.behavior;}}else{e.y=e.baseY=e.homeY=[360,130,390,145,430,170][i];}
    if(e.kind==='cactus'){e.left=e.right=x;e.drainY=floor;e.y=e.baseY=floor;s.platforms.push({x:x-8,y:floor-12,w:e.w+16,h:12,kind:'drain'});}s.enemies.push(e);
   }
+  if(s.worldId===3&&H.decorateSkyRoute)H.decorateSkyRoute(s,{floor,end,n,pits});
+  if(s.worldId>=5&&H.decorateLateWorld)H.decorateLateWorld(s,{floor,end,n,pits});
   if(s.worldId===1){
    const forestExtra=n===1?[.22,.41,.61,.82]:[.18,.36,.57,.76,.88];
    forestExtra.forEach((fraction,i)=>{const x=end*fraction;
@@ -107,6 +105,17 @@
    // Preserve a readable takeoff/landing zone around every fatal void, especially at higher difficulty.
    for(const e of s.enemies)for(const h of pits){const center=h.x+h.w/2,margin=95+n*20;if(Math.abs(e.x-center)<margin){const shift=e.x<center?-(margin+45):(margin+45);e.x+=shift;e.left+=shift;e.right+=shift;}}
   }
+  if(s.worldId>=5){
+   const rewardBlocks=s.blocks.filter(b=>b.kind==='reward').sort((a,b)=>a.x-b.x),letters=s.items.filter(a=>a.kind==='letter').sort((a,b)=>a.index-b.index);
+   const lanes=[368,305,245,335,205,280,170];letters.forEach((letter,i)=>{letter.y=lanes[(i+n+s.worldId)%lanes.length];letter.x+=((i%3)-1)*65;});
+   const hiddenCount=Math.min(letters.length-1,n===1?1:n===2?2:n===3?3:4),chosen=[];
+   letters.filter((_,i)=>i%2===1).slice(0,hiddenCount).forEach((letter,i)=>{const block=rewardBlocks.find((b,bi)=>!chosen.includes(b)&&bi>=i);if(!block)return;chosen.push(block);const old=block.rewardId;block.rewardId=letter.id;letter.contained=true;s.items=s.items.filter(a=>a.id!==old||a===letter);});
+   const free=rewardBlocks.filter(b=>!chosen.includes(b));
+   const setReward=(idx,kind)=>{const b=free[idx];if(!b)return;const old=b.rewardId;s.items=s.items.filter(a=>a.id!==old);const id=`late-${kind}-${idx}`;b.rewardId=id;s.items.push({id,kind,x:0,y:0,w:40,h:kind==='power'?45:42,contained:true});};
+   setReward(0,'power');setReward(1,'powerStar');
+   const coinLanes=[350,300,240,350,205,275];s.items.filter(a=>a.kind==='coin'&&!a.contained).forEach((coin,i)=>coin.y=coinLanes[i%coinLanes.length]);
+   s.items.filter(a=>a.kind==='star'&&!a.contained).forEach((star,i)=>star.y=i%2?215:320);
+  }
   if(s.worldId===2){
    const rewardBlocks=s.blocks.filter(b=>b.kind==='reward');
    const hideCount=s.boss?4:n===3?2:n===2?3:2;
@@ -114,7 +123,7 @@
    // Visible letters no longer sit on one flat line: alternate upper/middle/lower swim lanes.
    const lanes=[155,245,335,205,300,120];
    letters.forEach((letter,i)=>{letter.y=lanes[(i+n)%lanes.length];letter.x+=((i%3)-1)*70;if(n===3&&i===2){letter.y=125;letter.x+=90;letter.contained=false;}});
-   letters.slice(0,hideCount).forEach((letter,i)=>{const block=rewardBlocks[Math.min(rewardBlocks.length-1,i*2+1)]||rewardBlocks[i];if(!block)return;const old=block.rewardId;block.rewardId=letter.id;letter.contained=true;s.items=s.items.filter(a=>a.id!==old);});
+   const chosen=[];letters.slice(0,hideCount).forEach((letter,i)=>{const preferred=[1,3,5,0,2,4][i],block=rewardBlocks[preferred]&&!chosen.includes(rewardBlocks[preferred])?rewardBlocks[preferred]:rewardBlocks.find(b=>!chosen.includes(b));if(!block)return;chosen.push(block);const old=block.rewardId;block.rewardId=letter.id;letter.contained=true;s.items=s.items.filter(a=>a.id!==old||a===letter);});
    const occupied=new Set(letters.filter(l=>l.contained).map(l=>rewardBlocks.find(b=>b.rewardId===l.id)));
    const available=rewardBlocks.filter(b=>!occupied.has(b));
    const setReward=(idx,kind)=>{const b=available[idx];if(!b)return;const old=b.rewardId;s.items=s.items.filter(a=>a.id!==old);const id=`ocean-${kind}-${idx}`;b.rewardId=id;s.items.push({id,kind,x:0,y:0,w:40,h:kind==='power'?45:42,contained:true});};
@@ -123,6 +132,7 @@
   if(swim){s.oceanShells=[{id:'route-clam',x:end*.58,y:435,w:82,h:55,opened:false,rewardId:'route-pearl'}];s.items.push({id:'route-pearl',kind:'coin',x:end*.58+24,y:390,w:30,h:36,contained:true});s.currents.push({x:end*.73,w:100,y:160,h:310,vx:0,vy:-180,kind:'bubble-column'});if(n>=2)s.currents.push({x:end*.32,w:220,y:150,h:220,vx:n===2?25:-20,vy:0});if(s.boss)s.platforms.push({x:end*.63,y:60,w:190,h:32,kind:'reef-ceiling'});}
   if(sky){for(let i=0;i<4;i++)s.items.push({id:i?`flight-backup-${i}`:'flight-wings',kind:'flight',x:i?end*i/4:112,y:351,w:48,h:48});}
   if(s.worldId===7||s.worldId===8)s.hazards.push({kind:s.worldId===7?'lava':'electric',x:end*.59,y:400,w:32,h:20,phase:0});
+  for(const e of s.enemies)for(const h of s.hazards.filter(a=>a.kind==='void')){const center=h.x+h.w/2,margin=130;if(Math.abs(e.x-center)<margin){const shift=e.x<center?-(margin+45):(margin+45);e.x+=shift;e.left+=shift;e.right+=shift;}}
   // Keep required tiles accessible and visually separate from blocks and elevated terrain.
   for(const item of s.items.filter(a=>a.kind==='letter'))for(const obstacle of [...s.blocks,...s.platforms.filter(p=>p.kind!=='ground')])if(H.overlaps(item,obstacle))item.x=obstacle.x+obstacle.w+24;
   s.checkpoints=[{id:0,x:60,y:swim?310:420},{id:1,x:end*.5+200,y:swim?310:420}];
