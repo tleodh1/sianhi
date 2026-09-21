@@ -7,7 +7,7 @@
    if(this.stage.runZones&&this.stage.runZones.some(z=>this.player.x>=z.x&&this.player.x<z.x+z.w))this.mode='run';
    if(this.stage.waterZones){const p=this.player;this.mode=this.stage.waterZones.some(z=>p.x>=z.x&&p.x<z.x+z.w&&p.y+p.h>z.surface+Math.sin(this.elapsed*.6)*25)?'swim':'run';}
    if(this.stage.flightPickup&&this.mode==='fly'&&!this.player.flight)this.mode='run';
-   if(this.player.flight&&this.sceneState==='RUN_STAGE')this.mode='fly';
+   if(this.stage.worldId!==4&&this.player.flight&&this.sceneState==='RUN_STAGE')this.mode='fly';
    if(this.sceneState!=='RUN_STAGE')this.mode='run';
    this.freeMotion=this.mode==='swim'||this.mode==='fly';this.player.gravity=this.freeMotion?0:1500;
    for(const a of this.stage.platforms){if(!a.motion)continue;const oldX=a.x,oldY=a.y;a.x=a.originX+Math.sin(this.elapsed*a.motion.speed)*a.motion.x;a.y=a.originY+Math.sin(this.elapsed*a.motion.speed)*a.motion.y;
