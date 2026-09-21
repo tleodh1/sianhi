@@ -1,4 +1,4 @@
-const VERSION = "sianhi-pwa-20260921-1";
+const VERSION = "sianhi-pwa-20260921-2";
 const SHELL = [
   "/",
   "/index.html",
