@@ -64,13 +64,8 @@
       const palettes={forest:['#68c6f7','#b5e7f5','#ecf9fa'],ocean:['#075f9d','#13a9bd','#063c72'],sky:['#7999f4','#d6c2ff','#fff0d0'],underground:['#241c3a','#493052','#141d2c'],dinosaur:['#6ac6ad','#bbdda0','#527e46'],ice:['#7fbfe0','#dcf8ff','#9cbfe4'],fire:['#773342','#f19c57','#a84638'],lightning:['#292c65','#7977b9','#bbc2ee'],space:['#0b1237','#32295d','#533d7d']},colors=palettes[theme]||palettes.forest;
       const sky=g.createLinearGradient(0,0,0,h);sky.addColorStop(0,colors[0]);sky.addColorStop(.62,colors[1]);sky.addColorStop(1,colors[2]);g.fillStyle=sky;g.fillRect(0,0,w,h);
       if(theme==='ocean'&&this.oceanBackground)this.oceanBackground(e);
-      if(theme==='sky'){for(let i=-1;i<6;i++){const x=i*210-(c*.1+t*12)%210;g.fillStyle='#fff9';g.beginPath();g.ellipse(x,95+(i%3)*85,95,30,0,0,Math.PI*2);g.fill();}}
-      if(theme==='underground'){g.fillStyle='#89ffd555';for(let i=0;i<12;i++){g.beginPath();g.arc((i*127-c*.2)%1050,90+(i%5)*90,4+i%3*2,0,Math.PI*2);g.fill();}}
-      if(['dinosaur','ice','fire','lightning','space'].includes(theme)){g.save();for(let i=-1;i<9;i++){const x=i*180-(c*.16)%180;
-        if(theme==='space'){g.fillStyle='#fff9';g.beginPath();g.arc(x+70,55+(i+1)*37%230,3,0,Math.PI*2);g.fill();g.fillStyle='#9782bf';g.beginPath();g.ellipse(x,225,30,22,.4,0,Math.PI*2);g.fill();}
-        else {g.fillStyle=theme==='ice'?'#efffff99':theme==='fire'?'#532b3e99':theme==='lightning'?'#32365788':'#32765788';g.beginPath();g.moveTo(x-100,420);g.lineTo(x+40,120+(i%3)*45);g.lineTo(x+170,420);g.fill();}
-        if(theme==='lightning'&&Math.floor(t*2)%7===0){g.strokeStyle='#fff6b4';g.lineWidth=4;g.beginPath();g.moveTo(x,65);g.lineTo(x-18,105);g.lineTo(x+8,100);g.lineTo(x-12,145);g.stroke();}
-      }g.restore();}
+      if(theme==='sky'&&this.skyBackground)this.skyBackground(e);
+      if(['dinosaur','ice','fire','lightning','space','underground'].includes(theme)&&this.lateBackground)this.lateBackground(e);
       // Independent layers, camera ratios: cloud .06, mountain .13, castle .21,
       // waterfall .34, forest .53, platform 1, foreground 1.12.
       if(theme==='forest'){for(let i=-1;i<5;i++){const x=i*420-(c*.06+t*4)%420;this.sprite(13,x,35+(i%2)*55,185,92);}
@@ -81,7 +76,7 @@
         g.save();g.globalAlpha=.15;g.fillStyle='#fff';for(let k=0;k<6;k++)g.fillRect(x+125+k*12,280+(t*100+k*29)%210,3,26);g.restore();}
       for(let i=-1;i<5;i++)draw(g,this.art.back[3],i*460-(c*.53)%460,242,520,287);}
       for(const a of e.stage.platforms){const x=a.x-c;if(x+a.w<-40||x>w+40)continue;
-        if(theme==='ocean'&&this.oceanTerrain){this.oceanTerrain(a,x,e);}else if(a.kind==='drain'){g.fillStyle=theme==='forest'?'#79634d':theme==='underground'?'#706581':'#4d8292';g.strokeStyle='#c5e3d6';g.lineWidth=3;g.beginPath();g.roundRect(x,a.y,a.w,a.h+12,6);g.fill();g.stroke();g.fillStyle='#22373d';g.fillRect(x+6,a.y+2,a.w-12,5);}else if(theme!=='forest'){const ground={ocean:'#a2bfa5',sky:'#e7e7ff',underground:'#786c99',dinosaur:'#8aaa58',ice:'#d6f7ff',fire:'#914940',lightning:'#868ba7',space:'#6b6193'}[theme]||'#8aaa58';g.fillStyle=ground;g.fillRect(x,a.y,a.w,Math.min(a.h,120));g.fillStyle='#ffffff66';g.fillRect(x,a.y,a.w,7);g.fillStyle='#00000022';for(let j=0;j<a.w;j+=50)g.fillRect(x+j,a.y+12,3,Math.min(a.h,90));}else if(a.kind==='ground'){
+        if(theme==='ocean'&&this.oceanTerrain){this.oceanTerrain(a,x,e);}else if(this.themeTerrain&&a.kind!=='drain'&&this.themeTerrain(a,x,e)){/* painted by world skin */}else if(a.kind==='drain'){g.fillStyle=theme==='forest'?'#79634d':theme==='underground'?'#706581':'#4d8292';g.strokeStyle='#c5e3d6';g.lineWidth=3;g.beginPath();g.roundRect(x,a.y,a.w,a.h+12,6);g.fill();g.stroke();g.fillStyle='#22373d';g.fillRect(x+6,a.y+2,a.w-12,5);}else if(theme!=='forest'){const ground={ocean:'#a2bfa5',sky:'#e7e7ff',underground:'#786c99',dinosaur:'#8aaa58',ice:'#d6f7ff',fire:'#914940',lightning:'#868ba7',space:'#6b6193'}[theme]||'#8aaa58';g.fillStyle=ground;g.fillRect(x,a.y,a.w,Math.min(a.h,120));g.fillStyle='#ffffff66';g.fillRect(x,a.y,a.w,7);g.fillStyle='#00000022';for(let j=0;j<a.w;j+=50)g.fillRect(x+j,a.y+12,3,Math.min(a.h,90));}else if(a.kind==='ground'){
           // Texture tiles meet exactly at collider tops; split terrain leaves real holes.
           const n=Math.ceil(a.w/260);for(let j=0;j<n;j++){const tw=a.w/n;this.surfaceSprite(0,x+j*tw-1,a.y,tw+2,a.h,45);}
           // Keep the illustrated grass edge only; do not overlay a flat green stripe across the terrain.
@@ -112,6 +107,7 @@
       const p=e.player;this.hero(e,c);if(theme==='ocean'&&this.oceanForeground)this.oceanForeground(e);
       for(const v of e.particles){g.globalAlpha=Math.min(1,v.life*2);this.sprite(11,v.x-c-5,v.y-5,10,10);}g.globalAlpha=1;
       if(e.comboTime>0&&e.combo){g.save();g.globalAlpha=Math.min(1,e.comboTime*1.5);g.fillStyle='#fff5a8';g.strokeStyle='#5c3b64';g.lineWidth=5;g.font='900 22px Pretendard';g.textAlign='center';g.strokeText(e.combo>1?`${e.combo} COMBO!`:'NICE!',p.x-c+p.w/2,p.y-24);g.fillText(e.combo>1?`${e.combo} COMBO!`:'NICE!',p.x-c+p.w/2,p.y-24);g.restore();}
+      this.themeForeground?.(e);
       if(theme==='forest'||theme==='dinosaur')for(let i=0;i<5;i++){const x=i*340-(c*1.12)%340;this.sprite(14,x,502+Math.sin(i)*7,105,55);}
       // Draw distance/position in the scene so assistive status matches visible gameplay.
       g.fillStyle='rgba(255,255,255,.82)';g.beginPath();g.roundRect(16,16,170,30,15);g.fill();g.fillStyle='#235570';g.textAlign='left';g.font='700 13px Pretendard, sans-serif';g.fillText(e.stage.world.name+' · '+Math.floor(p.x/10)+' m',29,36);
