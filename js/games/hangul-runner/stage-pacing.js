@@ -67,6 +67,18 @@
    for(const e of s.enemies){for(const h of s.hazards.filter(a=>a.kind==='void')){const center=h.x+h.w/2;if(Math.abs(e.x-center)<130){const shift=e.x<center?-165:165;e.x+=shift;e.left+=shift;e.right+=shift;}}}
   }
   if(s.worldId===4){
+   // WORLD 4 is a pure run/jump world: no swim/flight traversal.
+   delete s.waterZones;s.mode='run';s.flightPickup=false;
+   for(const item of s.items.filter(a=>a.kind==='flight'))item.contained=true;
+   // Every 3-block row must have a reachable takeoff surface underneath.
+   const rows=new Map();
+   for(const b of s.blocks){const key=b.id?.match(/^route-block-(\d+)-/)?.[1];if(key!==undefined){if(!rows.has(key))rows.set(key,[]);rows.get(key).push(b);}}
+   for(const blocks of rows.values()){
+    const minX=Math.min(...blocks.map(b=>b.x)),maxX=Math.max(...blocks.map(b=>b.x+b.w));
+    const support=s.platforms.some(p=>p.x<=minX+20&&p.x+p.w>=maxX-20&&p.y>=300&&p.y<=420);
+    if(!support)s.platforms.push({x:minX-36,y:350,w:(maxX-minX)+72,h:22,kind:'pipe',oneWay:true});
+    for(const b of blocks)if(b.y<202)b.y=202;
+   }
    // WORLD 4 pickup mix mirrors WORLD 1/2: some on the floor, some elevated, some inside reward blocks.
    const rewardBlocks=s.blocks.filter(b=>b.kind==='reward').sort((a,b)=>a.x-b.x);
    const letters=s.items.filter(a=>a.kind==='letter').sort((a,b)=>a.index-b.index);
