@@ -1,6 +1,6 @@
 (function(g){
 'use strict';
-const P=g.SianPang,names=['하트','오렌지','별','클로버','구슬','포도','꽃','민트'];
+const P=g.SianPang,names=['루비 젤리','오렌지','별빛 왕관','초록 잎','파랑 방패','보석','꽃','민트'];
 function play(){
  const oldOverflow=document.body.style.overflow;document.body.style.overflow='hidden';game.classList.add('pangModal');
  gameBody.innerHTML='<section class="pangGame"><div class="pangHead"><button data-back>← 게임월드</button><strong>시안팡 <small>STAR CANDY MATCH</small></strong></div><div class="pangHud"><b data-level></b><span>SCORE <strong data-score>0</strong></span><span>BEST <b data-best>0</b></span></div><div class="pangTimer"><b data-time>60</b><progress max="60" value="60" aria-label="남은 시간"></progress></div><div class="pangWrap"><canvas width="700" height="700" aria-label="캔디 보드: 인접한 두 캔디를 누르거나 끌어 교환하세요" tabindex="0"></canvas><div class="pangOverlay"></div></div><div class="pangFever"><b data-combo>COMBO 0</b><progress max="100" value="0" aria-label="피버"></progress><span data-fever>FEVER</span></div><p class="pangMission"></p><div class="pangFooter"><button data-pause>Ⅱ 잠깐 멈춤</button><button data-levels>레벨 선택</button><span>무제한 PLAY</span></div><p class="pangMessage" role="status">캔디를 밀어서 같은 모양 3개를 이어요!</p></section>';
@@ -34,41 +34,30 @@ function play(){
   const trimBox=c=>{const x=c.getContext('2d'),d=x.getImageData(0,0,c.width,c.height).data;let minX=c.width,minY=c.height,maxX=-1,maxY=-1;for(let y=0;y<c.height;y++)for(let z=0;z<c.width;z++){if(d[(y*c.width+z)*4+3]>20){if(z<minX)minX=z;if(z>maxX)maxX=z;if(y<minY)minY=y;if(y>maxY)maxY=y;}}return maxX<0?null:{x:minX,y:minY,w:maxX-minX+1,h:maxY-minY+1};};
   const orb=(kind)=>{const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#101a4a66';x.shadowBlur=7;x.shadowOffsetY=5;const g=x.createRadialGradient(-15,-20,4,0,0,43);if(kind==='row'){g.addColorStop(0,'#ff9cab');g.addColorStop(.35,'#ff4866');g.addColorStop(1,'#b91439');}else{g.addColorStop(0,'#8edfff');g.addColorStop(.35,'#249df5');g.addColorStop(1,'#1356c8');}x.fillStyle=g;x.beginPath();x.arc(0,0,40,0,Math.PI*2);x.fill();x.shadowBlur=0;x.strokeStyle='#ffffffdf';x.lineCap='round';for(const d of [-17,0,17]){x.lineWidth=9;x.beginPath();if(kind==='row'){x.moveTo(-32,d);x.lineTo(32,d);}else{x.moveTo(d,-32);x.lineTo(d,32);}x.stroke();}x.strokeStyle=kind==='row'?'#ffb1bd':'#91dfff';x.lineWidth=3;for(const d of [-17,0,17]){x.beginPath();if(kind==='row'){x.moveTo(-32,d);x.lineTo(32,d);}else{x.moveTo(d,-32);x.lineTo(d,32);}x.stroke();}x.fillStyle='#ffffff88';x.beginPath();x.ellipse(-13,-19,12,6,-.45,0,Math.PI*2);x.fill();return c;};
   for(let t=0;t<10;t++){const tmp=document.createElement('canvas');tmp.width=Math.max(1,Math.round(sw));tmp.height=Math.max(1,Math.round(sh));const tx=tmp.getContext('2d');if(!tx)return;tx.imageSmoothingQuality='high';tx.drawImage(sheet,t%5*sw,(t/5|0)*sh,sw,sh,0,0,tmp.width,tmp.height);try{cleanTile(tmp);}catch(_){}const box=trimBox(tmp),c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');if(!x)return;x.imageSmoothingQuality='high';if(box){const max=82,scale=Math.min(max/box.w,max/box.h),dw=box.w*scale,dh=box.h*scale;x.drawImage(tmp,box.x,box.y,box.w,box.h,(SZ-dw)/2,(SZ-dh)/2,dw,dh);}sprites[t]=c;}
-  // Heart uses a native cached vector sprite instead of JPEG extraction so its lobes/edge can never be clipped.
-  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#7e123c77';x.shadowBlur=8;x.shadowOffsetY=6;
-   const g=x.createLinearGradient(-28,-32,28,42);g.addColorStop(0,'#ff7a96');g.addColorStop(.32,'#ff335e');g.addColorStop(.72,'#ea1649');g.addColorStop(1,'#a90e34');x.fillStyle=g;x.strokeStyle='#ffb4c3';x.lineWidth=2.5;
-   x.beginPath();x.moveTo(0,39);x.bezierCurveTo(-8,30,-42,10,-42,-15);x.bezierCurveTo(-42,-35,-18,-45,-3,-28);x.bezierCurveTo(-1,-26,0,-23,0,-20);x.bezierCurveTo(0,-23,1,-26,3,-28);x.bezierCurveTo(18,-45,42,-35,42,-15);x.bezierCurveTo(42,10,8,30,0,39);x.closePath();x.fill();x.stroke();
-   x.shadowBlur=0;const shine=x.createRadialGradient(-17,-22,2,-13,-17,20);shine.addColorStop(0,'#ffffffee');shine.addColorStop(.28,'#ffffff88');shine.addColorStop(1,'#ffffff00');x.fillStyle=shine;x.beginPath();x.ellipse(-14,-18,15,10,-.55,0,Math.PI*2);x.fill();
-   x.strokeStyle='#ffced8aa';x.lineWidth=2;x.beginPath();x.moveTo(-27,7);x.quadraticCurveTo(-12,27,0,33);x.stroke();sprites[0]=c;}
-  // Clover also uses a native cached 3D vector sprite to avoid a flat cut-out look.
-  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#165d2f88';x.shadowBlur=9;x.shadowOffsetY=6;
-   const leaf=(cx,cy,rot)=>{x.save();x.translate(cx,cy);x.rotate(rot);const g=x.createRadialGradient(-8,-10,2,0,0,28);g.addColorStop(0,'#d8ff9a');g.addColorStop(.24,'#75f05a');g.addColorStop(.62,'#28b84a');g.addColorStop(1,'#0a6f2f');x.fillStyle=g;x.strokeStyle='#b8ff92';x.lineWidth=2.4;x.beginPath();x.moveTo(0,18);x.bezierCurveTo(-20,10,-24,-10,-9,-18);x.bezierCurveTo(-1,-23,0,-13,0,-7);x.bezierCurveTo(0,-13,1,-23,9,-18);x.bezierCurveTo(24,-10,20,10,0,18);x.closePath();x.fill();x.stroke();x.shadowBlur=0;
-    const h=x.createRadialGradient(-7,-11,1,-5,-8,12);h.addColorStop(0,'#ffffffdd');h.addColorStop(.35,'#ffffff66');h.addColorStop(1,'#ffffff00');x.fillStyle=h;x.beginPath();x.ellipse(-5,-7,9,5,-.4,0,Math.PI*2);x.fill();
-    x.strokeStyle='#d7ffb877';x.lineWidth=1.5;x.beginPath();x.moveTo(0,13);x.quadraticCurveTo(2,1,5,-9);x.stroke();x.restore();};
-   leaf(-17,-15,-.78);leaf(17,-15,.78);leaf(-17,17,-2.35);leaf(17,17,2.35);
-   x.shadowBlur=0;const core=x.createRadialGradient(-3,-4,1,0,0,14);core.addColorStop(0,'#caff8d');core.addColorStop(.45,'#4ed45a');core.addColorStop(1,'#147d38');x.fillStyle=core;x.beginPath();x.arc(0,1,13,0,Math.PI*2);x.fill();x.strokeStyle='#d8ffae';x.lineWidth=2;x.stroke();sprites[3]=c;}
-  // Orange slice — native cached 3D sprite.
-  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#8f4d0088';x.shadowBlur=8;x.shadowOffsetY=6;
-   const g=x.createRadialGradient(-14,-18,3,0,0,43);g.addColorStop(0,'#fff59c');g.addColorStop(.18,'#ffca3a');g.addColorStop(.62,'#ff8a16');g.addColorStop(1,'#d65300');x.fillStyle=g;x.strokeStyle='#ffd26e';x.lineWidth=3;x.beginPath();x.arc(0,0,40,0,Math.PI*2);x.fill();x.stroke();x.shadowBlur=0;
-   x.strokeStyle='#fff3b0';x.lineWidth=3;for(let n=0;n<8;n++){const a=n*Math.PI/4;x.beginPath();x.moveTo(0,0);x.lineTo(Math.cos(a)*34,Math.sin(a)*34);x.stroke();}x.fillStyle='#fff7cb';x.beginPath();x.arc(0,0,6,0,Math.PI*2);x.fill();
-   x.fillStyle='#ffffff99';x.beginPath();x.ellipse(-14,-18,13,7,-.45,0,Math.PI*2);x.fill();sprites[1]=c;}
-  // Star — rounded golden 3D candy.
-  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#9a6a0088';x.shadowBlur=9;x.shadowOffsetY=6;const g=x.createLinearGradient(-28,-35,28,38);g.addColorStop(0,'#fff59a');g.addColorStop(.32,'#ffd92d');g.addColorStop(.72,'#ffb515');g.addColorStop(1,'#e28b00');x.fillStyle=g;x.strokeStyle='#fff0a5';x.lineWidth=3;
-   x.beginPath();for(let n=0;n<10;n++){const r=n%2?19:42,a=-Math.PI/2+n*Math.PI/5;n?x.lineTo(Math.cos(a)*r,Math.sin(a)*r):x.moveTo(Math.cos(a)*r,Math.sin(a)*r);}x.closePath();x.fill();x.stroke();x.shadowBlur=0;
-   const h=x.createRadialGradient(-10,-17,2,-6,-12,17);h.addColorStop(0,'#ffffffee');h.addColorStop(.35,'#ffffff77');h.addColorStop(1,'#ffffff00');x.fillStyle=h;x.beginPath();x.ellipse(-9,-14,12,7,-.4,0,Math.PI*2);x.fill();sprites[2]=c;}
-  // Blue orb — native cached 3D hard candy, no JPEG flattening.
-  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#0d4f9a88';x.shadowBlur=9;x.shadowOffsetY=6;const g=x.createRadialGradient(-14,-19,3,0,0,43);g.addColorStop(0,'#c8f6ff');g.addColorStop(.2,'#58d6ff');g.addColorStop(.58,'#1598ee');g.addColorStop(1,'#1558c6');x.fillStyle=g;x.strokeStyle='#a8ecff';x.lineWidth=3;x.beginPath();x.arc(0,0,40,0,Math.PI*2);x.fill();x.stroke();x.shadowBlur=0;
-   x.save();x.rotate(-.35);x.strokeStyle='#a8ecff';x.lineWidth=11;x.beginPath();x.arc(0,0,27,.15,Math.PI-.1);x.stroke();x.strokeStyle='#3d7fe6';x.lineWidth=4;x.beginPath();x.arc(0,0,27,.15,Math.PI-.1);x.stroke();x.restore();
-   x.fillStyle='#ffffffaa';x.beginPath();x.ellipse(-14,-18,14,7,-.5,0,Math.PI*2);x.fill();sprites[4]=c;}
-  // Grapes — clustered glossy beads.
-  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#4f1c7c88';x.shadowBlur=8;x.shadowOffsetY=6;const pts=[[0,-26],[-18,-12],[0,-10],[18,-12],[-25,7],[-8,7],[9,7],[26,7],[-15,25],[3,25],[18,25],[3,39]];
-   for(const [px,py] of pts){const g=x.createRadialGradient(px-6,py-7,1,px,py,14);g.addColorStop(0,'#f3c3ff');g.addColorStop(.22,'#c662ff');g.addColorStop(.65,'#8a32d2');g.addColorStop(1,'#57208c');x.fillStyle=g;x.strokeStyle='#e4adff';x.lineWidth=1.5;x.beginPath();x.arc(px,py,12,0,Math.PI*2);x.fill();x.stroke();}x.shadowBlur=0;x.fillStyle='#66c75a';x.beginPath();x.ellipse(-3,-38,15,7,-.3,0,Math.PI*2);x.fill();sprites[5]=c;}
-  // Flower — dimensional purple petals.
-  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#53217c88';x.shadowBlur=8;x.shadowOffsetY=6;
-   for(let n=0;n<6;n++){const a=n*Math.PI/3,px=Math.cos(a)*24,py=Math.sin(a)*24;const g=x.createRadialGradient(px-6,py-8,2,px,py,24);g.addColorStop(0,'#f2b4ff');g.addColorStop(.25,'#c35cf2');g.addColorStop(.68,'#8e39c7');g.addColorStop(1,'#5f258f');x.fillStyle=g;x.strokeStyle='#e6a7ff';x.lineWidth=2;x.beginPath();x.ellipse(px,py,18,24,a,0,Math.PI*2);x.fill();x.stroke();}x.shadowBlur=0;
-   const core=x.createRadialGradient(-4,-5,1,0,0,16);core.addColorStop(0,'#ffd98f');core.addColorStop(.4,'#e991ff');core.addColorStop(1,'#7d2ba8');x.fillStyle=core;x.beginPath();x.arc(0,0,15,0,Math.PI*2);x.fill();sprites[6]=c;}
-  // Mint drop — translucent aqua jelly drop.
-  {const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d');x.translate(SZ/2,SZ/2);x.shadowColor='#147f7c77';x.shadowBlur=9;x.shadowOffsetY=6;const g=x.createLinearGradient(-20,-38,22,38);g.addColorStop(0,'#d4fff9');g.addColorStop(.24,'#79f0de');g.addColorStop(.62,'#35c7bd');g.addColorStop(1,'#168f91');x.fillStyle=g;x.strokeStyle='#c4fff6';x.lineWidth=3;x.beginPath();x.moveTo(0,-43);x.bezierCurveTo(18,-23,36,-3,34,16);x.bezierCurveTo(32,38,17,43,0,43);x.bezierCurveTo(-17,43,-32,38,-34,16);x.bezierCurveTo(-36,-3,-18,-23,0,-43);x.closePath();x.fill();x.stroke();x.shadowBlur=0;x.fillStyle='#ffffffa8';x.beginPath();x.ellipse(-12,-17,11,6,-.6,0,Math.PI*2);x.fill();sprites[7]=c;}
+  // Original sculpted candy silhouettes, baked once; gameplay only blits cached sprites.
+  const shapes=[
+   'M-27-37 Q-38-37-38-23 L-38 25 Q-38 37-25 37 L25 37 Q38 37 38 25 L38-23 Q38-37 27-37Z',
+   'M0-38 C23-41 39-22 39 1 C39 24 23 38 0 38 C-24 38-39 24-39 1 C-39-21-23-40 0-38Z',
+   'M-37-25 Q-40-35-30-29 L-17-16 L-8-36 Q0-48 8-36 L17-16 L30-29 Q40-35 37-25 L30 29 Q28 36 19 36 L-19 36 Q-28 36-30 29Z',
+   'M0-40 C12-30 39-15 38 8 C38 31 14 35 4 24 L4 40 L-5 40 L-5 24 C-19 38-40 27-37 7 C-35-15-11-29 0-40Z',
+   'M-30-36 Q0-44 30-36 Q38-34 37-24 L34 4 Q30 25 0 40 Q-30 25-34 4 L-37-24 Q-38-34-30-36Z',
+   'M-23-34 L23-34 L41-12 L0 40 L-41-12Z',
+   'M0-27 C13-48 34-36 28-17 C51-16 49 13 28 17 C32 42 8 48 0 29 C-12 49-35 36-28 17 C-51 13-47-16-28-17 C-33-40-10-46 0-27Z',
+   'M0-43 C16-23 36-5 35 14 C34 32 20 41 0 41 C-20 41-34 32-35 14 C-36-5-16-23 0-43Z'
+  ];
+  const colors=[['#ff7764','#f51920','#bc0511','#760611'],['#ffe075','#ff9b16','#e65e00','#9c3602'],['#fff68a','#ffd51b','#f5a600','#b56600'],['#a2fa4d','#43d514','#15980b','#075b0a'],['#70dfff','#1299ff','#0758d7','#06368a'],['#ffa9fa','#ed4ee4','#b61ab6','#760e85'],['#edacff','#ac55ef','#7429bb','#42166f'],['#b5fff0','#42dbc3','#13a9a6','#08696e']];
+  shapes.forEach((d,t)=>{const c=document.createElement('canvas');c.width=c.height=SZ;const x=c.getContext('2d'),p=new Path2D(d),[light,mid,dark,edge]=colors[t];x.translate(SZ/2,SZ/2-2);
+   // Extruded underside and contact shadow are part of the bitmap, not live filters.
+   x.save();x.translate(0,5);x.fillStyle=edge;x.shadowColor='#10254466';x.shadowBlur=5;x.shadowOffsetY=3;x.fill(p);x.restore();
+   const body=x.createLinearGradient(-18,-40,20,42);body.addColorStop(0,light);body.addColorStop(.25,mid);body.addColorStop(.7,mid);body.addColorStop(1,dark);x.fillStyle=body;x.fill(p);x.strokeStyle=edge;x.lineWidth=2;x.stroke(p);
+   x.save();x.clip(p);x.translate(0,-3);x.scale(.88,.88);const bevel=x.createLinearGradient(0,-40,0,40);bevel.addColorStop(0,'#ffffffb3');bevel.addColorStop(.3,light);bevel.addColorStop(.55,mid);bevel.addColorStop(1,dark);x.strokeStyle=bevel;x.lineWidth=4;x.stroke(p);x.restore();
+   if(t===4){x.save();x.scale(.63,.69);x.fillStyle='#0871e5';x.fill(p);x.strokeStyle='#55c9ff';x.lineWidth=3;x.stroke(p);x.restore();x.fillStyle='#2eafff';x.beginPath();x.moveTo(0,-26);x.lineTo(-20,-22);x.lineTo(-18,1);x.quadraticCurveTo(-16,14,0,25);x.closePath();x.fill();}
+   if(t===5){x.strokeStyle='#ffb5fb';x.lineWidth=2;x.beginPath();x.moveTo(-41,-12);x.lineTo(41,-12);x.moveTo(-23,-34);x.lineTo(-15,-12);x.lineTo(0,40);x.lineTo(15,-12);x.lineTo(23,-34);x.stroke();x.fillStyle='#ffc4ff88';x.beginPath();x.moveTo(-23,-34);x.lineTo(23,-34);x.lineTo(15,-12);x.lineTo(-15,-12);x.closePath();x.fill();}
+   if(t===2){x.strokeStyle='#fff187';x.lineWidth=3;x.beginPath();x.moveTo(-29,22);x.quadraticCurveTo(0,28,29,22);x.stroke();}
+   if(t===3){x.strokeStyle='#16880e';x.lineWidth=3;x.lineCap='round';x.beginPath();x.moveTo(0,28);x.quadraticCurveTo(-6,6,2,-13);x.stroke();}
+   if(t===6){x.fillStyle='#f7c3ff';x.beginPath();x.arc(0,0,11,0,Math.PI*2);x.fill();}
+   x.save();x.clip(p);const shine=x.createLinearGradient(0,-35,0,-17);shine.addColorStop(0,'#ffffffed');shine.addColorStop(1,'#ffffff00');x.fillStyle=shine;x.beginPath();x.ellipse(-10,-27,t===0?20:13,5,-.15,0,Math.PI*2);x.fill();x.strokeStyle='#ffffff77';x.lineWidth=2;x.lineCap='round';x.beginPath();x.moveTo(-29,-15);x.quadraticCurveTo(-32,-1,-28,12);x.stroke();x.restore();sprites[t]=c;
+  });
   sprites.row=orb('row');sprites.column=orb('column');}
  // Special badges are stroked paths over the cached sprite: no per-frame canvas or image allocation.
  function mark(c){
